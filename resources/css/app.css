@@ -1,0 +1,6 @@
+/* Import Notyf CSS */
+@import 'notyf/notyf.min.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
