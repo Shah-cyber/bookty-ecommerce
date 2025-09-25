@@ -44,21 +44,36 @@
                         @endforeach
                     </div>
 
+                    <!-- Coupon Code -->
+                    <div class="mb-4">
+                        <div class="flex space-x-2">
+                            <input type="text" id="coupon-code" placeholder="Enter coupon code" class="flex-1 border-gray-300 rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50 text-sm">
+                            <button type="button" id="apply-coupon" class="px-4 py-2 bg-gray-800 text-white text-sm font-medium rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                                Apply
+                            </button>
+                        </div>
+                        <div id="coupon-message" class="text-sm mt-1 hidden"></div>
+                    </div>
+
                     <div class="border-t border-gray-200 pt-4">
                         <div class="flex justify-between mb-2">
                             <span class="text-gray-700">Subtotal</span>
-                            <span class="text-gray-900 font-medium">
-                                RM {{ number_format($cart->items->sum(function($item) { return $item->book->price * $item->quantity; }), 2) }}
+                            <span class="text-gray-900 font-medium" id="subtotal">
+                                RM {{ number_format($cart->items->sum(function($item) { return $item->book->final_price * $item->quantity; }), 2) }}
                             </span>
                         </div>
                         <div class="flex justify-between mb-2">
                             <span class="text-gray-700">Shipping</span>
                             <span class="text-gray-900 font-medium">Free</span>
                         </div>
+                        <div id="discount-row" class="justify-between mb-2 hidden">
+                            <span class="text-gray-700">Discount</span>
+                            <span class="text-green-600 font-medium" id="discount-amount">-RM 0.00</span>
+                        </div>
                         <div class="flex justify-between border-t border-gray-200 pt-4 mt-4">
                             <span class="text-lg font-bold text-gray-900">Total</span>
-                            <span class="text-lg font-bold text-purple-600">
-                                RM {{ number_format($cart->items->sum(function($item) { return $item->book->price * $item->quantity; }), 2) }}
+                            <span class="text-lg font-bold text-purple-600" id="total">
+                                RM {{ number_format($cart->items->sum(function($item) { return $item->book->final_price * $item->quantity; }), 2) }}
                             </span>
                         </div>
                     </div>
@@ -152,6 +167,10 @@
                             </div>
                         </div>
 
+                        <!-- Hidden field for coupon code -->
+                        <input type="hidden" name="coupon_code" id="applied-coupon-code">
+                        <input type="hidden" name="discount_amount" id="applied-discount-amount" value="0">
+                        
                         <div class="mt-8">
                             <button type="submit" class="w-full px-4 py-3 bg-purple-600 text-white text-center font-medium rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
                                 Complete Order
@@ -162,4 +181,103 @@
             </div>
         </div>
     </div>
+    <!-- Coupon JS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const couponCodeInput = document.getElementById('coupon-code');
+            const applyCouponBtn = document.getElementById('apply-coupon');
+            const couponMessage = document.getElementById('coupon-message');
+            const discountRow = document.getElementById('discount-row');
+            const discountAmount = document.getElementById('discount-amount');
+            const subtotalElement = document.getElementById('subtotal');
+            const totalElement = document.getElementById('total');
+            const appliedCouponInput = document.getElementById('applied-coupon-code');
+            const appliedDiscountInput = document.getElementById('applied-discount-amount');
+            
+            // Get the subtotal amount
+            const subtotalText = subtotalElement.innerText.trim();
+            const subtotal = parseFloat(subtotalText.replace('RM ', ''));
+            
+            applyCouponBtn.addEventListener('click', function() {
+                const couponCode = couponCodeInput.value.trim();
+                
+                if (!couponCode) {
+                    showMessage('Please enter a coupon code.', 'error');
+                    return;
+                }
+                
+                // Show loading state
+                applyCouponBtn.disabled = true;
+                applyCouponBtn.innerText = 'Applying...';
+                
+                // Get CSRF token
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                
+                // Make API request to validate coupon
+                fetch(`/api/coupons/validate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({
+                        code: couponCode,
+                        amount: subtotal
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    applyCouponBtn.disabled = false;
+                    applyCouponBtn.innerText = 'Apply';
+                    
+                    if (data.valid) {
+                        // Show success message
+                        showMessage(data.message, 'success');
+                        
+                        // Update discount amount
+                        discountRow.classList.remove('hidden');
+                        discountAmount.innerText = `-RM ${data.discount_amount.toFixed(2)}`;
+                        
+                        // Update total
+                        const newTotal = subtotal - data.discount_amount;
+                        totalElement.innerText = `RM ${newTotal.toFixed(2)}`;
+                        
+                        // Store coupon code and discount amount in hidden inputs
+                        appliedCouponInput.value = couponCode;
+                        appliedDiscountInput.value = data.discount_amount;
+                        
+                        // Disable coupon input and button
+                        couponCodeInput.disabled = true;
+                        applyCouponBtn.innerText = 'Applied';
+                        applyCouponBtn.disabled = true;
+                    } else {
+                        // Show error message
+                        showMessage(data.message, 'error');
+                        
+                        // Reset coupon code
+                        appliedCouponInput.value = '';
+                        appliedDiscountInput.value = '0';
+                    }
+                })
+                .catch(error => {
+                    applyCouponBtn.disabled = false;
+                    applyCouponBtn.innerText = 'Apply';
+                    showMessage('An error occurred. Please try again.', 'error');
+                    console.error('Error:', error);
+                });
+            });
+            
+            // Function to show message
+            function showMessage(message, type) {
+                couponMessage.innerText = message;
+                couponMessage.classList.remove('hidden', 'text-red-500', 'text-green-500');
+                
+                if (type === 'error') {
+                    couponMessage.classList.add('text-red-500');
+                } else {
+                    couponMessage.classList.add('text-green-500');
+                }
+            }
+        });
+    </script>
 @endsection

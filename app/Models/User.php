@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\OrderItem;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -63,5 +64,83 @@ class User extends Authenticatable
     public function cart()
     {
         return $this->hasOne(Cart::class);
+    }
+    
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+    
+    /**
+     * Get the wishlist items for the user.
+     */
+    public function wishlist()
+    {
+        return $this->hasMany(Wishlist::class);
+    }
+    
+    /**
+     * Get books in the user's wishlist.
+     */
+    public function wishlistBooks()
+    {
+        return $this->belongsToMany(Book::class, 'wishlists')->withTimestamps();
+    }
+    
+    /**
+     * Check if a book is in the user's wishlist.
+     *
+     * @param int $bookId
+     * @return bool
+     */
+    public function hasBookInWishlist($bookId)
+    {
+        return $this->wishlist()->where('book_id', $bookId)->exists();
+    }
+    
+    /**
+     * Check if user has purchased a specific book and is eligible to review it
+     * 
+     * @param int $bookId
+     * @return bool
+     */
+    public function canReviewBook($bookId)
+    {
+        return $this->orders()
+            ->where('status', 'completed')
+            ->whereHas('items', function($query) use ($bookId) {
+                $query->where('book_id', $bookId);
+            })
+            ->exists();
+    }
+    
+    /**
+     * Check if user has already reviewed a specific book
+     * 
+     * @param int $bookId
+     * @return bool
+     */
+    public function hasReviewedBook($bookId)
+    {
+        return $this->reviews()
+            ->where('book_id', $bookId)
+            ->exists();
+    }
+    
+    /**
+     * Get order item for a specific book that can be reviewed
+     * 
+     * @param int $bookId
+     * @return OrderItem|null
+     */
+    public function getOrderItemForBookReview($bookId)
+    {
+        return OrderItem::whereHas('order', function($query) {
+                $query->where('user_id', $this->id)
+                      ->where('status', 'completed');
+            })
+            ->where('book_id', $bookId)
+            ->whereDoesntHave('review')
+            ->first();
     }
 }

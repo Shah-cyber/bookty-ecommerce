@@ -6,12 +6,13 @@ use App\Models\Book;
 use App\Models\Genre;
 use App\Models\Trope;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class BookController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Book::with(['genre', 'tropes']);
+        $query = Book::with(['genre', 'tropes', 'reviews']);
         
         // Apply genre filter
         if ($request->has('genre') && $request->genre) {
@@ -73,7 +74,30 @@ class BookController extends Controller
             ->where('id', '!=', $book->id)
             ->take(4)
             ->get();
+        
+        // Get reviews for this book
+        $reviews = $book->reviews()
+            ->with('user')
+            ->where('is_approved', true)
+            ->orderBy('created_at', 'desc')
+            ->get();
+        
+        // Check if the current user can leave a review (if authenticated)
+        $canReview = false;
+        $hasReviewed = false;
+        $orderItem = null;
+        
+        if (Auth::check()) {
+            $user = Auth::user();
+            $canReview = $user->canReviewBook($book->id);
+            $hasReviewed = $user->hasReviewedBook($book->id);
             
-        return view('books.show', compact('book', 'relatedBooks'));
+            // If the user can review but hasn't yet, get the order item for the review form
+            if ($canReview && !$hasReviewed) {
+                $orderItem = $user->getOrderItemForBookReview($book->id);
+            }
+        }
+            
+        return view('books.show', compact('book', 'relatedBooks', 'reviews', 'canReview', 'hasReviewed', 'orderItem'));
     }
 }

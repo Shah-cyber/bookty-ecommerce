@@ -118,5 +118,8 @@
                 });
             });
         </script>
+        
+        <!-- Cart AJAX Operations -->
+        <script src="{{ asset('js/cart.js') }}"></script>
     </body>
 </html>

@@ -68,12 +68,15 @@ class CheckoutController extends Controller
                     throw new \Exception("Not enough stock for {$item->book->title}");
                 }
                 
-                // Create order item
+                // Create order item with cost tracking
                 OrderItem::create([
                     'order_id' => $order->id,
                     'book_id' => $item->book_id,
                     'quantity' => $item->quantity,
                     'price' => $item->book->price,
+                    'cost_price' => $item->book->cost_price,
+                    'total_selling' => $item->book->price * $item->quantity,
+                    'total_cost' => ($item->book->cost_price ?? 0) * $item->quantity,
                 ]);
                 
                 // Update book stock

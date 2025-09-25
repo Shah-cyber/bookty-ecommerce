@@ -42,6 +42,7 @@ class BookController extends Controller
             'author' => 'required|string|max:255',
             'synopsis' => 'nullable|string',
             'price' => 'required|numeric|min:0',
+            'cost_price' => 'nullable|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'genre_id' => 'required|exists:genres,id',
             'cover_image' => 'nullable|image|max:2048', // 2MB max
@@ -99,6 +100,7 @@ class BookController extends Controller
             'author' => 'required|string|max:255',
             'synopsis' => 'nullable|string',
             'price' => 'required|numeric|min:0',
+            'cost_price' => 'nullable|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'genre_id' => 'required|exists:genres,id',
             'cover_image' => 'nullable|image|max:3072', // 3MB max

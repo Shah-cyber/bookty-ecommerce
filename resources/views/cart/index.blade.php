@@ -65,14 +65,18 @@
                                         <div class="text-sm text-gray-900">RM {{ $item->book->price }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <form action="{{ route('cart.update', $item) }}" method="POST" class="flex items-center">
-                                            @csrf
-                                            @method('PATCH')
-                                            <input type="number" name="quantity" value="{{ $item->quantity }}" min="1" max="{{ $item->book->stock }}" class="w-16 border-gray-300 rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50">
-                                            <button type="submit" class="ml-2 text-sm text-purple-600 hover:text-purple-900">
-                                                Update
-                                            </button>
-                                        </form>
+                                        @if($item->book->stock <= 0)
+                                            <div class="text-sm text-red-600 font-medium">Out of stock</div>
+                                        @else
+                                            <form action="{{ route('cart.update', $item) }}" method="POST" class="flex items-center">
+                                                @csrf
+                                                @method('PATCH')
+                                                <input type="number" name="quantity" value="{{ $item->quantity }}" min="1" max="{{ $item->book->stock }}" class="w-16 border-gray-300 rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50">
+                                                <button type="submit" class="ml-2 text-sm text-purple-600 hover:text-purple-900">
+                                                    Update
+                                                </button>
+                                            </form>
+                                        @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm font-medium text-gray-900">RM {{ number_format($item->book->price * $item->quantity, 2) }}</div>

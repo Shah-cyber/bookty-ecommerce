@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Bookty Enterprise'),
+    'name' => env('APP_NAME', 'Bookty - Enterprise'),
 
     /*
     |--------------------------------------------------------------------------

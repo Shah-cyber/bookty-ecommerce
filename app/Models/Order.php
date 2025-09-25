@@ -21,7 +21,11 @@ class Order extends Model
         'shipping_state',
         'shipping_postal_code',
         'shipping_phone',
-        'admin_notes'
+        'admin_notes',
+        'coupon_id',
+        'discount_amount',
+        'coupon_code',
+        'public_id',
     ];
     
     public function user(): BelongsTo
@@ -34,6 +38,23 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
     
+    protected static function booted(): void
+    {
+        static::creating(function (Order $order) {
+            if (!$order->public_id) {
+                $order->public_id = self::generateUniquePublicId();
+            }
+        });
+    }
+
+    public static function generateUniquePublicId(): string
+    {
+        do {
+            $token = strtoupper(substr(bin2hex(random_bytes(8)), 0, 12));
+        } while (self::where('public_id', $token)->exists());
+        return $token;
+    }
+
     /**
      * Get the status badge class.
      *
@@ -75,5 +96,87 @@ class Order extends Model
     public function getTotalQuantity(): int
     {
         return $this->items->sum('quantity');
+    }
+    
+    /**
+     * Get the coupon used for this order.
+     */
+    public function coupon(): BelongsTo
+    {
+        return $this->belongsTo(Coupon::class);
+    }
+    
+    /**
+     * Get the coupon usage for this order.
+     */
+    public function couponUsage(): HasMany
+    {
+        return $this->hasMany(CouponUsage::class);
+    }
+    
+    /**
+     * Get the subtotal amount (before discount).
+     *
+     * @return float
+     */
+    public function getSubtotalAttribute(): float
+    {
+        return $this->total_amount + $this->discount_amount;
+    }
+    
+    /**
+     * Apply a coupon to the order.
+     *
+     * @param Coupon $coupon
+     * @return bool
+     */
+    public function applyCoupon(Coupon $coupon): bool
+    {
+        if (!$coupon->isValidFor($this->user, $this->total_amount)) {
+            return false;
+        }
+        
+        $discountAmount = $coupon->calculateDiscount($this->total_amount);
+        $newTotal = $this->total_amount - $discountAmount;
+        
+        $this->coupon_id = $coupon->id;
+        $this->coupon_code = $coupon->code;
+        $this->discount_amount = $discountAmount;
+        $this->total_amount = $newTotal;
+        $this->save();
+        
+        // Record coupon usage
+        CouponUsage::create([
+            'coupon_id' => $coupon->id,
+            'user_id' => $this->user_id,
+            'order_id' => $this->id,
+            'discount_amount' => $discountAmount
+        ]);
+        
+        return true;
+    }
+    
+    /**
+     * Remove a coupon from the order.
+     *
+     * @return bool
+     */
+    public function removeCoupon(): bool
+    {
+        if (!$this->coupon_id) {
+            return false;
+        }
+        
+        $this->total_amount += $this->discount_amount;
+        
+        // Delete coupon usage record
+        $this->couponUsage()->delete();
+        
+        $this->coupon_id = null;
+        $this->coupon_code = null;
+        $this->discount_amount = 0;
+        $this->save();
+        
+        return true;
     }
 }

@@ -17,8 +17,15 @@ class EnsureUserHasCart
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && !Auth::user()->cart) {
-            Cart::create(['user_id' => Auth::id()]);
+        if (Auth::check()) {
+            $user = Auth::user();
+            if (!$user->cart) {
+                Cart::create(['user_id' => Auth::id()]);
+            }
+            // Eager load cart items to avoid N+1 in shared layouts
+            if ($user instanceof \App\Models\User) {
+                $user->load(['cart.items']);
+            }
         }
         
         return $next($request);

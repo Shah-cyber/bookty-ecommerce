@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderController extends Controller
 {
@@ -124,5 +125,62 @@ class OrderController extends Controller
 
         return redirect()->route('admin.orders.index')
             ->with('success', "🗑️ Order #{$order->id} has been deleted successfully!");
+    }
+
+    /**
+     * Printable invoice view for an order.
+     */
+    public function invoice(Order $order)
+    {
+        $order->load(['user', 'items.book']);
+
+        // Seller/business details (replace with settings table if available)
+        $seller = [
+            'company' => config('app.name', 'Bookty'),
+            'address' => '123 Book Street, Kuala Lumpur, MY',
+            'tax_number' => 'TAX-1234567890',
+            'email' => 'accounts@bookty.local',
+            'phone' => '+60 12-345 6789',
+        ];
+
+        // Generate an invoice number (public facing); prefer public_id, add date suffix
+        $invoiceNumber = ($order->public_id ?? $order->id) . '-' . $order->created_at->format('Ymd');
+
+        // Tax configuration (simple example: 0% or 6% SST)
+        $taxRate = 0.06; // 6%
+        $subTotal = $order->items->sum(function($i){ return $i->price * $i->quantity; });
+        $discount = $order->discount_amount ?? 0;
+        $taxable = max(0, $subTotal - $discount);
+        $taxAmount = round($taxable * $taxRate, 2);
+        $grandTotal = $taxable + $taxAmount;
+
+        return view('admin.orders.invoice', compact('order', 'seller', 'invoiceNumber', 'taxRate', 'subTotal', 'discount', 'taxAmount', 'grandTotal'));
+    }
+
+    /**
+     * Download invoice as PDF.
+     */
+    public function invoicePdf(Order $order)
+    {
+        $order->load(['user', 'items.book']);
+        $seller = [
+            'company' => config('app.name', 'Bookty'),
+            'address' => '123 Book Street, Kuala Lumpur, MY',
+            'tax_number' => 'TAX-1234567890',
+            'email' => 'accounts@bookty.local',
+            'phone' => '+60 12-345 6789',
+        ];
+        $invoiceNumber = ($order->public_id ?? $order->id) . '-' . $order->created_at->format('Ymd');
+        $taxRate = 0.06;
+        $subTotal = $order->items->sum(function($i){ return $i->price * $i->quantity; });
+        $discount = $order->discount_amount ?? 0;
+        $taxable = max(0, $subTotal - $discount);
+        $taxAmount = round($taxable * $taxRate, 2);
+        $grandTotal = $taxable + $taxAmount;
+
+        $pdf = Pdf::loadView('admin.orders.invoice-pdf', compact('order', 'seller', 'invoiceNumber', 'taxRate', 'subTotal', 'discount', 'taxAmount', 'grandTotal'))
+            ->setPaper('a4');
+
+        return $pdf->download('invoice_'.$invoiceNumber.'.pdf');
     }
 }

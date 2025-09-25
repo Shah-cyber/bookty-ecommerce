@@ -15,141 +15,375 @@
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    
+    <!-- Notyf Toast Notification Library -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js" defer></script>
+    <script src="{{ asset('js/toast.js') }}" defer></script>
+
 </head>
 <body class="font-sans antialiased">
-    <div class="min-h-screen bg-bookty-cream">
-        <div x-data="{ sidebarOpen: false }" class="flex h-screen bg-bookty-cream">
+    <div class="min-h-screen bg-bookty-cream dark:bg-gray-900">
+        <div x-data="{ sidebarOpen: false }" class="flex h-screen bg-bookty-cream dark:bg-gray-900">
             <!-- Sidebar -->
-            <div :class="{'block': sidebarOpen, 'hidden': !sidebarOpen}" @click="sidebarOpen = false" class="fixed inset-0 z-20 transition-opacity bg-black opacity-50 lg:hidden"></div>
-            
-            <div :class="{'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen}" class="fixed inset-y-0 left-0 z-30 w-64 overflow-y-auto transition duration-300 transform bg-white shadow-lg lg:translate-x-0 lg:static lg:inset-0">
-                <div class="flex items-center justify-center mt-8">
-                    <div class="flex items-center">
+           <!-- Sidebar -->
+<aside id="sidebar-admin" 
+class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full 
+       sm:translate-x-0 bg-white dark:bg-gray-800 shadow-lg" 
+aria-label="Sidebar">
+
+<div class="h-full px-3 py-4 overflow-y-auto">
+  <!-- Mobile Close Button -->
+  <div class="flex justify-end sm:hidden">
+    <button data-drawer-hide="sidebar-admin" aria-controls="sidebar-admin" type="button" class="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600">
+      <span class="sr-only">Close sidebar</span>
+      <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" />
+      </svg>
+    </button>
+  </div>
+  <!-- Logo -->
+  <div class="flex items-center justify-center mt-6">
                         <img src="{{ asset('storage/BooktyLogo/BooktyL.png') }}" alt="Bookty Logo" class="h-10 w-auto">
-                        <span class="ml-2 text-2xl font-serif font-bold text-bookty-purple-700">Bookty Enterprise</span>
-                    </div>
+    <span class="ml-2 text-xl font-serif font-bold text-bookty-purple-700">Bookty Enterprise</span>
                 </div>
 
-                <nav class="mt-10">
-                    <a class="flex items-center px-6 py-2 mt-4 {{ request()->routeIs('admin.dashboard') ? 'text-white bg-bookty-purple-600' : 'text-bookty-black hover:bg-bookty-pink-50 hover:text-bookty-purple-700' }} transition-colors duration-200 rounded-md" href="{{ route('admin.dashboard') }}">
-                        <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
-                            <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
+  <!-- Nav -->
+  <ul class="mt-8 space-y-2 font-medium">
+
+    <!-- Dashboard -->
+    <li>
+      <a href="{{ route('admin.dashboard') }}" 
+        class="flex items-center p-2 rounded-lg 
+               {{ request()->routeIs('admin.dashboard') 
+                  ? 'bg-bookty-purple-600 text-white' 
+                  : 'text-bookty-black hover:bg-bookty-pink-50 hover:text-bookty-purple-700 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white' }}">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M2 10a8 8 0 018-8v8h8a8 8 
+                   0 11-16 0z"></path>
+          <path d="M12 2.252A8.014 8.014 
+                   0 0117.748 8H12V2.252z"></path>
                         </svg>
+        <span class="ms-3">Dashboard</span>
+      </a>
+    </li>
 
-                        <span class="mx-3">Dashboard</span>
-                    </a>
-
-                    <a class="flex items-center px-6 py-2 mt-4 {{ request()->routeIs('admin.books.*') ? 'text-white bg-bookty-purple-600' : 'text-bookty-black hover:bg-bookty-pink-50 hover:text-bookty-purple-700' }} transition-colors duration-200 rounded-md" href="{{ route('admin.books.index') }}">
-                        <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"></path>
+    <!-- Books -->
+    <li>
+      <a href="{{ route('admin.books.index') }}" 
+        class="flex items-center p-2 rounded-lg 
+               {{ request()->routeIs('admin.books.*') 
+                  ? 'bg-bookty-purple-600 text-white' 
+                  : 'text-bookty-black hover:bg-bookty-pink-50 hover:text-bookty-purple-700 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white' }}">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M9 4.804A7.968 7.968 
+                   0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 
+                   7.969 0 015.5 14c1.669 0 3.218.51 
+                   4.5 1.385A7.962 7.962 0 0114.5 
+                   14c1.255 0 2.443.29 3.5.804v-10A7.968 
+                   7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 
+                   1 0 11-2 0V4.804z"></path>
                         </svg>
+        <span class="ms-3">Books</span>
+      </a>
+    </li>
 
-                        <span class="mx-3">Books</span>
-                    </a>
-
-                    <a class="flex items-center px-6 py-2 mt-4 {{ request()->routeIs('admin.genres.*') ? 'text-white bg-bookty-purple-600' : 'text-bookty-black hover:bg-bookty-pink-50 hover:text-bookty-purple-700' }} transition-colors duration-200 rounded-md" href="{{ route('admin.genres.index') }}">
-                        <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"></path>
+    <!-- Genres -->
+    <li>
+      <a href="{{ route('admin.genres.index') }}" 
+        class="flex items-center p-2 rounded-lg 
+               {{ request()->routeIs('admin.genres.*') 
+                  ? 'bg-bookty-purple-600 text-white' 
+                  : 'text-bookty-black hover:bg-bookty-pink-50 hover:text-bookty-purple-700 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white' }}">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M7 3a1 1 0 000 2h6a1 1 
+                   0 100-2H7zM4 7a1 1 0 011-1h10a1 1 
+                   0 110 2H5a1 1 0 01-1-1zM2 11a2 2 
+                   0 012-2h12a2 2 0 012 2v4a2 2 0 
+                   01-2 2H4a2 2 0 01-2-2v-4z"></path>
                         </svg>
+        <span class="ms-3">Genres</span>
+      </a>
+    </li>
 
-                        <span class="mx-3">Genres</span>
-                    </a>
-
-                    <a class="flex items-center px-6 py-2 mt-4 {{ request()->routeIs('admin.tropes.*') ? 'text-white bg-bookty-purple-600' : 'text-bookty-black hover:bg-bookty-pink-50 hover:text-bookty-purple-700' }} transition-colors duration-200 rounded-md" href="{{ route('admin.tropes.index') }}">
-                        <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
+    <!-- Tropes -->
+    <li>
+      <a href="{{ route('admin.tropes.index') }}" 
+        class="flex items-center p-2 rounded-lg 
+               {{ request()->routeIs('admin.tropes.*') 
+                  ? 'bg-bookty-purple-600 text-white' 
+                  : 'text-bookty-black hover:bg-bookty-pink-50 hover:text-bookty-purple-700 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white' }}">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M17.707 9.293a1 1 
+                   0 010 1.414l-7 7a1 1 0 01-1.414 
+                   0l-7-7A.997.997 0 012 10V5a3 3 
+                   0 013-3h5c.256 0 .512.098.707.293l7 
+                   7zM5 6a1 1 0 100-2 1 1 0 000 2z" 
+                clip-rule="evenodd"></path>
                         </svg>
+        <span class="ms-3">Tropes</span>
+      </a>
+    </li>
 
-                        <span class="mx-3">Tropes</span>
-                    </a>
-
-                    <a class="flex items-center px-6 py-2 mt-4 {{ request()->routeIs('admin.orders.*') ? 'text-white bg-bookty-purple-600' : 'text-bookty-black hover:bg-bookty-pink-50 hover:text-bookty-purple-700' }} transition-colors duration-200 rounded-md" href="{{ route('admin.orders.index') }}">
-                        <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"></path>
+    <!-- Orders -->
+    <li>
+      <a href="{{ route('admin.orders.index') }}" 
+        class="flex items-center p-2 rounded-lg 
+               {{ request()->routeIs('admin.orders.*') 
+                  ? 'bg-bookty-purple-600 text-white' 
+                  : 'text-bookty-black hover:bg-bookty-pink-50 hover:text-bookty-purple-700 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white' }}">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M3 1a1 1 0 000 2h1.22l.305 
+                   1.222a.997.997 0 00.01.042l1.358 
+                   5.43-.893.892C3.74 11.846 4.632 
+                   14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 
+                   1 0 00.894-.553l3-6A1 1 0 
+                   0017 3H6.28l-.31-1.243A1 1 0 
+                   005 1H3zM16 16.5a1.5 1.5 0 11-3 
+                   0 1.5 1.5 0 013 0zM6.5 18a1.5 
+                   1.5 0 100-3 1.5 1.5 0 000 3z"></path>
                         </svg>
+        <span class="ms-3">Orders</span>
+      </a>
+    </li>
 
-                        <span class="mx-3">Orders</span>
-                    </a>
-
-                    <a class="flex items-center px-6 py-2 mt-4 {{ request()->routeIs('admin.customers.*') ? 'text-white bg-bookty-purple-600' : 'text-bookty-black hover:bg-bookty-pink-50 hover:text-bookty-purple-700' }} transition-colors duration-200 rounded-md" href="{{ route('admin.customers.index') }}">
-                        <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path>
+    <!-- Customers -->
+    <li>
+      <a href="{{ route('admin.customers.index') }}" 
+        class="flex items-center p-2 rounded-lg 
+               {{ request()->routeIs('admin.customers.*') 
+                  ? 'bg-bookty-purple-600 text-white' 
+                  : 'text-bookty-black hover:bg-bookty-pink-50 hover:text-bookty-purple-700 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white' }}">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M13 6a3 3 0 11-6 0 3 3 
+                   0 016 0zM18 8a2 2 0 11-4 0 2 2 
+                   0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 
+                   8a2 2 0 11-4 0 2 2 0 014 
+                   0zM16 18v-3a5.972 5.972 0 
+                   00-.75-2.906A3.005 3.005 0 
+                   0119 15v3h-3zM4.75 12.094A5.973 
+                   5.973 0 004 15v3H1v-3a3 3 0 
+                   013.75-2.906z"></path>
                         </svg>
+        <span class="ms-3">Customers</span>
+      </a>
+    </li>
 
-                        <span class="mx-3">Customers</span>
-                    </a>
-
-                    <div class="border-t border-bookty-pink-100 mt-6 pt-4">
-                        @role('superadmin')
-                        <a href="{{ route('superadmin.dashboard') }}" class="flex items-center px-6 py-2 mt-4 text-bookty-black hover:bg-bookty-pink-50 hover:text-bookty-purple-700 transition-colors duration-200 rounded-md">
-                            <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
-                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"></path>
+    <!-- ========== Promotions (Collapsible) ========== -->
+    <li>
+      <button type="button" 
+        class="flex items-center w-full p-2 text-bookty-black transition duration-75 rounded-lg 
+               hover:bg-bookty-pink-50 hover:text-bookty-purple-700 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white" 
+        aria-controls="dropdown-promotions" 
+        data-collapse-toggle="dropdown-promotions">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 
+                    7a1 1 0 01-1.414 0l-7-7A.997.997 
+                    0 012 10V5a3 3 0 013-3h5c.256 
+                    0 .512.098.707.293l7 7zM5 6a1 1 
+                    0 100-2 1 1 0 000 2z" 
+                clip-rule="evenodd"></path>
+                        </svg>
+        <span class="flex-1 ms-3 text-left whitespace-nowrap">Promotions</span>
+        <svg class="w-3 h-3" aria-hidden="true" fill="none" viewBox="0 0 10 6">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" 
+                stroke-width="2" d="m1 1 4 4 4-4"/>
                             </svg>
-                            <span class="mx-3">SuperAdmin Dashboard</span>
-                        </a>
-                        @endrole
-                        
-                        <a href="{{ route('home') }}" class="flex items-center px-6 py-2 mt-4 text-bookty-black hover:bg-bookty-pink-50 hover:text-bookty-purple-700 transition-colors duration-200 rounded-md">
-                            <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-                            </svg>
-                            <span class="mx-3">Visit Store</span>
-                        </a>
+                        </button>
+      <ul id="dropdown-promotions" class="hidden py-2 space-y-2">
+        <li>
+          <a href="{{ route('admin.discounts.index') }}" 
+            class="flex items-center w-full p-2 pl-11 rounded-lg 
+                   {{ request()->routeIs('admin.discounts.*') 
+                      ? 'bg-bookty-purple-600 text-white' 
+                      : 'text-bookty-black hover:bg-bookty-pink-50 hover:text-bookty-purple-700 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white' }}">
+            Book Discounts
+          </a>
+        </li>
+        <li>
+          <a href="{{ route('admin.coupons.index') }}" 
+            class="flex items-center w-full p-2 pl-11 rounded-lg 
+                   {{ request()->routeIs('admin.coupons.*') 
+                      ? 'bg-bookty-purple-600 text-white' 
+                      : 'text-bookty-black hover:bg-bookty-pink-50 hover:text-bookty-purple-700 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white' }}">
+            Coupon Codes
+          </a>
+        </li>
+        <li>
+          <a href="{{ route('admin.flash-sales.index') }}" 
+            class="flex items-center w-full p-2 pl-11 rounded-lg 
+                   {{ request()->routeIs('admin.flash-sales.*') 
+                      ? 'bg-bookty-purple-600 text-white' 
+                      : 'text-bookty-black hover:bg-bookty-pink-50 hover:text-bookty-purple-700 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white' }}">
+            Flash Sales
+          </a>
+        </li>
+      </ul>
+    </li>
 
+    <!-- ========== Reports (Collapsible) ========== -->
+    <li>
+      <button type="button" 
+        class="flex items-center w-full p-2 text-bookty-black transition duration-75 rounded-lg 
+               hover:bg-bookty-pink-50 hover:text-bookty-purple-700 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white" 
+        aria-controls="dropdown-reports" 
+        data-collapse-toggle="dropdown-reports">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M2 11a1 1 0 011-1h2a1 1 0 
+                   011 1v5a1 1 0 01-1 1H3a1 
+                   1 0 01-1-1v-5zM8 7a1 1 0 
+                   011-1h2a1 1 0 011 1v9a1 1 
+                   0 01-1 1H9a1 1 0 01-1-1V7zM14 
+                   4a1 1 0 011-1h2a1 1 0 011 
+                   1v12a1 1 0 01-1 1h-2a1 1 
+                   0 01-1-1V4z"></path>
+                                </svg>
+        <span class="flex-1 ms-3 text-left whitespace-nowrap">Reports</span>
+        <svg class="w-3 h-3" aria-hidden="true" fill="none" viewBox="0 0 10 6">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" 
+                stroke-width="2" d="m1 1 4 4 4-4"/>
+                                </svg>
+      </button>
+      <ul id="dropdown-reports" class="hidden py-2 space-y-2">
+        <li><a href="{{ route('admin.reports.index') }}" class="flex items-center w-full p-2 pl-11 rounded-lg {{ request()->routeIs('admin.reports.index') ? 'bg-bookty-purple-600 text-white' : 'text-bookty-black hover:bg-bookty-pink-50 hover:text-bookty-purple-700 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white' }}">Reports Dashboard</a></li>
+        <li><a href="{{ route('admin.reports.sales') }}" class="flex items-center w-full p-2 pl-11 rounded-lg {{ request()->routeIs('admin.reports.sales') ? 'bg-bookty-purple-600 text-white' : 'text-bookty-black hover:bg-bookty-pink-50 hover:text-bookty-purple-700 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white' }}">Sales Reports</a></li>
+        <li><a href="{{ route('admin.reports.customers') }}" class="flex items-center w-full p-2 pl-11 rounded-lg {{ request()->routeIs('admin.reports.customers') ? 'bg-bookty-purple-600 text-white' : 'text-bookty-black hover:bg-bookty-pink-50 hover:text-bookty-purple-700 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white' }}">Customer Reports</a></li>
+        <li><a href="{{ route('admin.reports.inventory') }}" class="flex items-center w-full p-2 pl-11 rounded-lg {{ request()->routeIs('admin.reports.inventory') ? 'bg-bookty-purple-600 text-white' : 'text-bookty-black hover:bg-bookty-pink-50 hover:text-bookty-purple-700 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white' }}">Inventory Reports</a></li>
+        <li><a href="{{ route('admin.reports.promotions') }}" class="flex items-center w-full p-2 pl-11 rounded-lg {{ request()->routeIs('admin.reports.promotions') ? 'bg-bookty-purple-600 text-white' : 'text-bookty-black hover:bg-bookty-pink-50 hover:text-bookty-purple-700 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white' }}">Promotions Reports</a></li>
+        <li><a href="{{ route('admin.reports.profitability') }}" class="flex items-center w-full p-2 pl-11 rounded-lg {{ request()->routeIs('admin.reports.profitability') ? 'bg-bookty-purple-600 text-white' : 'text-bookty-black hover:bg-bookty-pink-50 hover:text-bookty-purple-700 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white' }}">Profitability Reports</a></li>
+      </ul>
+    </li>
+
+    <!-- ========== Reviews (Collapsible) ========== -->
+    <li>
+      <button type="button"
+        class="flex items-center w-full p-2 text-bookty-black transition duration-75 rounded-lg
+               hover:bg-bookty-pink-50 hover:text-bookty-purple-700 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white"
+        aria-controls="dropdown-reviews"
+        data-collapse-toggle="dropdown-reviews">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span class="flex-1 ms-3 text-left whitespace-nowrap">Reviews</span>
+        <svg class="w-3 h-3" aria-hidden="true" fill="none" viewBox="0 0 10 6">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                stroke-width="2" d="m1 1 4 4 4-4"/>
+        </svg>
+      </button>
+      <ul id="dropdown-reviews" class="hidden py-2 space-y-2">
+        <li><a href="{{ route('admin.reviews.reports.index') }}" class="flex items-center w-full p-2 pl-11 rounded-lg {{ request()->routeIs('admin.reviews.reports.*') ? 'bg-bookty-purple-600 text-white' : 'text-bookty-black hover:bg-bookty-pink-50 hover:text-bookty-purple-700 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white' }}">Review Reports</a></li>
+        <li><a href="{{ route('admin.reviews.helpful.index') }}" class="flex items-center w-full p-2 pl-11 rounded-lg {{ request()->routeIs('admin.reviews.helpful.*') ? 'bg-bookty-purple-600 text-white' : 'text-bookty-black hover:bg-bookty-pink-50 hover:text-bookty-purple-700 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white' }}">Review Helpful Analytics</a></li>
+      </ul>
+    </li>
+
+    <!-- ========== Settings (Collapsible) ========== -->
+    <li>
+      <button type="button" 
+        class="flex items-center w-full p-2 text-bookty-black transition duration-75 rounded-lg 
+               hover:bg-bookty-pink-50 hover:text-bookty-purple-700 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white" 
+        aria-controls="dropdown-settings" 
+        data-collapse-toggle="dropdown-settings">
+        <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M11.983 1.724a1 1 0 00-1.966 0l-.094.564a7.967 7.967 0 00-1.788.74l-.51-.295a1 1 0 00-1.366.366l-.983 1.703a1 1 0 00.366 1.366l.51.295a7.967 7.967 0 000 1.48l-.51.295a1 1 0 00-.366 1.366l.983 1.703a1 1 0 001.366.366l.51-.295c.567.32 1.17.573 1.788.74l.094.564a1 1 0 001.966 0l.094-.564c.618-.167 1.221-.42 1.788-.74l.51.295a1 1 0 001.366-.366l.983-1.703a1 1 0 00-.366-1.366l-.51-.295c.06-.486.06-.994 0-1.48l.51-.295a1 1 0 00.366-1.366l-.983-1.703a1 1 0 00-1.366-.366l-.51.295a7.967 7.967 0 00-1.788-.74l-.094-.564zM10 7a3 3 0 110 6 3 3 0 010-6z" clip-rule="evenodd"/>
+        </svg>
+        <span class="flex-1 ms-3 text-left whitespace-nowrap">Settings</span>
+        <svg class="w-3 h-3" aria-hidden="true" fill="none" viewBox="0 0 10 6">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" 
+                stroke-width="2" d="m1 1 4 4 4-4"/>
+        </svg>
+      </button>
+      <ul id="dropdown-settings" class="hidden py-2 space-y-2">
+        <li>
+          <a href="{{ route('admin.settings.system') }}" 
+            class="flex items-center w-full p-2 pl-11 rounded-lg 
+                   {{ request()->routeIs('admin.settings.system') 
+                      ? 'bg-bookty-purple-600 text-white' 
+                      : 'text-bookty-black hover:bg-bookty-pink-50 hover:text-bookty-purple-700 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white' }}">
+            System Preference
+          </a>
+        </li>
+      </ul>
+    </li>
+
+    <!-- SuperAdmin -->
+    <li>
+      <a href="{{ route('superadmin.dashboard') }}" 
+        class="flex items-center p-2 rounded-lg 
+               {{ request()->routeIs('superadmin.*') 
+                  ? 'bg-bookty-purple-600 text-white' 
+                  : 'text-bookty-black hover:bg-bookty-pink-50 hover:text-bookty-purple-700 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white' }}">
+        <i class="fa-solid fa-user-shield w-5 h-5"></i>
+        <span class="ms-3">SuperAdmin</span>
+      </a>
+    </li>
+
+    <!-- Visit Store -->
+    <li>
+      <a href="{{ route('home') }}" target="_blank"
+        class="flex items-center p-2 rounded-lg 
+               text-bookty-black hover:bg-bookty-pink-50 hover:text-bookty-purple-700 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white">
+        <i class="fa-solid fa-store w-5 h-5"></i>
+        <span class="ms-3">Visit Store</span>
+      </a>
+    </li>
+
+    <!-- Logout -->
+    {{-- <li>
                         <form method="POST" action="{{ route('logout') }}" onsubmit="return handleLogout(event, this)">
                             @csrf
-                            <button type="submit" class="flex w-full items-center px-6 py-2 mt-4 text-bookty-black hover:bg-bookty-pink-50 hover:text-bookty-purple-700 transition-colors duration-200 rounded-md">
-                                <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"></path>
-                                </svg>
-                                <span class="mx-3">Logout</span>
+        <button type="submit" 
+          class="flex items-center w-full p-2 text-bookty-black rounded-lg 
+                 hover:bg-bookty-pink-50 hover:text-bookty-purple-700 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white">
+          <i class="fa-solid fa-right-from-bracket w-5 h-5"></i>
+          <span class="ms-3">Logout</span>
                             </button>
                         </form>
-                    </div>
-                </nav>
-            </div>
+    </li> --}}
 
+  </ul>
+                    </div>
+</aside>
             <div class="flex flex-col flex-1 overflow-hidden">
-                <header class="flex items-center justify-between px-6 py-4 bg-white border-b-2 border-bookty-pink-100 shadow-sm">
-                    <div class="flex items-center">
-                        <button @click="sidebarOpen = true" class="text-gray-500 focus:outline-none lg:hidden">
-                            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M4 6H20M4 12H20M4 18H11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                <header class="flex items-center justify-between px-4 sm:px-6 py-4 bg-white dark:bg-gray-800 border-b-2 border-bookty-pink-100 dark:border-gray-700 shadow-sm sm:ml-64">
+                    <div class="flex items-center gap-3">
+                        <button data-drawer-target="sidebar-admin" data-drawer-toggle="sidebar-admin" data-drawer-backdrop="true" aria-controls="sidebar-admin" type="button" class="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600">
+                            <span class="sr-only">Open sidebar</span>
+                            <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
+                                <path clip-rule="evenodd" fill-rule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z" />
                             </svg>
                         </button>
 
-                        <div class="mx-4">
-                            <h1 class="text-2xl font-serif font-semibold text-bookty-black">@yield('header', 'Dashboard')</h1>
+                        <div class="mx-1 sm:mx-4">
+                            <h1 class="text-xl sm:text-2xl  font-semibold text-bookty-black dark:text-gray-100 truncate">@yield('header', 'Dashboard')</h1>
                         </div>
                     </div>
 
-                    <div class="flex items-center">
+                    <div class="flex items-center space-x-4">
+
                         <div x-data="{ dropdownOpen: false }" class="relative">
                             <button @click="dropdownOpen = ! dropdownOpen" class="flex items-center space-x-2 relative focus:outline-none">
                                 <div class="h-9 w-9 rounded-full bg-bookty-purple-200 flex items-center justify-center">
                                     <span class="text-sm font-medium text-bookty-purple-800">{{ substr(Auth::user()->name, 0, 1) }}</span>
                                 </div>
-                                <span class="text-bookty-black font-medium">{{ Auth::user()->name }}</span>
+                                <span class="text-bookty-black dark:text-gray-200 font-medium">{{ Auth::user()->name }}</span>
                                 <svg class="w-5 h-5 text-bookty-purple-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                                 </svg>
                             </button>
 
-                            <div x-show="dropdownOpen" @click.away="dropdownOpen = false" class="absolute right-0 mt-2 w-48 bg-white rounded-md overflow-hidden shadow-xl z-10">
-                                <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-bookty-black hover:bg-bookty-pink-50">Profile</a>
+                            <div x-show="dropdownOpen" @click.away="dropdownOpen = false" class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md overflow-hidden shadow-xl z-10">
+                                <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-bookty-black dark:text-gray-200 hover:bg-bookty-pink-50 dark:hover:bg-gray-700">Profile</a>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
-                                    <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-bookty-black hover:bg-bookty-pink-50">Logout</button>
+                                    <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-bookty-black dark:text-gray-200 hover:bg-bookty-pink-50 dark:hover:bg-gray-700">Logout</button>
                                 </form>
                             </div>
                         </div>
                     </div>
                 </header>
 
-                <main class="flex-1 overflow-x-hidden overflow-y-auto bg-bookty-cream">
-                    <div class="container mx-auto px-6 py-8">
+                <main class="flex-1 overflow-x-hidden overflow-y-auto bg-bookty-cream dark:bg-gray-900 sm:ml-64">
+                    <div class="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
                         @yield('content')
                     </div>
                 </main>
@@ -162,19 +396,19 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Handle session flash messages
             @if(session('success'))
-                window.showToast('{{ session('success') }}', 'success');
+                showToast('{{ session('success') }}', 'success');
             @endif
             
             @if(session('error'))
-                window.showToast('{{ session('error') }}', 'error');
+                showToast('{{ session('error') }}', 'error');
             @endif
             
             @if(session('warning'))
-                window.showToast('{{ session('warning') }}', 'warning');
+                showToast('{{ session('warning') }}', 'warning');
             @endif
             
             @if(session('info'))
-                window.showToast('{{ session('info') }}', 'info');
+                showToast('{{ session('info') }}', 'info');
             @endif
         });
     </script>
@@ -216,6 +450,36 @@
             
             return false;
         }
+    </script>
+
+    <!-- ApexCharts CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.46.0/dist/apexcharts.min.js"></script>
+    <!-- Simple DataTables CDN (UMD bundle) -->
+    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@9.0.3/dist/umd.js"></script>
+    <!-- Flowbite JS (for dropdowns, etc.) -->
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
+
+    <!-- Theme preference (light/dark/system) -->
+    <script>
+        (function() {
+            const root = document.documentElement;
+            const prefKey = 'themePreference'; // 'light' | 'dark' | 'system'
+            function getPref() {
+                return localStorage.getItem(prefKey) || 'system';
+            }
+            function applyTheme(pref) {
+                const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const isDark = pref === 'dark' || (pref === 'system' && prefersDark);
+                if (isDark) root.classList.add('dark'); else root.classList.remove('dark');
+            }
+            // Initial
+            applyTheme(getPref());
+            // Update on system changes if set to system
+            const mq = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+            mq && mq.addEventListener && mq.addEventListener('change', function() {
+                if (getPref() === 'system') applyTheme('system');
+            });
+        })();
     </script>
 </body>
 </html>
