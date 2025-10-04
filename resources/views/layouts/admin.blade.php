@@ -6,7 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ config('app.name', 'Bookty Enterprise') }} - Admin Dashboard</title>
-    <link rel="icon" type="image/png" href="{{ asset('storage/BooktyLogo/BooktyL.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/BooktyL.png') }}">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -44,7 +44,7 @@ aria-label="Sidebar">
   </div>
   <!-- Logo -->
   <div class="flex items-center justify-center mt-6">
-                        <img src="{{ asset('storage/BooktyLogo/BooktyL.png') }}" alt="Bookty Logo" class="h-10 w-auto">
+                        <img src="{{ asset('images/BooktyL.png') }}" alt="Bookty Logo" class="h-10 w-auto">
     <span class="ml-2 text-xl font-serif font-bold text-bookty-purple-700">Bookty Enterprise</span>
                 </div>
 
