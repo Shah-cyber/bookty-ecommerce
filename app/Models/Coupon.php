@@ -21,11 +21,13 @@ class Coupon extends Model
         'starts_at',
         'expires_at',
         'is_active',
+        'free_shipping',
     ];
     
     protected $casts = [
         'starts_at' => 'datetime',
         'expires_at' => 'datetime',
+        'free_shipping' => 'boolean',
         'is_active' => 'boolean',
     ];
     
@@ -89,6 +91,9 @@ class Coupon extends Model
      */
     public function calculateDiscount($orderAmount)
     {
+        if ($this->free_shipping) {
+            return 0;
+        }
         if ($this->discount_type === 'fixed') {
             return min($this->discount_value, $orderAmount);
         }

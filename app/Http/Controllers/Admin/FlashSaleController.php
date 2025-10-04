@@ -17,7 +17,7 @@ class FlashSaleController extends Controller
      */
     public function index()
     {
-        $flashSales = FlashSale::withCount('books')->latest()->paginate(10);
+        $flashSales = FlashSale::withCount('books')->latest()->paginate(6);
         return view('admin.flash-sales.index', compact('flashSales'));
     }
 
@@ -95,6 +95,7 @@ class FlashSaleController extends Controller
             $flashSale->ends_at = date('Y-m-d H:i:s', strtotime($request->ends_at));
             $flashSale->discount_type = $request->discount_type;
             $flashSale->discount_value = $request->discount_value;
+            $flashSale->free_shipping = $request->has('free_shipping') ? true : false;
             $flashSale->is_active = true;
             $flashSale->save();
             
@@ -216,6 +217,8 @@ class FlashSaleController extends Controller
             $flashSale->ends_at = date('Y-m-d H:i:s', strtotime($request->ends_at));
             $flashSale->discount_type = $request->discount_type;
             $flashSale->discount_value = $request->discount_value;
+            // Handle free shipping toggle
+            $flashSale->free_shipping = $request->has('free_shipping') ? true : false;
             // Handle is_active field explicitly
             $flashSale->is_active = $request->has('is_active') ? true : false;
             $flashSale->save();

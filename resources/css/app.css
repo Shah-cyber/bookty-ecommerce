@@ -1,14 +1,14 @@
 /* Import Notyf CSS */
 @import 'notyf/notyf.min.css';
-
+/* Flowbite styles */
+@import "flowbite";
+@import "flowbite/src/themes/default";
 /* Tailwind layers */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Flowbite styles */
-@import "flowbite";
-@import "flowbite/src/themes/default";
+
 
 
 @layer utilities {

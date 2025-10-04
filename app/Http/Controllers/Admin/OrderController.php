@@ -55,7 +55,7 @@ class OrderController extends Controller
                 break;
         }
 
-        $orders = $query->paginate(15);
+        $orders = $query->paginate(6);
         
         // Get order statuses for filter
         $statuses = ['pending', 'processing', 'shipped', 'completed', 'cancelled'];

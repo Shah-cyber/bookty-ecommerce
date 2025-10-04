@@ -94,6 +94,36 @@
                     <p class="dark:text-gray-100">{{ $order->shipping_address }}</p>
                     <p class="dark:text-gray-100">{{ $order->shipping_city }}, {{ $order->shipping_state }} {{ $order->shipping_postal_code }}</p>
                     <p class="mt-2 dark:text-gray-100"><span class="text-gray-500 dark:text-gray-300">Phone:</span> {{ $order->shipping_phone }}</p>
+                    @if($order->shipping_region)
+                        <div class="mt-4 grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-300">Region</p>
+                                <p class="font-medium dark:text-gray-100">{{ __('regions.'.$order->shipping_region) }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-300">Customer Paid (Postage)</p>
+                                <p class="font-medium dark:text-gray-100">RM {{ number_format($order->shipping_customer_price, 2) }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-300">Actual Cost</p>
+                                <p class="font-medium dark:text-gray-100">RM {{ number_format($order->shipping_actual_cost, 2) }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-300">Postage Profit</p>
+                                <p class="font-medium dark:text-gray-100">RM {{ number_format(($order->shipping_customer_price - $order->shipping_actual_cost), 2) }}</p>
+                            </div>
+                        </div>
+                        <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-300">Free Shipping</p>
+                                <p class="font-medium dark:text-gray-100">{{ $order->is_free_shipping ? 'Yes' : 'No' }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-300">Postage Absorbed by Company</p>
+                                <p class="font-medium dark:text-gray-100">RM {{ number_format($order->is_free_shipping ? $order->shipping_actual_cost : max(0, $order->shipping_actual_cost - $order->shipping_customer_price), 2) }}</p>
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
 

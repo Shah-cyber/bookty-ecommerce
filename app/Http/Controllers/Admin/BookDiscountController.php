@@ -15,7 +15,7 @@ class BookDiscountController extends Controller
      */
     public function index()
     {
-        $discounts = BookDiscount::with('book')->latest()->paginate(10);
+        $discounts = BookDiscount::with('book')->latest()->paginate(6);
         return view('admin.discounts.index', compact('discounts'));
     }
 
@@ -63,6 +63,7 @@ class BookDiscountController extends Controller
             $discount->starts_at = $request->starts_at;
             $discount->ends_at = $request->ends_at;
             $discount->description = $request->description;
+            $discount->free_shipping = $request->has('free_shipping') ? true : false;
             $discount->is_active = true;
             $discount->save();
             
@@ -139,6 +140,7 @@ class BookDiscountController extends Controller
             $discount->starts_at = $request->starts_at;
             $discount->ends_at = $request->ends_at;
             $discount->description = $request->description;
+            $discount->free_shipping = $request->has('free_shipping') ? true : false;
             $discount->is_active = $request->has('is_active') ? true : false;
             $discount->save();
             

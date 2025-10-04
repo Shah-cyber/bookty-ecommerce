@@ -16,6 +16,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RolesAndPermissionsSeeder::class,
             SettingsSeeder::class,
+            GenreSeeder::class,
+            TropeSeeder::class,
         ]);
     }
 }

@@ -57,7 +57,7 @@ class CustomerController extends Controller
                 break;
         }
         
-        $customers = $query->withCount('orders')->paginate(10);
+        $customers = $query->withCount('orders')->paginate(6);
         return view('admin.customers.index', compact('customers'));
     }
 

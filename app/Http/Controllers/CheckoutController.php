@@ -37,13 +37,65 @@ class CheckoutController extends Controller
             'shipping_state' => 'required|string|max:100',
             'shipping_postal_code' => 'required|string|max:20',
             'shipping_phone' => 'required|string|max:20',
+            'shipping_region' => 'nullable|in:sm,sabah,sarawak,labuan',
+            'shipping_customer_price' => 'nullable|numeric|min:0',
+            'shipping_actual_cost' => 'nullable|numeric|min:0',
         ]);
         
-        // Calculate total amount
+        // Calculate subtotal amount
         $totalAmount = 0;
         foreach ($cart->items as $item) {
             $totalAmount += $item->book->price * $item->quantity;
         }
+
+        // Determine shipping region and rate
+        $state = strtolower($request->shipping_state);
+        $smStates = ['johor','kedah','kelantan','melaka','negeri sembilan','pahang','perak','perlis','pulau pinang','penang','selangor','terengganu','kuala lumpur','putrajaya'];
+        $region = 'sm';
+        if (in_array($state, ['sabah'])) { $region = 'sabah'; }
+        elseif (in_array($state, ['sarawak'])) { $region = 'sarawak'; }
+        elseif (in_array($state, ['labuan','wilayah persekutuan labuan'])) { $region = 'labuan'; }
+        elseif (!in_array($state, $smStates)) { $region = 'sm'; }
+
+        $rateModel = \App\Models\PostageRate::where('region', $region === 'labuan' ? 'sabah' : $region)->first();
+        $shippingCustomerPrice = $rateModel?->customer_price ?? 0;
+        $shippingActualCost = $rateModel?->actual_cost ?? 0;
+
+        // Check for free shipping via promotions or coupons
+        $isFreeShipping = false;
+        // Coupon free shipping
+        $appliedCouponCode = $request->input('coupon_code');
+        if ($appliedCouponCode) {
+            $coupon = \App\Models\Coupon::where('code', $appliedCouponCode)->first();
+            if ($coupon && $coupon->is_active && now()->between($coupon->starts_at, $coupon->expires_at)) {
+                if ($coupon->free_shipping) {
+                    $isFreeShipping = true;
+                }
+            }
+        }
+        // Book discounts or flash sales on cart items
+        if (!$isFreeShipping) {
+            foreach ($cart->items as $item) {
+                $book = $item->book;
+                // Flash sale free shipping
+                if ($book->active_flash_sale && $book->active_flash_sale->free_shipping) {
+                    $isFreeShipping = true;
+                    break;
+                }
+                // Book discount free shipping
+                if ($book->discount && $book->discount->free_shipping) {
+                    $isFreeShipping = true;
+                    break;
+                }
+            }
+        }
+
+        if ($isFreeShipping) {
+            $shippingCustomerPrice = 0;
+        }
+
+        // Add shipping to total
+        $totalAmount += $shippingCustomerPrice;
         
         try {
             DB::beginTransaction();
@@ -57,8 +109,12 @@ class CheckoutController extends Controller
                 'shipping_address' => $request->shipping_address,
                 'shipping_city' => $request->shipping_city,
                 'shipping_state' => $request->shipping_state,
+                'shipping_region' => $region,
+                'shipping_customer_price' => $shippingCustomerPrice,
+                'shipping_actual_cost' => $shippingActualCost,
                 'shipping_postal_code' => $request->shipping_postal_code,
                 'shipping_phone' => $request->shipping_phone,
+                'is_free_shipping' => $isFreeShipping,
             ]);
             
             // Create order items and update stock

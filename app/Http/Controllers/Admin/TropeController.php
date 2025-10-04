@@ -14,7 +14,7 @@ class TropeController extends Controller
      */
     public function index()
     {
-        $tropes = Trope::withCount('books')->latest()->paginate(10);
+        $tropes = Trope::withCount('books')->latest()->paginate(6);
         return view('admin.tropes.index', compact('tropes'));
     }
 

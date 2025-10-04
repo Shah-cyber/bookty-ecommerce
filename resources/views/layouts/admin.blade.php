@@ -302,6 +302,15 @@ aria-label="Sidebar">
             System Preference
           </a>
         </li>
+        <li>
+          <a href="{{ route('admin.postage-rates.index') }}" 
+            class="flex items-center w-full p-2 pl-11 rounded-lg 
+                   {{ request()->routeIs('admin.postage-rates.*') 
+                      ? 'bg-bookty-purple-600 text-white' 
+                      : 'text-bookty-black hover:bg-bookty-pink-50 hover:text-bookty-purple-700 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white' }}">
+            Postage Rates
+          </a>
+        </li>
       </ul>
     </li>
 

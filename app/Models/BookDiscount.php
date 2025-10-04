@@ -18,11 +18,13 @@ class BookDiscount extends Model
         'ends_at',
         'is_active',
         'description',
+        'free_shipping',
     ];
     
     protected $casts = [
         'starts_at' => 'datetime',
         'ends_at' => 'datetime',
+        'free_shipping' => 'boolean',
         'is_active' => 'boolean',
     ];
     

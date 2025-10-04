@@ -64,7 +64,7 @@
                         </div>
                         <div class="flex justify-between mb-2">
                             <span class="text-gray-700">Shipping</span>
-                            <span class="text-gray-900 font-medium">Free</span>
+                            <span class="text-gray-900 font-medium" id="shipping-amount">RM 0.00</span>
                         </div>
                         <div id="discount-row" class="justify-between mb-2 hidden">
                             <span class="text-gray-700">Discount</span>
@@ -119,7 +119,13 @@
 
                             <div>
                                 <label for="shipping_state" class="block text-sm font-medium text-gray-700 mb-1">State</label>
-                                <input type="text" name="shipping_state" id="shipping_state" value="{{ old('shipping_state', auth()->user()->state) }}" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50">
+                                <select name="shipping_state" id="shipping_state" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50">
+                                    <option value="">-- Select State --</option>
+                                    @php($states = ['Johor','Kedah','Kelantan','Melaka','Negeri Sembilan','Pahang','Perak','Perlis','Pulau Pinang','Selangor','Terengganu','Kuala Lumpur','Putrajaya','Sabah','Sarawak','Labuan'])
+                                    @foreach($states as $st)
+                                        <option value="{{ $st }}" @selected(old('shipping_state', auth()->user()->state) === $st)>{{ $st }}</option>
+                                    @endforeach
+                                </select>
                                 @error('shipping_state')
                                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                 @enderror
@@ -171,6 +177,10 @@
                         <input type="hidden" name="coupon_code" id="applied-coupon-code">
                         <input type="hidden" name="discount_amount" id="applied-discount-amount" value="0">
                         
+                        <input type="hidden" name="shipping_region" id="shipping_region" value="">
+                        <input type="hidden" name="shipping_customer_price" id="shipping_customer_price" value="0">
+                        <input type="hidden" name="shipping_actual_cost" id="shipping_actual_cost" value="0">
+
                         <div class="mt-8">
                             <button type="submit" class="w-full px-4 py-3 bg-purple-600 text-white text-center font-medium rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
                                 Complete Order
@@ -194,9 +204,16 @@
             const appliedCouponInput = document.getElementById('applied-coupon-code');
             const appliedDiscountInput = document.getElementById('applied-discount-amount');
             
-            // Get the subtotal amount
-            const subtotalText = subtotalElement.innerText.trim();
-            const subtotal = parseFloat(subtotalText.replace('RM ', ''));
+            function parseAmount(text) {
+                return parseFloat(text.replace('RM', '').trim());
+            }
+            function updateTotal() {
+                const subtotal = parseAmount(subtotalElement.innerText);
+                const shipping = parseFloat(document.getElementById('shipping_customer_price').value || '0');
+                const discount = parseFloat(appliedDiscountInput.value || '0');
+                const newTotal = subtotal + shipping - discount;
+                totalElement.innerText = `RM ${newTotal.toFixed(2)}`;
+            }
             
             applyCouponBtn.addEventListener('click', function() {
                 const couponCode = couponCodeInput.value.trim();
@@ -239,8 +256,7 @@
                         discountAmount.innerText = `-RM ${data.discount_amount.toFixed(2)}`;
                         
                         // Update total
-                        const newTotal = subtotal - data.discount_amount;
-                        totalElement.innerText = `RM ${newTotal.toFixed(2)}`;
+                        updateTotal();
                         
                         // Store coupon code and discount amount in hidden inputs
                         appliedCouponInput.value = couponCode;
@@ -250,6 +266,14 @@
                         couponCodeInput.disabled = true;
                         applyCouponBtn.innerText = 'Applied';
                         applyCouponBtn.disabled = true;
+
+                        // Re-fetch postage with potential free shipping from coupon
+                        try {
+                            const stateEl = document.getElementById('shipping_state');
+                            if (stateEl && stateEl.value) {
+                                fetchPostage(stateEl.value);
+                            }
+                        } catch (e) { /* no-op */ }
                     } else {
                         // Show error message
                         showMessage(data.message, 'error');
@@ -278,6 +302,57 @@
                     couponMessage.classList.add('text-green-500');
                 }
             }
+            const shippingState = document.getElementById('shipping_state');
+            const shippingAmount = document.getElementById('shipping-amount');
+            const shippingRegionInput = document.getElementById('shipping_region');
+            const shippingCustomerPriceInput = document.getElementById('shipping_customer_price');
+            const shippingActualCostInput = document.getElementById('shipping_actual_cost');
+
+            function fetchPostage(state) {
+                if (!state) {
+                    shippingAmount.innerText = 'RM 0.00';
+                    shippingRegionInput.value = '';
+                    shippingCustomerPriceInput.value = '0';
+                    shippingActualCostInput.value = '0';
+                    updateTotal();
+                    return;
+                }
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                fetch(`/api/postage/rate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({ state, coupon_code: document.getElementById('applied-coupon-code').value || '' })
+                })
+                .then(r => r.json())
+                .then(data => {
+                    const price = parseFloat(data.customer_price || 0);
+                    if (data.is_free_shipping) {
+                        shippingAmount.innerText = 'Free';
+                    } else {
+                        shippingAmount.innerText = `RM ${price.toFixed(2)}`;
+                    }
+                    shippingRegionInput.value = data.region || '';
+                    shippingCustomerPriceInput.value = price.toFixed(2);
+                    // actual cost is unknown in UI; controller will fill based on region
+                    updateTotal();
+                })
+                .catch(() => {
+                    shippingAmount.innerText = 'RM 0.00';
+                    shippingRegionInput.value = '';
+                    shippingCustomerPriceInput.value = '0';
+                    shippingActualCostInput.value = '0';
+                    updateTotal();
+                });
+            }
+
+            // initial
+            if (shippingState.value) fetchPostage(shippingState.value);
+            shippingState.addEventListener('change', function() {
+                fetchPostage(this.value);
+            });
         });
     </script>
 @endsection

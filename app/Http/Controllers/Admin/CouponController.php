@@ -16,7 +16,7 @@ class CouponController extends Controller
      */
     public function index()
     {
-        $coupons = Coupon::withCount('usages')->latest()->paginate(10);
+        $coupons = Coupon::withCount('usages')->latest()->paginate(6);
         return view('admin.coupons.index', compact('coupons'));
     }
 
@@ -57,6 +57,7 @@ class CouponController extends Controller
             $coupon->starts_at = $request->starts_at;
             $coupon->expires_at = $request->expires_at;
             $coupon->is_active = true;
+            $coupon->free_shipping = $request->has('free_shipping') ? true : false;
             $coupon->save();
             
             return redirect()->route('admin.coupons.index')
@@ -115,6 +116,7 @@ class CouponController extends Controller
             $coupon->starts_at = $request->starts_at;
             $coupon->expires_at = $request->expires_at;
             $coupon->is_active = $request->has('is_active') ? true : false;
+            $coupon->free_shipping = $request->has('free_shipping') ? true : false;
             $coupon->save();
             
             return redirect()->route('admin.coupons.index')

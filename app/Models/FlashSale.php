@@ -18,12 +18,14 @@ class FlashSale extends Model
         'ends_at',
         'discount_type',
         'discount_value',
+        'free_shipping',
         'is_active',
     ];
     
     protected $casts = [
         'starts_at' => 'datetime',
         'ends_at' => 'datetime',
+        'free_shipping' => 'boolean',
         'is_active' => 'boolean',
     ];
     

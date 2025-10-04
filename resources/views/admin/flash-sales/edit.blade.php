@@ -163,6 +163,15 @@
             </div>
             
             <div class="mb-6">
+                <label class="inline-flex items-center cursor-pointer">
+                    <input type="hidden" name="free_shipping" value="0">
+                    <input type="checkbox" name="free_shipping" value="1" class="sr-only peer" {{ old('free_shipping', $flashSale->free_shipping) ? 'checked' : '' }}>
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:ml-0.5 after:mt-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-600 relative"></div>
+                    <span class="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300">Offer Free Shipping</span>
+                </label>
+            </div>
+
+            <div class="mb-6">
                 <div class="flex items-center">
                     <input type="hidden" name="is_active" value="0">
                     <input id="is_active" name="is_active" type="checkbox" value="1" class="h-4 w-4 text-indigo-600 border-gray-300 rounded" {{ old('is_active', $flashSale->is_active) ? 'checked' : '' }}>

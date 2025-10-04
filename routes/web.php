@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\TropeController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\PostageRateController;
 use App\Http\Controllers\SuperAdmin\RoleController;
 use App\Http\Controllers\SuperAdmin\AdminController;
 use App\Http\Controllers\SuperAdmin\SettingController;
@@ -139,6 +140,9 @@ Route::middleware(['auth', 'role:admin,superadmin'])->prefix('admin')->name('adm
     Route::prefix('settings')->name('settings.')->group(function () {
         Route::get('/system', [SettingsController::class, 'system'])->name('system');
     });
+
+    // Postage Rates management
+    Route::resource('postage-rates', PostageRateController::class)->except(['show']);
 });
 
 // Superadmin routes (requires superadmin role)
@@ -160,6 +164,7 @@ Route::middleware(['auth', 'role:superadmin'])->prefix('superadmin')->name('supe
 // API routes
 Route::prefix('api')->middleware('auth')->group(function () {
     Route::post('/coupons/validate', [App\Http\Controllers\Api\CouponController::class, 'validate'])->name('api.coupons.validate');
+    Route::post('/postage/rate', [App\Http\Controllers\Api\PostageController::class, 'rate'])->name('api.postage.rate');
 });
 
 // Authentication routes
