@@ -7,10 +7,15 @@
                 <!-- Enhanced Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('home') }}" class="flex items-center group transition-all duration-300 hover:scale-105">
+                        {{-- <div class="relative">
+                            <img src="{{ asset('images/BooktyL.png') }}" alt="Bookty Logo" class="h-10 w-auto transition-all duration-300 group-hover:drop-shadow-lg">
+                            <div class="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300 blur-xl"></div>
+                        </div> --}}
                         <div class="relative">
                             <img src="{{ asset('images/BooktyL.png') }}" alt="Bookty Logo" class="h-10 w-auto transition-all duration-300 group-hover:drop-shadow-lg">
                             <div class="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300 blur-xl"></div>
                         </div>
+                        
                         <div class="ml-3">
                             <span class="text-2xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">Bookty</span>
                             <div class="text-sm text-gray-600 font-medium -mt-1">Enterprise</div>
