@@ -35,7 +35,7 @@
                         <span class="relative z-10">Shop</span>
                     </a>
                     <div x-data="{ open: false }" class="relative group">
-                        <button @mouseenter="open = true" @mouseleave="open = false" class="relative inline-flex items-center px-4 py-8 text-sm font-semibold text-gray-700">
+                        <button @mouseenter="open = true" @mouseleave="open = false" @click="open = !open" @keydown.escape.window="open = false" class="relative inline-flex items-center px-4 py-8 text-sm font-semibold text-gray-700" aria-haspopup="true" :aria-expanded="open.toString()">
                             <svg class="w-4 h-4 mr-2 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
                             </svg>
@@ -45,7 +45,7 @@
                             </svg>
                         </button>
                         
-                        <div x-show="open" @mouseenter="open = true" @mouseleave="open = false" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95 translate-y-1" x-transition:enter-end="opacity-100 scale-100 translate-y-0" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100 translate-y-0" x-transition:leave-end="opacity-0 scale-95 translate-y-1" class="absolute top-full left-0 mt-1 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 py-2 z-50 backdrop-blur-sm">
+                        <div x-show="open" @mouseenter="open = true" @mouseleave="open = false" @click.away="open = false" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95 translate-y-1" x-transition:enter-end="opacity-100 scale-100 translate-y-0" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100 translate-y-0" x-transition:leave-end="opacity-0 scale-95 translate-y-1" class="absolute top-full left-0 mt-1 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 py-2 z-50 backdrop-blur-sm">
                             <div class="px-4 py-2 border-b border-gray-100">
                                 <h3 class="text-sm font-semibold text-gray-900">Browse by Author</h3>
                             </div>

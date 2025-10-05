@@ -13,8 +13,8 @@
             <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(1200px 400px at 20% 10%, rgba(99,102,241,0.10), transparent), radial-gradient(800px 300px at 90% 80%, rgba(236,72,153,0.10), transparent);"></div>
         </div>
         
-        <div class="container mx-auto px-6 py-20 relative z-10">
-            <div class="flex flex-col lg:flex-row items-center justify-between gap-16 min-h-[80vh]">
+        <div class="container mx-auto px-4 sm:px-6 py-12 sm:py-16 lg:py-20 relative z-10">
+            <div class="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-16 min-h-[70vh] lg:min-h-[80vh]">
                 <!-- Left Content (dynamic details) -->
                 @php $heroBooks = $newArrivals->take(6); $firstHero = $heroBooks->first(); @endphp
                 <div class="flex-1 text-gray-900" data-aos="fade-right" data-aos-duration="1000">
@@ -62,8 +62,8 @@
                 </div>
 
                 <!-- Right Content - Portrait cover slider -->
-                <div class="flex-1 relative" data-aos="fade-left" data-aos-duration="1000">
-                    <div class="relative max-w-sm mx-auto h-[520px]">
+                <div class="flex-1 w-full" data-aos="fade-left" data-aos-duration="1000">
+                    <div class="relative max-w-xs sm:max-w-sm md:max-w-md lg:max-w-sm mx-auto h-[420px] sm:h-[520px]">
                         <div class="absolute -inset-6 rounded-3xl bg-gradient-to-tr from-indigo-300/30 via-purple-300/30 to-pink-300/30 blur-2xl"></div>
                         <div id="heroCoverCarousel" class="relative w-full h-full">
                             @foreach($heroBooks as $i => $book)
