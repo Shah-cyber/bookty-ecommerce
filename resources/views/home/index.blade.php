@@ -3,43 +3,45 @@
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-gray-50 to-indigo-50">
     <!-- Hero Section -->
-    <div class="relative overflow-hidden bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 min-h-screen">
+    <div class="relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-indigo-50 min-h-screen">
         <!-- Animated Background Elements -->
         <div class="absolute inset-0 overflow-hidden">
-            <div class="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse"></div>
-            <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse animation-delay-2000"></div>
-            <div class="absolute top-20 left-20 w-64 h-64 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse animation-delay-4000"></div>
+            <div class="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-2xl opacity-60 animate-pulse"></div>
+            <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-2xl opacity-60 animate-pulse animation-delay-2000"></div>
+            <div class="absolute top-24 left-16 w-72 h-72 bg-indigo-300 rounded-full mix-blend-multiply filter blur-2xl opacity-60 animate-pulse animation-delay-4000"></div>
+            <!-- subtle radial lighting -->
+            <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(1200px 400px at 20% 10%, rgba(99,102,241,0.10), transparent), radial-gradient(800px 300px at 90% 80%, rgba(236,72,153,0.10), transparent);"></div>
         </div>
         
         <div class="container mx-auto px-6 py-20 relative z-10">
             <div class="flex flex-col lg:flex-row items-center justify-between gap-16 min-h-[80vh]">
-                <!-- Left Content -->
-                <div class="flex-1 text-white" data-aos="fade-right" data-aos-duration="1000">
-                    <div class="inline-flex items-center px-4 py-2 bg-white bg-opacity-10 rounded-full text-sm font-medium mb-8 backdrop-blur-md border border-white border-opacity-20">
+                <!-- Left Content (dynamic details) -->
+                @php $heroBooks = $newArrivals->take(6); $firstHero = $heroBooks->first(); @endphp
+                <div class="flex-1 text-gray-900" data-aos="fade-right" data-aos-duration="1000">
+                    <div class="mb-6">
+                        <span class="inline-flex items-center px-4 py-2 bg-white bg-opacity-70 rounded-full text-sm font-medium backdrop-blur-md border border-white/60 shadow-sm">
                         <span class="w-2 h-2 bg-yellow-400 rounded-full mr-2 animate-pulse"></span>
-                        ✨ LIMITED TIME OFFER
+                            <span id="hero-genre">{{ optional($firstHero->genre)->name }}</span>
+                        </span>
                     </div>
-                    <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-8 bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
-                        Discover Your<br>
-                        <span class="text-yellow-300">Next Favorite</span><br>
-                        Story
+                    <h1 id="hero-title" class="text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight mb-4 bg-gradient-to-r from-gray-900 via-purple-800 to-indigo-800 bg-clip-text text-transparent" style="line-height: 1.1; display: inline-block;">
+                        
+                            {{ $firstHero?->title }}
+                        
                     </h1>
-                    <p class="text-xl md:text-2xl mb-10 max-w-2xl text-purple-100 leading-relaxed">
-                        Immerse yourself in thousands of captivating books. From bestsellers to hidden gems, find your perfect read today.
+                    <p id="hero-synopsis" class="text-lg md:text-xl mb-8 max-w-2xl text-gray-600 leading-relaxed">
+                        {{ \Illuminate\Support\Str::limit($firstHero?->synopsis ?? 'Discover your next favorite story.', 200) }}
                     </p>
                     <div class="flex flex-wrap gap-6">
-                        <a href="{{ route('books.index') }}" class="group inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-full transition-all duration-300 shadow-2xl hover:shadow-purple-500/25 hover:scale-105 transform">
-                            <span class="mr-2">EXPLORE BOOKS</span>
+                        <a id="hero-details-link" href="{{ $firstHero ? route('books.show', $firstHero) : '#' }}" class="group inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-full transition-all duration-300 shadow-xl hover:shadow-purple-400/30 hover:scale-105 transform">
+                            <span class="mr-2">VIEW DETAILS</span>
                             <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
                             </svg>
                         </a>
-                        <button class="inline-flex items-center px-8 py-4 border-2 border-white border-opacity-30 text-white font-semibold rounded-full transition-all duration-300 hover:bg-white hover:text-purple-900 backdrop-blur-sm">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M19 10a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            WATCH TRAILER
-                        </button>
+                        @if($firstHero)
+                        <button onclick="quickAddToCart({{ $firstHero->id }})" id="hero-quick-add" class="inline-flex items-center px-8 py-4 border-2 border-indigo-200 text-indigo-700 font-semibold rounded-full bg-white/70 hover:bg-white transition-all duration-300 shadow-sm">Quick Add</button>
+                        @endif
                     </div>
                     
                     <!-- Stats Row -->
@@ -59,66 +61,127 @@
                     </div>
                 </div>
 
-                <!-- Right Content - Modern Book Showcase -->
+                <!-- Right Content - Portrait cover slider -->
                 <div class="flex-1 relative" data-aos="fade-left" data-aos-duration="1000">
-                    <div class="relative max-w-lg mx-auto">
-                        <!-- Floating Books Animation -->
-                        <div class="relative h-[500px] w-full">
-                            <!-- Main Featured Book -->
-                            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
-                                <div class="w-48 h-64 bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl shadow-2xl transform rotate-6 hover:rotate-0 transition-transform duration-500">
-                                    <div class="p-6 h-full flex flex-col justify-between text-white">
-                                        <div>
-                                            <div class="w-8 h-1 bg-white rounded mb-4"></div>
-                                            <div class="w-12 h-1 bg-white rounded opacity-75 mb-2"></div>
-                                            <div class="w-16 h-1 bg-white rounded opacity-50"></div>
-                                        </div>
-                                        <div>
-                                            <div class="text-lg font-bold mb-2">Featured</div>
-                                            <div class="text-sm opacity-75">Book Collection</div>
-                                        </div>
-                                    </div>
+                    <div class="relative max-w-sm mx-auto h-[520px]">
+                        <div class="absolute -inset-6 rounded-3xl bg-gradient-to-tr from-indigo-300/30 via-purple-300/30 to-pink-300/30 blur-2xl"></div>
+                        <div id="heroCoverCarousel" class="relative w-full h-full">
+                            @foreach($heroBooks as $i => $book)
+                                @php
+                                    $coverPath = $book->cover_image;
+                                    $coverUrl = null;
+                                    try {
+                                        if ($coverPath && \Illuminate\Support\Facades\Storage::disk('public')->exists($coverPath)) {
+                                            $coverUrl = \Illuminate\Support\Facades\Storage::url($coverPath);
+                                        }
+                                    } catch (\Throwable $e) {
+                                        $coverUrl = null;
+                                    }
+                                @endphp
+                                @php
+                                    // initial positions: 0=front, 1=middle, 2=back, others hidden
+                                    $posClass = '';
+                                    if ($i === 0) {
+                                        $posClass = 'z-30 opacity-100 translate-x-0 translate-y-0 scale-100 ring-2 ring-indigo-300/60';
+                                    } elseif ($i === 1) {
+                                        $posClass = 'z-20 opacity-90 translate-x-6 translate-y-3 scale-95';
+                                    } elseif ($i === 2) {
+                                        $posClass = 'z-10 opacity-70 translate-x-12 translate-y-6 scale-90';
+                                    } else {
+                                        $posClass = 'opacity-0 pointer-events-none';
+                                    }
+                                @endphp
+                                <div
+                                    class="hero-item absolute inset-0 transition-all duration-700 ease-out rounded-2xl shadow-2xl ring-1 ring-indigo-200/50 overflow-hidden bg-white aspect-[3/4] {{ $posClass }}"
+                                    data-title="{{ $book->title }}"
+                                    data-genre="{{ optional($book->genre)->name }}"
+                                    data-synopsis="{{ \Illuminate\Support\Str::limit($book->synopsis ?? '', 220) }}"
+                                    data-link="{{ route('books.show', $book) }}"
+                                    data-book-id="{{ $book->id }}"
+                                >
+                                    @if($coverUrl)
+                                        <img src="{{ $coverUrl }}" alt="{{ $book->title }}" class="w-full h-full object-contain"/>
+                                    @else
+                                        <div class="w-full h-full bg-gradient-to-br from-indigo-400 via-purple-400 to-pink-400"></div>
+                                    @endif
                                 </div>
-                            </div>
-                            
-                            <!-- Floating Book 1 -->
-                            <div class="absolute top-20 right-4 w-32 h-40 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-xl shadow-xl transform -rotate-12 animate-float">
-                                <div class="p-4 h-full flex flex-col justify-between text-white text-xs">
-                                    <div class="w-6 h-0.5 bg-white rounded"></div>
-                                    <div class="space-y-1">
-                                        <div class="w-4 h-0.5 bg-white rounded opacity-75"></div>
-                                        <div class="w-6 h-0.5 bg-white rounded opacity-50"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Floating Book 2 -->
-                            <div class="absolute bottom-16 left-8 w-28 h-36 bg-gradient-to-br from-pink-500 to-rose-600 rounded-xl shadow-xl transform rotate-12 animate-float-delayed">
-                                <div class="p-3 h-full flex flex-col justify-between text-white text-xs">
-                                    <div class="w-5 h-0.5 bg-white rounded"></div>
-                                    <div class="space-y-1">
-                                        <div class="w-3 h-0.5 bg-white rounded opacity-75"></div>
-                                        <div class="w-5 h-0.5 bg-white rounded opacity-50"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Floating Book 3 -->
-                            <div class="absolute top-32 left-12 w-24 h-32 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg shadow-lg transform -rotate-6 animate-float-slow">
-                                <div class="p-2 h-full flex flex-col justify-between text-white text-xs">
-                                    <div class="w-4 h-0.5 bg-white rounded"></div>
-                                    <div class="w-3 h-0.5 bg-white rounded opacity-50"></div>
-                                </div>
-                            </div>
-                            
-                            <!-- Decorative Elements -->
-                            <div class="absolute -top-4 -left-4 w-6 h-6 bg-yellow-400 rounded-full animate-ping"></div>
-                            <div class="absolute -bottom-2 -right-2 w-4 h-4 bg-pink-400 rounded-full animate-pulse"></div>
-                            <div class="absolute top-1/3 -left-8 w-2 h-2 bg-purple-400 rounded-full animate-bounce"></div>
+                            @endforeach
                         </div>
                     </div>
                 </div>
-            </div>
+                                </div>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const container = document.getElementById('heroCoverCarousel');
+                    if (!container) return;
+                    const slides = Array.from(container.querySelectorAll('.hero-item'));
+                    const titleEl = document.getElementById('hero-title');
+                    const genreEl = document.getElementById('hero-genre');
+                    const synopsisEl = document.getElementById('hero-synopsis');
+                    const detailsLinkEl = document.getElementById('hero-details-link');
+                    const quickAddBtnEl = document.getElementById('hero-quick-add');
+                    let i = 0; let timer;
+
+                    function setText(el, value) {
+                        if (!el) return;
+                        el.textContent = value || '';
+                    }
+
+                    function applyDetails(slide) {
+                        const t = slide.dataset.title || '';
+                        const g = slide.dataset.genre || '';
+                        const syn = slide.dataset.synopsis || '';
+                        const href = slide.dataset.link || '#';
+                        const id = slide.dataset.bookId || '';
+
+                        setText(titleEl, t);
+                        setText(synopsisEl, syn);
+
+                        if (genreEl) {
+                            if (g) {
+                                genreEl.textContent = g;
+                                genreEl.parentElement?.classList?.remove('invisible');
+                            } else {
+                                genreEl.textContent = '';
+                                genreEl.parentElement?.classList?.add('invisible');
+                            }
+                        }
+
+                        if (detailsLinkEl && href) detailsLinkEl.href = href;
+                        if (quickAddBtnEl && id) quickAddBtnEl.setAttribute('onclick', `quickAddToCart(${id})`);
+                    }
+
+                    function show(n) {
+                        const total = slides.length;
+                        const prev = (n - 1 + total) % total;
+                        const next = (n + 1) % total;
+
+                        slides.forEach((el, idx) => {
+                            el.classList.remove('z-30','z-20','z-10','opacity-100','opacity-90','opacity-70','opacity-0','translate-x-0','translate-x-6','translate-x-12','translate-y-0','translate-y-3','translate-y-6','scale-100','scale-95','scale-90','ring-2','ring-indigo-300/60','pointer-events-none');
+                            el.classList.add('absolute');
+                            if (idx === n) {
+                                el.classList.add('z-30','opacity-100','translate-x-0','translate-y-0','scale-100','ring-2','ring-indigo-300/60');
+                            } else if (idx === next) {
+                                el.classList.add('z-20','opacity-90','translate-x-6','translate-y-3','scale-95');
+                            } else if (idx === prev) {
+                                el.classList.add('z-10','opacity-70','translate-x-12','translate-y-6','scale-90');
+                            } else {
+                                el.classList.add('opacity-0','pointer-events-none');
+                            }
+                        });
+                        applyDetails(slides[n]);
+                    }
+
+                    function next() { i = (i + 1) % slides.length; show(i); }
+                    function start() { timer = setInterval(next, 4000); }
+                    function stop() { if (timer) clearInterval(timer); }
+
+                    container.addEventListener('mouseenter', stop);
+                    container.addEventListener('mouseleave', start);
+
+                    if (slides.length) { show(i); start(); }
+                });
+            </script>
         </div>
         
         <!-- Scroll Indicator -->
@@ -128,6 +191,8 @@
             </svg>
         </div>
     </div>
+                            
+   
 
     <!-- Genre Gallery with Filters (Flowbite-style) -->
     <div class="py-20 bg-white">
