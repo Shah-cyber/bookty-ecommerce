@@ -25,7 +25,8 @@
             <div :class="{'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen}" class="fixed inset-y-0 left-0 z-30 w-64 overflow-y-auto transition duration-300 transform bg-white shadow-lg lg:translate-x-0 lg:static lg:inset-0">
                 <div class="flex items-center justify-center mt-8">
                     <div class="flex items-center">
-                        <img src="{{ asset('storage/BooktyLogo/BooktyL.png') }}" alt="Bookty Logo" class="h-10 w-auto">
+                        <img src="{{ asset('images/BooktyL.png') }}" alt="Bookty Logo" class="h-10 w-auto">
+
                         <span class="ml-2 text-2xl font-serif font-bold text-bookty-purple-700">SuperAdmin</span>
                     </div>
                 </div>

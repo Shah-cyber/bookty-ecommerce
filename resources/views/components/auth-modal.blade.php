@@ -26,7 +26,7 @@
                 {{-- Logo and title --}}
                 <div class="text-center text-white">
                     <div class="inline-flex items-center justify-center w-16 h-16 bg-white/20 backdrop-blur-lg rounded-full mb-4">
-                        <img src="{{ asset('storage/BooktyLogo/BooktyL.png') }}" alt="Bookty Logo" class="h-10 w-auto">
+                        <img src="{{ asset('images/BooktyL.png') }}" alt="Bookty Logo" class="h-10 w-auto">
                     </div>
                     <h1 class="text-2xl font-bold mb-2">Welcome to Bookty</h1>
                     <p class="text-purple-100 text-sm">Your gateway to endless stories</p>
