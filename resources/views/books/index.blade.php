@@ -45,6 +45,29 @@
                 </div>
 
                 <form action="{{ route('books.index') }}" method="GET" class="p-6 space-y-6">
+                  <!-- Author Filter -->
+                  <div class="filter-section">
+                    <button type="button" data-collapse-toggle="author-filters"
+                      class="flex items-center justify-between w-full text-sm font-bold text-gray-900 group">
+                      Authors
+                      <svg class="w-4 h-4 ml-2 text-gray-500 group-hover:text-purple-600 transition-transform"
+                           data-collapse-icon fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M19 9l-7 7-7-7"/>
+                      </svg>
+                    </button>
+                    <div id="author-filters" class="space-y-2 mt-3 max-h-48 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-purple-200 scrollbar-track-gray-100 hidden">
+                      @foreach($authors as $author)
+                        <label for="author-{{ Str::slug($author) }}" 
+                               class="flex items-center px-2 py-1.5 rounded-md cursor-pointer hover:bg-purple-50 transition">
+                          <input id="author-{{ \Illuminate\Support\Str::slug($author) }}" name="author" type="radio" value="{{ $author }}"
+                                 {{ request('author') == $author ? 'checked' : '' }}
+                                 class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
+                          <span class="ml-2 text-sm text-gray-700">{{ $author }}</span>
+                        </label>
+                      @endforeach
+                    </div>
+                  </div>
                   <!-- Genre Filter -->
                   <div class="filter-section">
                     <button type="button" data-collapse-toggle="genre-filters"
@@ -148,6 +171,8 @@
                             {{ $genres->where('id', request('genre'))->first()->name }} Books
                         @elseif(request('trope') && $tropes->where('id', request('trope'))->first())
                             Books with {{ $tropes->where('id', request('trope'))->first()->name }} Trope
+                        @elseif(request('author'))
+                            Books by {{ request('author') }}
                         @else
                             All Books
                         @endif
@@ -163,6 +188,9 @@
                                 @endif
                                 @if(request('trope'))
                                     <input type="hidden" name="trope" value="{{ request('trope') }}">
+                                @endif
+                                @if(request('author'))
+                                    <input type="hidden" name="author" value="{{ request('author') }}">
                                 @endif
                                 @if(request('price_min'))
                                     <input type="hidden" name="price_min" value="{{ request('price_min') }}">
@@ -228,12 +256,23 @@
                     </div>
                     
                     <!-- Active Filters -->
-                    @if(request('genre') || request('trope') || request('price_min') || request('price_max'))
+                    @if(request('genre') || request('trope') || request('author') || request('price_min') || request('price_max'))
                         <div class="mt-4 flex flex-wrap gap-2">
                             @if(request('genre') && $genres->where('id', request('genre'))->first())
                                 <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
                                     Genre: {{ $genres->where('id', request('genre'))->first()->name }}
                                     <a href="{{ route('books.index', request()->except('genre')) }}" class="ml-1 text-purple-600 hover:text-purple-800">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </a>
+                                </div>
+                            @endif
+
+                            @if(request('author'))
+                                <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                    Author: {{ request('author') }}
+                                    <a href="{{ route('books.index', request()->except('author')) }}" class="ml-1 text-blue-600 hover:text-blue-800">
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                         </svg>
@@ -270,7 +309,7 @@
                                 </div>
                             @endif
                             
-                            @if(request('genre') || request('trope') || request('price_min') || request('price_max'))
+                            @if(request('genre') || request('trope') || request('author') || request('price_min') || request('price_max'))
                                 <a href="{{ route('books.index') }}" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 hover:bg-gray-200">
                                     Clear All Filters
                                 </a>

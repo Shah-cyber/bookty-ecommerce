@@ -25,6 +25,11 @@ class BookController extends Controller
                 $q->where('tropes.id', $request->trope);
             });
         }
+
+        // Apply author filter
+        if ($request->has('author') && $request->author) {
+            $query->where('author', $request->author);
+        }
         
         // Apply price filter
         if ($request->has('price_min') && $request->price_min) {
@@ -58,11 +63,12 @@ class BookController extends Controller
         
         $books = $query->paginate(12);
         
-        // Get all genres and tropes for filters
+        // Get all genres, tropes and authors for filters
         $genres = Genre::all();
         $tropes = Trope::all();
+        $authors = Book::select('author')->distinct()->orderBy('author')->pluck('author');
         
-        return view('books.index', compact('books', 'genres', 'tropes'));
+        return view('books.index', compact('books', 'genres', 'tropes', 'authors'));
     }
     
     public function show(Book $book)

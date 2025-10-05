@@ -47,41 +47,22 @@
                         
                         <div x-show="open" @mouseenter="open = true" @mouseleave="open = false" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95 translate-y-1" x-transition:enter-end="opacity-100 scale-100 translate-y-0" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100 translate-y-0" x-transition:leave-end="opacity-0 scale-95 translate-y-1" class="absolute top-full left-0 mt-1 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 py-2 z-50 backdrop-blur-sm">
                             <div class="px-4 py-2 border-b border-gray-100">
-                                <h3 class="text-sm font-semibold text-gray-900">Browse by Genre</h3>
+                                <h3 class="text-sm font-semibold text-gray-900">Browse by Author</h3>
                             </div>
-                            <a href="{{ route('books.index', ['genre' => '1']) }}" class="flex items-center px-4 py-3 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 transition-colors duration-200">
+                            @php $navAuthors = \App\Models\Book::select('author')->distinct()->orderBy('author')->limit(6)->pluck('author'); @endphp
+                            @foreach($navAuthors as $navAuthor)
+                            <a href="{{ route('books.index', ['author' => $navAuthor]) }}" class="flex items-center px-4 py-3 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 transition-colors duration-200">
                                 <div class="w-8 h-8 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg flex items-center justify-center mr-3">
                                     <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                                     </svg>
                                 </div>
                                 <div>
-                                    <div class="text-sm font-medium text-gray-900">Romance</div>
-                                    <div class="text-xs text-gray-500">Love stories & relationships</div>
+                                    <div class="text-sm font-medium text-gray-900">{{ $navAuthor }}</div>
+                                    <div class="text-xs text-gray-500">View books by this author</div>
                                 </div>
                             </a>
-                            <a href="{{ route('books.index', ['genre' => '2']) }}" class="flex items-center px-4 py-3 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 transition-colors duration-200">
-                                <div class="w-8 h-8 bg-gradient-to-br from-indigo-100 to-blue-100 rounded-lg flex items-center justify-center mr-3">
-                                    <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <div class="text-sm font-medium text-gray-900">Mystery</div>
-                                    <div class="text-xs text-gray-500">Thrillers & detective stories</div>
-                                </div>
-                            </a>
-                            <a href="{{ route('books.index', ['genre' => '3']) }}" class="flex items-center px-4 py-3 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 transition-colors duration-200">
-                                <div class="w-8 h-8 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-lg flex items-center justify-center mr-3">
-                                    <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <div class="text-sm font-medium text-gray-900">Fantasy</div>
-                                    <div class="text-xs text-gray-500">Magic & adventure</div>
-                                </div>
-                            </a>
+                            @endforeach
                             <div class="border-t border-gray-100 pt-2 mt-2">
                                 <a href="{{ route('books.index') }}" class="block px-4 py-2 text-sm text-purple-600 font-medium hover:text-purple-700">View All Collections →</a>
                             </div>
