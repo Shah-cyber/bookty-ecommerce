@@ -191,6 +191,45 @@
             </svg>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterButtons = Array.from(document.querySelectorAll('#genreFilters .genre-filter-btn'));
+            const items = Array.from(document.querySelectorAll('#genreGallery .gallery-item'));
+            const emptyState = document.getElementById('galleryEmptyState');
+
+            function applyFilter(filter) {
+                let visible = 0;
+                items.forEach((el) => {
+                    const match = filter === 'all' || String(el.dataset.genreId) === String(filter);
+                    el.style.display = match ? '' : 'none';
+                    if (match) visible++;
+                });
+                if (emptyState) emptyState.classList.toggle('hidden', visible > 0);
+            }
+
+            function setActive(btn) {
+                filterButtons.forEach(b => {
+                    b.classList.remove('bg-indigo-700','text-white','border-indigo-700');
+                    b.classList.add('bg-white','text-gray-900','border-white');
+                });
+                btn.classList.remove('bg-white','text-gray-900','border-white');
+                btn.classList.add('bg-indigo-700','text-white','border-indigo-700');
+            }
+
+            filterButtons.forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    setActive(btn);
+                    applyFilter(btn.dataset.filter);
+                });
+            });
+
+            // Initialize
+            const initial = document.querySelector('#genreFilters .genre-filter-btn[data-filter="all"]');
+            if (initial) setActive(initial);
+            applyFilter('all');
+        });
+    </script>
                             
    
 
