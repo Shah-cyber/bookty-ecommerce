@@ -1,4 +1,4 @@
-<nav class="bg-white/95 backdrop-blur-md shadow-lg z-50 sticky top-0 transition-all duration-300 nav-fade-in">
+<nav x-data="{ open: false }" class="bg-white/95 backdrop-blur-md shadow-lg z-50 sticky top-0 transition-all duration-300 nav-fade-in">
     <!-- Removed decorative gradient border -->
     
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -307,7 +307,7 @@
 
             <!-- Enhanced Mobile menu button -->
             <div class="-mr-2 flex items-center sm:hidden">
-                <button x-data="{ open: false }" @click="open = !open; document.getElementById('mobile-menu').classList.toggle('hidden')" type="button" class="group inline-flex items-center justify-center p-3 rounded-2xl text-gray-600 hover:text-purple-600 hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/10" aria-controls="mobile-menu" aria-expanded="false">
+                <button @click="open = !open" type="button" class="group inline-flex items-center justify-center p-3 rounded-2xl text-gray-600 hover:text-purple-600 hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/10 h-12" :aria-expanded="open.toString()" aria-controls="mobile-menu">
                     <span class="sr-only">Open main menu</span>
                     <svg class="block h-5 w-5 transition-transform duration-300 group-hover:scale-110" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -318,9 +318,14 @@
     </div>
 
     <!-- Enhanced Mobile menu -->
-    <div class="sm:hidden hidden" id="mobile-menu">
-        <div class="bg-white/95 backdrop-blur-md border-t border-gray-100">
-            <div class="pt-4 pb-3 space-y-2 px-4">
+    <div class="sm:hidden" id="mobile-menu" x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-2" @keydown.escape.window="open=false">
+        <div class="fixed inset-x-0 top-0 mt-20 bg-white/95 backdrop-blur-md border-t border-gray-100 shadow-lg">
+            <div class="pt-4 pb-3 space-y-2 px-4" x-data="{ colOpen: false }">
+                <!-- Logo on top for mobile -->
+                <a href="{{ route('home') }}" class="flex items-center mb-2">
+                    <img src="{{ asset('images/BooktyL.png') }}" alt="Bookty Logo" class="h-8 w-auto">
+                    <span class="ml-2 text-lg font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">Bookty</span>
+                </a>
                 <a href="{{ route('home') }}" class="flex items-center px-4 py-3 rounded-2xl {{ request()->routeIs('home') ? 'bg-gradient-to-r from-purple-50 to-pink-50 text-purple-700 border-l-4 border-purple-500' : 'text-gray-700 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 hover:text-purple-700' }} text-base font-medium transition-all duration-200">
                     <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
@@ -333,12 +338,27 @@
                     </svg>
                     Shop
                 </a>
-                <a href="#" class="flex items-center px-4 py-3 rounded-2xl text-gray-700 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 hover:text-purple-700 text-base font-medium transition-all duration-200">
-                    <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                <!-- Collections (mobile) with author list -->
+                <button @click="colOpen = !colOpen" type="button" class="w-full flex items-center justify-between px-4 py-3 rounded-2xl text-gray-700 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 hover:text-purple-700 text-base font-medium transition-all duration-200 h-12">
+                    <span class="flex items-center">
+                        <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                        </svg>
+                        Collections
+                    </span>
+                    <svg class="w-4 h-4 ml-2 text-gray-500 transition-transform" :class="colOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                     </svg>
-                    Collections
-                </a>
+                </button>
+                <div x-show="colOpen" x-transition class="pl-4 space-y-1">
+                    @php $mobileAuthors = \App\Models\Book::select('author')->distinct()->orderBy('author')->limit(8)->pluck('author'); @endphp
+                    @foreach($mobileAuthors as $mAuthor)
+                        <a href="{{ route('books.index', ['author' => $mAuthor]) }}" class="flex items-center px-4 py-2 rounded-xl text-gray-700 hover:bg-purple-50 hover:text-purple-700 text-sm font-medium transition-colors">
+                            <span class="truncate">{{ $mAuthor }}</span>
+                        </a>
+                    @endforeach
+                    <a href="{{ route('books.index') }}" class="block px-4 py-2 text-sm text-purple-600 font-medium hover:text-purple-700">View All →</a>
+                </div>
                 <a href="{{ route('about') }}" class="flex items-center px-4 py-3 rounded-2xl {{ request()->routeIs('about') ? 'bg-gradient-to-r from-purple-50 to-pink-50 text-purple-700 border-l-4 border-purple-500' : 'text-gray-700 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 hover:text-purple-700' }} text-base font-medium transition-all duration-200">
                     <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -351,8 +371,14 @@
                     </svg>
                     Contact
                 </a>
+
+                <!-- Search (mobile) -->
+                <div class="pt-2">
+                    <label for="search-mobile" class="sr-only">Search</label>
+                    <input id="search-mobile" name="search-mobile" class="block w-full px-4 py-3 border border-gray-200 rounded-2xl leading-5 bg-gray-50/80 backdrop-blur-sm placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 focus:bg-white text-base" placeholder="Search for books..." type="search">
+                </div>
         </div>
-            <div class="pt-4 pb-3 border-t border-gray-100 px-4">
+            <div class="pt-4 pb-6 border-t border-gray-100 px-4">
             @auth
                     <div class="flex items-center px-4 py-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl">
                     <div class="flex-shrink-0">
@@ -423,7 +449,7 @@
                     </form>
                 </div>
             @else
-                    <div class="mt-4 space-y-3 px-4">
+                    <div class="mt-4 space-y-3 px-4 pb-4">
                         <button onclick="document.dispatchEvent(new CustomEvent('open-auth-modal', {detail: 'login'}))" class="w-full px-4 py-3 text-center rounded-2xl border border-gray-200 text-gray-700 hover:bg-gray-50 text-base font-medium transition-all duration-200">
                             Log in
                         </button>

@@ -17,54 +17,56 @@
             <div class="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-16 min-h-[70vh] lg:min-h-[80vh]">
                 <!-- Left Content (dynamic details) -->
                 @php $heroBooks = $newArrivals->take(6); $firstHero = $heroBooks->first(); @endphp
-                <div class="flex-1 text-gray-900" data-aos="fade-right" data-aos-duration="1000">
+                <div class="flex-1 text-gray-900 order-2 lg:order-1 flex flex-col items-center lg:items-start text-center lg:text-left" data-aos="fade-right" data-aos-duration="1000">
                     <div class="mb-6">
                         <span class="inline-flex items-center px-4 py-2 bg-white bg-opacity-70 rounded-full text-sm font-medium backdrop-blur-md border border-white/60 shadow-sm">
                         <span class="w-2 h-2 bg-yellow-400 rounded-full mr-2 animate-pulse"></span>
                             <span id="hero-genre">{{ optional($firstHero->genre)->name }}</span>
                         </span>
                     </div>
-                    <h1 id="hero-title" class="text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight mb-4 bg-gradient-to-r from-gray-900 via-purple-800 to-indigo-800 bg-clip-text text-transparent" style="line-height: 1.1; display: inline-block;">
+                    <h1 id="hero-title" class="text-3xl md:text-5xl lg:text-7xl font-extrabold leading-tight mb-4 bg-gradient-to-r from-gray-900 via-purple-800 to-indigo-800 bg-clip-text text-transparent" style="line-height: 1.15; display: inline-block;">
                         
                             {{ $firstHero?->title }}
                         
                     </h1>
-                    <p id="hero-synopsis" class="text-lg md:text-xl mb-8 max-w-2xl text-gray-600 leading-relaxed">
+                    <p id="hero-synopsis" class="text-base md:text-lg mb-8 max-w-2xl px-1 text-gray-600 leading-relaxed">
                         {{ \Illuminate\Support\Str::limit($firstHero?->synopsis ?? 'Discover your next favorite story.', 200) }}
                     </p>
-                    <div class="flex flex-wrap gap-6">
-                        <a id="hero-details-link" href="{{ $firstHero ? route('books.show', $firstHero) : '#' }}" class="group inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-full transition-all duration-300 shadow-xl hover:shadow-purple-400/30 hover:scale-105 transform">
+                    <div class="flex flex-col sm:flex-row w-full items-stretch sm:items-center justify-center sm:justify-start gap-3 sm:gap-6">
+                        <a id="hero-details-link" href="{{ $firstHero ? route('books.show', $firstHero) : '#' }}" class="group inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-full transition-all duration-300 shadow-xl hover:shadow-purple-400/30 hover:scale-105 transform">
                             <span class="mr-2">VIEW DETAILS</span>
                             <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
                             </svg>
                         </a>
                         @if($firstHero)
-                        <button onclick="quickAddToCart({{ $firstHero->id }})" id="hero-quick-add" class="inline-flex items-center px-8 py-4 border-2 border-indigo-200 text-indigo-700 font-semibold rounded-full bg-white/70 hover:bg-white transition-all duration-300 shadow-sm">Quick Add</button>
+                        <button onclick="quickAddToCart({{ $firstHero->id }})" id="hero-quick-add" class="inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 border-2 border-indigo-200 text-indigo-700 font-semibold rounded-full bg-white/70 hover:bg-white transition-all duration-300 shadow-sm">Quick Add</button>
                         @endif
                     </div>
                     
                     <!-- Stats Row -->
-                    <div class="flex flex-wrap gap-8 mt-16 pt-8 border-t border-white border-opacity-20">
-                        <div class="text-center" data-aos="fade-up" data-aos-delay="200">
+                    <div class="w-full overflow-x-auto mt-10 sm:mt-16 pt-6 sm:pt-8 border-t border-white border-opacity-20">
+                        <div class="flex items-stretch justify-center sm:justify-start gap-6 sm:gap-8 min-w-max">
+                        <div class="text-center min-w-[120px]" data-aos="fade-up" data-aos-delay="200">
                             <div class="text-3xl font-bold text-yellow-300">10K+</div>
                             <div class="text-purple-200 text-sm">Happy Readers</div>
                         </div>
-                        <div class="text-center" data-aos="fade-up" data-aos-delay="400">
+                        <div class="text-center min-w-[120px]" data-aos="fade-up" data-aos-delay="400">
                             <div class="text-3xl font-bold text-yellow-300">5K+</div>
                             <div class="text-purple-200 text-sm">Books Available</div>
                         </div>
-                        <div class="text-center" data-aos="fade-up" data-aos-delay="600">
+                        <div class="text-center min-w-[120px]" data-aos="fade-up" data-aos-delay="600">
                             <div class="text-3xl font-bold text-yellow-300">98%</div>
                             <div class="text-purple-200 text-sm">Satisfaction Rate</div>
+                        </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Right Content - Portrait cover slider -->
-                <div class="flex-1 w-full" data-aos="fade-left" data-aos-duration="1000">
-                    <div class="relative max-w-xs sm:max-w-sm md:max-w-md lg:max-w-sm mx-auto h-[420px] sm:h-[520px]">
-                        <div class="absolute -inset-6 rounded-3xl bg-gradient-to-tr from-indigo-300/30 via-purple-300/30 to-pink-300/30 blur-2xl"></div>
+                <div class="flex-1 w-full order-1 lg:order-2" data-aos="fade-left" data-aos-duration="1000">
+                    <div class="relative max-w-xs sm:max-w-sm md:max-w-md lg:max-w-sm mx-auto h-[360px] sm:h-[520px]">
+                        <div class="absolute -inset-3 sm:-inset-6 rounded-3xl bg-gradient-to-tr from-indigo-300/30 via-purple-300/30 to-pink-300/30 blur-xl sm:blur-2xl"></div>
                         <div id="heroCoverCarousel" class="relative w-full h-full">
                             @foreach($heroBooks as $i => $book)
                                 @php
