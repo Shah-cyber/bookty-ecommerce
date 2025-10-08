@@ -17,7 +17,12 @@ class Review extends Model
         'order_item_id',
         'rating',
         'comment',
+        'images',
         'is_approved'
+    ];
+
+    protected $casts = [
+        'images' => 'array',
     ];
     
     /**
@@ -82,5 +87,39 @@ class Review extends Model
     public function isReportedBy($userId): bool
     {
         return $this->reports()->where('user_id', $userId)->exists();
+    }
+
+    /**
+     * Get the review images with full URLs.
+     */
+    public function getImageUrlsAttribute(): array
+    {
+        if (!$this->images) {
+            return [];
+        }
+
+        return array_map(function ($image) {
+            return asset('storage/' . $image);
+        }, $this->images);
+    }
+
+    /**
+     * Check if the review has images.
+     */
+    public function hasImages(): bool
+    {
+        return !empty($this->images);
+    }
+
+    /**
+     * Get the first image URL for thumbnail display.
+     */
+    public function getFirstImageUrlAttribute(): ?string
+    {
+        if (!$this->images || empty($this->images)) {
+            return null;
+        }
+
+        return asset('storage/' . $this->images[0]);
     }
 }

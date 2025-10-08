@@ -16,13 +16,9 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     
-    <!-- Notyf Toast Notification Library -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js" defer></script>
-    <script src="{{ asset('js/toast.js') }}" defer></script>
 
 </head>
-<body class="font-sans antialiased">
+    <body class="font-sans antialiased" data-layout="admin">
     <div class="min-h-screen bg-bookty-cream dark:bg-gray-900">
         <div x-data="{ sidebarOpen: false }" class="flex h-screen bg-bookty-cream dark:bg-gray-900">
             <!-- Sidebar -->

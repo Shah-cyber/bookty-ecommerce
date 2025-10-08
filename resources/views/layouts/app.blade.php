@@ -23,7 +23,7 @@
             [x-cloak] { display: none !important; }
         </style>
     </head>
-    <body class="font-sans antialiased">
+    <body class="font-sans antialiased" data-layout="customer">
         <div class="min-h-screen bg-gray-100">
             @include('layouts.navigation')
 

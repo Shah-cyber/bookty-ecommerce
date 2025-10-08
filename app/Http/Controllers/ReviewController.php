@@ -9,6 +9,7 @@ use App\Models\ReviewReport;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ReviewController extends Controller
 {
@@ -29,6 +30,14 @@ class ReviewController extends Controller
             'rating' => 'required|integer|min:1|max:5',
             'comment' => 'nullable|string|max:1000',
             'order_item_id' => 'required|exists:order_items,id',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Max 2MB per image
+        ]);
+        
+        // Debug: Log the uploaded files
+        \Log::info('Review submission debug:', [
+            'has_images' => $request->hasFile('images'),
+            'files_count' => $request->hasFile('images') ? count($request->file('images')) : 0,
+            'all_files' => $request->allFiles(),
         ]);
         
         // Check if user has purchased the book
@@ -43,6 +52,17 @@ class ReviewController extends Controller
                 ->with('error', 'You have already reviewed this book.');
         }
         
+        // Handle image uploads
+        $imagePaths = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                // Generate a unique filename with timestamp
+                $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                $path = $image->storeAs('reviews', $filename, 'public');
+                $imagePaths[] = $path;
+            }
+        }
+        
         // Create the review
         $review = new Review([
             'user_id' => Auth::id(),
@@ -50,6 +70,7 @@ class ReviewController extends Controller
             'order_item_id' => $request->order_item_id,
             'rating' => $request->rating,
             'comment' => $request->comment,
+            'images' => $imagePaths,
             'is_approved' => true, // Auto-approve for now, can be changed for moderation workflow
         ]);
         

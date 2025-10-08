@@ -40,7 +40,7 @@ class GenreController extends Controller
         Genre::create($request->all());
 
         return redirect()->route('admin.genres.index')
-            ->with('success', "🏷️ Genre '{$request->name}' has been created successfully!");
+            ->with('success', " Genre '{$request->name}' has been created successfully!");
     }
 
     /**
@@ -73,7 +73,7 @@ class GenreController extends Controller
         $genre->update($request->all());
 
         return redirect()->route('admin.genres.index')
-            ->with('success', "✅ Genre '{$genre->name}' has been updated successfully!");
+            ->with('success', " Genre '{$genre->name}' has been updated successfully!");
     }
 
     /**
@@ -84,12 +84,12 @@ class GenreController extends Controller
         // Check if genre has books
         if ($genre->books()->count() > 0) {
             return redirect()->route('admin.genres.index')
-                ->with('error', "⚠️ Cannot delete '{$genre->name}' because it has {$genre->books()->count()} associated books.");
+                ->with('error', " Cannot delete '{$genre->name}' because it has {$genre->books()->count()} associated books.");
         }
 
         $genre->delete();
 
         return redirect()->route('admin.genres.index')
-            ->with('success', "🗑️ Genre '{$genre->name}' has been deleted successfully!");
+            ->with('success', " Genre '{$genre->name}' has been deleted successfully!");
     }
 }

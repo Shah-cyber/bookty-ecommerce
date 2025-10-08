@@ -8,17 +8,7 @@
             </a>
         </div>
 
-        @if(session('success'))
-            <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6" role="alert">
-                <p>{{ session('success') }}</p>
-            </div>
-        @endif
-
-        @if(session('error'))
-            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
-                <p>{{ session('error') }}</p>
-            </div>
-        @endif
+        {{-- Flash messages are now handled by JavaScript toast notifications --}}
 
         <div class="bg-white rounded-lg shadow-lg overflow-hidden">
             <div class="md:flex">
@@ -52,17 +42,11 @@
                             </div>
 
                             <div class="flex flex-col space-y-4">
-                                <div class="mb-4">
-                                    <label for="quantity" class="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
-                                    <input type="number" id="quantity" value="1" min="1" max="{{ $book->stock }}" class="w-full border-gray-300 rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50" {{ $book->stock < 1 ? 'disabled' : '' }}>
-                                </div>
-                                
                                 @if($book->stock > 0)
                                     <button 
                                         type="button" 
                                         class="ajax-add-to-cart w-full px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
                                         data-book-id="{{ $book->id }}"
-                                        onclick="addToCart({{ $book->id }}, document.getElementById('quantity').value, this)"
                                     >
                                         Add to Cart
                                     </button>
@@ -157,235 +141,340 @@
         </div>
 
         <!-- Customer Reviews -->
-        <div class="mt-12 bg-white rounded-lg shadow-lg overflow-hidden">
-            <div class="p-6 border-b border-gray-200">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-2xl font-serif font-bold text-gray-900">Customer Reviews</h2>
-                    <div class="flex items-center">
-                        @php
-                            $avgRating = $book->average_rating;
-                            $reviewsCount = $book->reviews_count;
-                        @endphp
-                        
-                        <div class="flex">
-                            @for ($i = 1; $i <= 5; $i++)
-                                @if ($i <= $avgRating)
-                                    <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                    </svg>
-                                @elseif ($i - 0.5 <= $avgRating)
-                                    <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                    </svg>
-                                @else
-                                    <svg class="w-5 h-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                    </svg>
-                                @endif
-                            @endfor
-                        </div>
-                        <span class="ml-2 text-sm text-gray-600">
-                            {{ $avgRating ? $avgRating : 'No' }} rating{{ $avgRating != 1 ? 's' : '' }} from {{ $reviewsCount }} review{{ $reviewsCount != 1 ? 's' : '' }}
-                        </span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Write a Review Form -->
-            @auth
-                @if($canReview && !$hasReviewed && $orderItem)
-                    <div class="p-6 bg-purple-50">
-                        <h3 class="text-xl font-semibold text-gray-900 mb-4">Write a Review</h3>
-                        <form action="{{ route('books.reviews.store', $book) }}" method="POST">
-                            @csrf
-                            <input type="hidden" name="order_item_id" value="{{ $orderItem->id }}">
-                            
-                            <div class="mb-4">
-                                <label for="rating" class="block text-sm font-medium text-gray-700 mb-1">Rating</label>
-                                <div class="flex items-center space-x-2 star-rating">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <label class="cursor-pointer star-rating-item" data-rating="{{ $i }}">
-                                            <input type="radio" name="rating" value="{{ $i }}" class="sr-only star-input" required {{ old('rating') == $i ? 'checked' : '' }}>
-                                            <svg class="w-6 h-6 text-gray-300 star-svg transition-colors duration-200" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                                                <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+        <div class="mt-12 p-6">
+            <div class="max-w-screen-xl mx-auto">
+                <div class="flex max-lg:flex-col gap-12">
+                    <!-- Left Sidebar - Review Statistics -->
+                    <div class="max-w-sm w-full">
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-900 !leading-tight mb-2">Customer reviews</h2>
+                            <div class="flex items-center gap-2">
+                                <div class="flex items-center gap-0.5 text-orange-500">
+                                    @for ($i = 1; $i <= 5; $i++)
+                                        @if ($i <= $reviewStats['average'])
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-[18px] h-[18px] fill-current" viewBox="0 0 24 24">
+                                                <path d="M12 17.42L6.25 21.54c-.29.2-.66-.09-.56-.43l2.14-6.74L2.08 10.15c-.26-.2-.13-.6.2-.62l7.07-.05L11.62 2.66c.1-.32.56-.32.66 0l2.24 6.82 7.07.05c.33.01.46.42.2.62l-5.75 4.22 2.14 6.74c.1.34-.27.63-.56.43L12 17.42z" />
                                             </svg>
-                                        </label>
+                                        @else
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-[18px] h-[18px] text-gray-300 fill-current" viewBox="0 0 24 24">
+                                                <path d="M12 17.42L6.25 21.54c-.29.2-.66-.09-.56-.43l2.14-6.74L2.08 10.15c-.26-.2-.13-.6.2-.62l7.07-.05L11.62 2.66c.1-.32.56-.32.66 0l2.24 6.82 7.07.05c.33.01.46.42.2.62l-5.75 4.22 2.14 6.74c.1.34-.27.63-.56.43L12 17.42z" />
+                                            </svg>
+                                        @endif
                                     @endfor
                                 </div>
-                                
-                                <script>
-                                    document.addEventListener('DOMContentLoaded', function() {
-                                        const starContainer = document.querySelector('.star-rating');
-                                        const stars = document.querySelectorAll('.star-rating-item');
-                                        const inputs = document.querySelectorAll('.star-input');
-                                        
-                                        // Check if there's a pre-selected value (e.g., from validation errors)
-                                        let selectedRating = 0;
-                                        inputs.forEach(input => {
-                                            if (input.checked) {
-                                                selectedRating = parseInt(input.value);
-                                                updateStars(selectedRating);
-                                            }
-                                        });
-                                        
-                                        // Add click event for each star
-                                        stars.forEach(star => {
-                                            star.addEventListener('click', function() {
-                                                const rating = parseInt(this.dataset.rating);
-                                                
-                                                // Select the correct radio button
-                                                const input = this.querySelector('input');
-                                                input.checked = true;
-                                                
-                                                // Update the UI
-                                                updateStars(rating);
-                                            });
-                                            
-                                            // Add hover effect
-                                            star.addEventListener('mouseenter', function() {
-                                                const rating = parseInt(this.dataset.rating);
-                                                hoverStars(rating);
-                                            });
-                                        });
-                                        
-                                        // Reset stars on mouse leave if no selection
-                                        starContainer.addEventListener('mouseleave', function() {
-                                            updateStars(selectedRating);
-                                        });
-                                        
-                                        // Function to update stars based on rating
-                                        function updateStars(rating) {
-                                            selectedRating = rating;
-                                            stars.forEach(star => {
-                                                const starRating = parseInt(star.dataset.rating);
-                                                const starSvg = star.querySelector('.star-svg');
-                                                
-                                                if (starRating <= rating) {
-                                                    starSvg.classList.add('text-yellow-300');
-                                                    starSvg.classList.remove('text-gray-300');
-                                                } else {
-                                                    starSvg.classList.remove('text-yellow-400');
-                                                    starSvg.classList.remove('text-yellow-300');
-                                                    starSvg.classList.add('text-gray-300');
-                                                }
-                                            });
-                                        }
-                                        
-                                        // Function for hover effect
-                                        function hoverStars(rating) {
-                                            stars.forEach(star => {
-                                                const starRating = parseInt(star.dataset.rating);
-                                                const starSvg = star.querySelector('.star-svg');
-                                                
-                                                if (starRating <= rating) {
-                                                    starSvg.classList.add('text-yellow-400');
-                                                    starSvg.classList.remove('text-gray-300');
-                                                } else {
-                                                    starSvg.classList.remove('text-yellow-400');
-                                                    starSvg.classList.add('text-gray-300');
-                                                }
-                                            });
-                                        }
-                                    });
-                                </script>
+                                <p class="text-slate-900 font-semibold text-sm">{{ $reviewStats['average'] }} out of 5</p>
                             </div>
-                            
-                            <div class="mb-4">
-                                <label for="comment" class="block text-sm font-medium text-gray-700 mb-1">Your Review</label>
-                                <textarea name="comment" id="comment" rows="4" class="w-full border-gray-300 rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50" placeholder="Share your experience with this book...">{{ old('comment') }}</textarea>
-                            </div>
-                            
-                            <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
-                                Submit Review
-                            </button>
-                        </form>
-                    </div>
-                @elseif($hasReviewed)
-                    <div class="p-6 bg-green-50">
-                        <div class="flex items-center">
-                            <svg class="w-6 h-6 text-green-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                            </svg>
-                            <p class="text-green-800 font-medium">You've already reviewed this book. Thank you for your feedback!</p>
+                            <p class="mt-4 text-slate-600 text-sm">global ratings ({{ $reviewStats['total'] }} reviews)</p>
                         </div>
-                    </div>
-                @elseif(auth()->check() && !$canReview)
-                    <div class="p-6 bg-gray-50">
-                        <p class="text-gray-600">
-                            <svg class="w-5 h-5 inline mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            Only customers who purchased this book can leave a review.
-                        </p>
-                    </div>
-                @endif
-            @else
-                <div class="p-6 bg-gray-50">
-                    <p class="text-gray-600">
-                        <svg class="w-5 h-5 inline mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        <a href="{{ route('login') }}" class="text-purple-600 hover:text-purple-800 font-medium">Sign in</a> to write a review. Only customers who purchased this book can leave a review.
-                    </p>
-                </div>
-            @endauth
-            
-            <!-- Review List (Flowbite style) -->
-            <div class="divide-y divide-gray-200">
-                @forelse($reviews as $review)
-                    <article class="p-6">
-                        <div class="flex items-center mb-4">
-                            <div class="w-10 h-10 me-4 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold">
-                                {{ strtoupper(substr($review->user->name, 0, 1)) }}
-                            </div>
-                            <div class="font-medium">
-                                <p class="text-gray-900">{{ $review->user->name }}
-                                    <time datetime="{{ $review->created_at->toIso8601String() }}" class="block text-sm text-gray-500">Reviewed on {{ $review->created_at->format('F d, Y') }}</time>
-                                </p>
-                            </div>
-                        </div>
-                        <div class="flex items-center mb-1 space-x-1">
-                            @for ($i = 1; $i <= 5; $i++)
-                                @if($i <= $review->rating)
-                                    <svg class="w-4 h-4 text-yellow-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                                        <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
-                                    </svg>
-                                @else
-                                    <svg class="w-4 h-4 text-gray-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                                        <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
-                                    </svg>
-                                @endif
+                        
+                        <!-- Rating Breakdown -->
+                        <div class="space-y-1 mt-6">
+                            @for ($rating = 5; $rating >= 1; $rating--)
+                                <div class="flex items-center">
+                                    <div class="min-w-9">
+                                        <p class="text-sm text-slate-900">{{ $rating }}.0</p>
+                                    </div>
+                                    <div class="bg-gray-300 rounded w-full h-3">
+                                        <div class="h-full rounded bg-orange-500" style="width: {{ $reviewStats['percentages'][$rating] }}%"></div>
+                                    </div>
+                                    <div class="min-w-14">
+                                        <p class="text-sm text-slate-900 ml-4">{{ $reviewStats['percentages'][$rating] }}%</p>
+                                    </div>
+                                </div>
                             @endfor
-                            <h3 class="ms-2 text-sm font-semibold text-gray-900">{{ $review->title ?? 'Customer Review' }}</h3>
                         </div>
-                        <footer class="mb-3 text-sm text-gray-500"><p>Purchased on <time datetime="{{ $review->created_at->toIso8601String() }}">{{ $review->created_at->format('M d, Y') }}</time></p></footer>
-                        @if($review->comment)
-                            <p class="mb-3 text-gray-700">{{ $review->comment }}</p>
-                        @endif
-                        <aside>
-                            <p class="mt-1 text-xs text-gray-500">{{ $review->helpful_count }} people found this helpful</p>
-                            <div class="flex items-center mt-3">
-                                <button type="button" 
-                                        class="helpful-btn px-2 py-1.5 text-xs font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 {{ $review->isMarkedHelpfulBy(Auth::id()) ? 'bg-blue-100 text-blue-700 border-blue-300' : '' }}"
-                                        data-review-id="{{ $review->id }}"
-                                        data-is-helpful="{{ $review->isMarkedHelpfulBy(Auth::id()) ? 'true' : 'false' }}">
-                                    {{ $review->isMarkedHelpfulBy(Auth::id()) ? 'Helpful ✓' : 'Helpful' }}
-                                </button>
-                                <button type="button" 
-                                        class="report-btn ps-4 text-sm font-medium text-blue-600 hover:underline border-gray-200 ms-4 border-s"
-                                        data-review-id="{{ $review->id }}">
-                                    Report abuse
-                                </button>
-                            </div>
-                        </aside>
-                    </article>
-                @empty
-                    <div class="p-6 text-center">
-                        <p class="text-gray-500">No reviews yet. Be the first to review this book!</p>
+
+                        <hr class="border-gray-300 my-6" />
+
+                        <!-- Write Review Section -->
+                        <div>
+                            <h3 class="text-lg font-semibold text-slate-900 !leading-tight mb-4">Review this product</h3>
+                            <p class="mt-4 text-slate-600 text-sm">Share your thoughts with other customers</p>
+                            @auth
+                                @if($canReview && !$hasReviewed && $orderItem)
+                                    <button type="button" id="writeReviewBtn" class="cursor-pointer px-4 py-2 text-white font-medium text-sm rounded-md mt-6 bg-orange-500 hover:bg-orange-600">Write a customer review</button>
+                                @elseif($hasReviewed)
+                                    <div class="mt-6 px-4 py-2 bg-green-100 text-green-800 rounded-md text-sm">
+                                        ✓ You've already reviewed this book. Thank you!
+                                    </div>
+                                @else
+                                    <div class="mt-6 px-4 py-2 bg-gray-100 text-gray-600 rounded-md text-sm">
+                                        Only customers who purchased this book can leave a review.
+                                    </div>
+                                @endif
+                            @else
+                                <a href="{{ route('login') }}" class="cursor-pointer px-4 py-2 text-white font-medium text-sm rounded-md mt-6 bg-orange-500 hover:bg-orange-600 inline-block">Sign in to write a review</a>
+                            @endauth
+                        </div>
                     </div>
-                @endforelse
+
+                    <!-- Right Side - Reviews -->
+                    <div class="flex-1">
+                        <!-- Reviews with Images Gallery -->
+                        @if($reviewsWithImages->count() > 0)
+                            <div>
+                                <h3 class="text-lg font-semibold text-slate-900 !leading-tight mb-4">Reviews with Images</h3>
+                                <div class="flex items-center gap-4 overflow-auto">
+                                    @foreach($reviewsWithImages as $reviewWithImage)
+                                        @foreach($reviewWithImage->image_urls as $imageUrl)
+                                            <img src="{{ $imageUrl }}" 
+                                                 class="bg-gray-100 object-cover p-2 w-[232px] h-[232px] cursor-pointer hover:opacity-90 transition-opacity" 
+                                                 alt="customer-review-image" 
+                                                 onclick="openImageModal('{{ $imageUrl }}', 0, {{ json_encode([$imageUrl]) }})" />
+                                        @endforeach
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+
+                        <!-- Individual Reviews -->
+                        <div class="divide-y divide-gray-300 {{ $reviewsWithImages->count() > 0 ? 'mt-8' : '' }}">
+                            @forelse($reviews as $review)
+                                <div class="py-6">
+                                    <div class="flex items-center gap-4">
+                                        <div class="shrink-0">
+                                            <div class="w-11 h-11 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold border-2 border-gray-400">
+                                                {{ strtoupper(substr($review->user->name, 0, 1)) }}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-slate-900 font-semibold">{{ $review->user->name }}</p>
+                                            <div class="flex items-center gap-2 mt-2">
+                                                <span class="w-4 h-4 flex items-center justify-center rounded-full bg-green-600/20">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-2 h-2 fill-green-700" viewBox="0 0 24 24">
+                                                        <path d="M9.225 20.656a1.206 1.206 0 0 1-1.71 0L.683 13.823a1.815 1.815 0 0 1 0-2.566l.855-.856a1.815 1.815 0 0 1 2.567 0l4.265 4.266L19.895 3.14a1.815 1.815 0 0 1 2.567 0l.855.856a1.815 1.815 0 0 1 0 2.566z" />
+                                                    </svg>
+                                                </span>
+                                                <p class="text-slate-600 text-xs">Verified Buyer</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4">
+                                        <h6 class="text-slate-900 text-[15px] font-semibold">{{ $review->title ?? 'Customer Review' }}</h6>
+                                        <div class="flex items-center space-x-0.5 text-orange-500 mt-2">
+                                            @for ($i = 1; $i <= 5; $i++)
+                                                @if($i <= $review->rating)
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-[18px] h-[18px] fill-current" viewBox="0 0 24 24">
+                                                        <path d="M12 17.42L6.25 21.54c-.29.2-.66-.09-.56-.43l2.14-6.74L2.08 10.15c-.26-.2-.13-.6.2-.62l7.07-.05L11.62 2.66c.1-.32.56-.32.66 0l2.24 6.82 7.07.05c.33.01.46.42.2.62l-5.75 4.22 2.14 6.74c.1.34-.27.63-.56.43L12 17.42z" />
+                                                    </svg>
+                                                @else
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-[18px] h-[18px] text-gray-300 fill-current" viewBox="0 0 24 24">
+                                                        <path d="M12 17.42L6.25 21.54c-.29.2-.66-.09-.56-.43l2.14-6.74L2.08 10.15c-.26-.2-.13-.6.2-.62l7.07-.05L11.62 2.66c.1-.32.56-.32.66 0l2.24 6.82 7.07.05c.33.01.46.42.2.62l-5.75 4.22 2.14 6.74c.1.34-.27.63-.56.43L12 17.42z" />
+                                                    </svg>
+                                                @endif
+                                            @endfor
+                                            <p class="text-slate-600 text-sm !ml-2">{{ $review->created_at->diffForHumans() }}</p>
+                                        </div>
+                                        @if($review->comment)
+                                            <div class="mt-4">
+                                                <p class="text-slate-600 text-sm leading-relaxed">{{ $review->comment }}</p>
+                                            </div>
+                                        @endif
+                                    </div>
+                                    
+                                    <!-- Review Images -->
+                                    @if($review->hasImages())
+                                        <div class="flex items-center gap-4 mt-4 overflow-auto">
+                                            @foreach($review->image_urls as $index => $imageUrl)
+                                                <img src="{{ $imageUrl }}" 
+                                                     class="bg-gray-100 object-cover p-2 w-48 h-48 cursor-pointer hover:opacity-90 transition-opacity" 
+                                                     alt="review-img-{{ $index + 1 }}" 
+                                                     onclick="openImageModal('{{ $imageUrl }}', {{ $index }}, {{ json_encode($review->image_urls) }})" />
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                    
+                                    <!-- Review Actions -->
+                                    <div class="mt-4">
+                                        <p class="text-xs text-gray-500 mb-2">{{ $review->helpful_count }} people found this helpful</p>
+                                        <div class="flex items-center gap-4">
+                                            @auth
+                                                <button type="button" 
+                                                        class="helpful-btn px-3 py-1.5 text-xs font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 {{ $review->isMarkedHelpfulBy(Auth::id()) ? 'bg-blue-100 text-blue-700 border-blue-300' : '' }}"
+                                                        data-review-id="{{ $review->id }}"
+                                                        data-is-helpful="{{ $review->isMarkedHelpfulBy(Auth::id()) ? 'true' : 'false' }}">
+                                                    {{ $review->isMarkedHelpfulBy(Auth::id()) ? 'Helpful ✓' : 'Helpful' }}
+                                                </button>
+                                                <button type="button" 
+                                                        class="report-btn text-sm font-medium text-blue-600 hover:underline"
+                                                        data-review-id="{{ $review->id }}">
+                                                    Report abuse
+                                                </button>
+                                            @endauth
+                                        </div>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="py-6 text-center">
+                                    <p class="text-gray-500">No reviews yet. Be the first to review this book!</p>
+                                </div>
+                            @endforelse
+                            
+                            @if($reviews->hasPages())
+                                <div class="py-6">
+                                    <ul class="flex space-x-4 justify-end">
+                                        {{-- Previous Page Link --}}
+                                        @if ($reviews->onFirstPage())
+                                            <li class="flex items-center justify-center shrink-0 bg-gray-100 w-9 h-9 rounded-full cursor-not-allowed">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 fill-gray-300" viewBox="0 0 55.753 55.753">
+                                                    <path d="M12.745 23.915c.283-.282.59-.52.913-.727L35.266 1.581a5.4 5.4 0 0 1 7.637 7.638L24.294 27.828l18.705 18.706a5.4 5.4 0 0 1-7.636 7.637L13.658 32.464a5.367 5.367 0 0 1-.913-.727 5.367 5.367 0 0 1-1.572-3.911 5.369 5.369 0 0 1 1.572-3.911z" data-original="#000000" />
+                                                </svg>
+                                            </li>
+                                        @else
+                                            <li class="flex items-center justify-center shrink-0 hover:bg-gray-50 border-2 border-gray-300 cursor-pointer w-9 h-9 rounded-full">
+                                                <a href="{{ $reviews->previousPageUrl() }}" class="flex items-center justify-center w-full h-full">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3 fill-gray-400" viewBox="0 0 55.753 55.753">
+                                                        <path d="M12.745 23.915c.283-.282.59-.52.913-.727L35.266 1.581a5.4 5.4 0 0 1 7.637 7.638L24.294 27.828l18.705 18.706a5.4 5.4 0 0 1-7.636 7.637L13.658 32.464a5.367 5.367 0 0 1-.913-.727 5.367 5.367 0 0 1-1.572-3.911 5.369 5.369 0 0 1 1.572-3.911z" data-original="#000000" />
+                                                    </svg>
+                                                </a>
+                                            </li>
+                                        @endif
+
+                                        {{-- Pagination Elements --}}
+                                        @php
+                                            $start = max(1, $reviews->currentPage() - 2);
+                                            $end = min($reviews->lastPage(), $reviews->currentPage() + 2);
+                                        @endphp
+
+                                        {{-- First page --}}
+                                        @if($start > 1)
+                                            <li class="flex items-center justify-center shrink-0 hover:bg-gray-50 border-2 border-gray-300 cursor-pointer text-[15px] font-medium text-slate-900 w-9 h-9 rounded-full">
+                                                <a href="{{ $reviews->url(1) }}" class="flex items-center justify-center w-full h-full">1</a>
+                                            </li>
+                                            @if($start > 2)
+                                                <li class="flex items-center justify-center shrink-0 text-[15px] font-medium text-slate-900 w-9 h-9">
+                                                    <span>...</span>
+                                                </li>
+                                            @endif
+                                        @endif
+
+                                        {{-- Page numbers around current page --}}
+                                        @for ($page = $start; $page <= $end; $page++)
+                                            @if ($page == $reviews->currentPage())
+                                                <li class="flex items-center justify-center shrink-0 bg-blue-500 border-2 border-blue-500 cursor-pointer text-[15px] font-medium text-white w-9 h-9 rounded-full">
+                                                    {{ $page }}
+                                                </li>
+                                            @else
+                                                <li class="flex items-center justify-center shrink-0 hover:bg-gray-50 border-2 border-gray-300 cursor-pointer text-[15px] font-medium text-slate-900 w-9 h-9 rounded-full">
+                                                    <a href="{{ $reviews->url($page) }}" class="flex items-center justify-center w-full h-full">{{ $page }}</a>
+                                                </li>
+                                            @endif
+                                        @endfor
+
+                                        {{-- Last page --}}
+                                        @if($end < $reviews->lastPage())
+                                            @if($end < $reviews->lastPage() - 1)
+                                                <li class="flex items-center justify-center shrink-0 text-[15px] font-medium text-slate-900 w-9 h-9">
+                                                    <span>...</span>
+                                                </li>
+                                            @endif
+                                            <li class="flex items-center justify-center shrink-0 hover:bg-gray-50 border-2 border-gray-300 cursor-pointer text-[15px] font-medium text-slate-900 w-9 h-9 rounded-full">
+                                                <a href="{{ $reviews->url($reviews->lastPage()) }}" class="flex items-center justify-center w-full h-full">{{ $reviews->lastPage() }}</a>
+                                            </li>
+                                        @endif
+
+                                        {{-- Next Page Link --}}
+                                        @if ($reviews->hasMorePages())
+                                            <li class="flex items-center justify-center shrink-0 hover:bg-gray-50 border-2 border-gray-300 cursor-pointer w-9 h-9 rounded-full">
+                                                <a href="{{ $reviews->nextPageUrl() }}" class="flex items-center justify-center w-full h-full">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3 fill-gray-400 rotate-180" viewBox="0 0 55.753 55.753">
+                                                        <path d="M12.745 23.915c.283-.282.59-.52.913-.727L35.266 1.581a5.4 5.4 0 0 1 7.637 7.638L24.294 27.828l18.705 18.706a5.4 5.4 0 0 1-7.636 7.637L13.658 32.464a5.367 5.367 0 0 1-.913-.727 5.367 5.367 0 0 1-1.572-3.911 5.369 5.369 0 0 1 1.572-3.911z" data-original="#000000" />
+                                                    </svg>
+                                                </a>
+                                            </li>
+                                        @else
+                                            <li class="flex items-center justify-center shrink-0 bg-gray-100 w-9 h-9 rounded-full cursor-not-allowed">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 fill-gray-300 rotate-180" viewBox="0 0 55.753 55.753">
+                                                    <path d="M12.745 23.915c.283-.282.59-.52.913-.727L35.266 1.581a5.4 5.4 0 0 1 7.637 7.638L24.294 27.828l18.705 18.706a5.4 5.4 0 0 1-7.636 7.637L13.658 32.464a5.367 5.367 0 0 1-.913-.727 5.367 5.367 0 0 1-1.572-3.911 5.369 5.369 0 0 1 1.572-3.911z" data-original="#000000" />
+                                                </svg>
+                                            </li>
+                                        @endif
+                                    </ul>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+        
+        <!-- Write Review Modal -->
+        @auth
+            @if($canReview && !$hasReviewed && $orderItem)
+                <div id="reviewModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+                    <div class="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+                        <div class="mt-3">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-medium text-gray-900">Write a Review</h3>
+                                <button type="button" id="closeReviewModal" class="text-gray-400 hover:text-gray-600">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <form action="{{ route('books.reviews.store', $book) }}" method="POST" enctype="multipart/form-data">
+                                @csrf
+                                <input type="hidden" name="order_item_id" value="{{ $orderItem->id }}">
+                                
+                                <div class="mb-4">
+                                    <label for="rating" class="block text-sm font-medium text-gray-700 mb-1">Rating</label>
+                                    <div class="flex items-center space-x-2 star-rating">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            <label class="cursor-pointer star-rating-item" data-rating="{{ $i }}">
+                                                <input type="radio" name="rating" value="{{ $i }}" class="sr-only star-input" required {{ old('rating') == $i ? 'checked' : '' }}>
+                                                <svg class="w-6 h-6 text-gray-300 star-svg transition-colors duration-200" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+                                                    <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+                                                </svg>
+                                            </label>
+                                        @endfor
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label for="comment" class="block text-sm font-medium text-gray-700 mb-1">Your Review</label>
+                                    <textarea name="comment" id="comment" rows="4" class="w-full border-gray-300 rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50" placeholder="Share your experience with this book...">{{ old('comment') }}</textarea>
+                                </div>
+                                
+                                <!-- Image Upload Section -->
+                                <div class="mb-4">
+                                    <label for="images" class="block text-sm font-medium text-gray-700 mb-2">Add Photos (Optional)</label>
+                                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-purple-400 transition-colors duration-200" id="image-upload-area">
+                                        <input type="file" id="images" name="images[]" multiple accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+                                        <div class="space-y-2">
+                                            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                            </svg>
+                                            <div class="text-sm text-gray-600">
+                                                <label for="images" class="relative cursor-pointer bg-white rounded-md font-medium text-purple-600 hover:text-purple-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-purple-500">
+                                                    <span>Upload photos</span>
+                                                    <input type="file" id="images" name="images[]" multiple accept="image/*" class="sr-only" onchange="handleImageUpload(event)">
+                                                </label>
+                                                <span class="pl-1">or drag and drop</span>
+                                            </div>
+                                            <p class="text-xs text-gray-500">PNG, JPG, GIF up to 2MB each (max 5 photos)</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Image Preview Gallery -->
+                                    <div id="image-preview-gallery" class="mt-4 gap-4 hidden">
+                                        <!-- Preview images will be inserted here -->
+                                    </div>
+                                </div>
+                                
+                                <div class="flex justify-end space-x-3">
+                                    <button type="button" id="cancelReview" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200">
+                                        Cancel
+                                    </button>
+                                    <button type="submit" class="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2">
+                                        Submit Review
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            @endif
+        @endauth
         
         <!-- Related Books -->
         @if($relatedBooks->count() > 0)
@@ -481,8 +570,319 @@
         </div>
     </div>
 
+    <!-- Image Gallery Modal -->
+    <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-75 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-0 mx-auto p-5 w-full h-full flex items-center justify-center">
+            <div class="relative bg-white rounded-lg shadow-lg max-w-4xl max-h-full w-full h-full flex flex-col">
+                <!-- Modal Header -->
+                <div class="flex justify-between items-center p-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Review Photos</h3>
+                    <button type="button" id="closeImageModal" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- Modal Body -->
+                <div class="flex-1 flex items-center justify-center p-4">
+                    <div class="relative w-full h-full flex items-center justify-center">
+                        <!-- Main Image -->
+                        <img id="modalMainImage" src="" alt="Review image" class="max-w-full max-h-full object-contain">
+                        
+                        <!-- Navigation Arrows -->
+                        <button id="prevImage" class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                        </button>
+                        
+                        <button id="nextImage" class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Thumbnail Navigation -->
+                <div id="thumbnailContainer" class="p-4 border-t border-gray-200">
+                    <div id="thumbnails" class="flex space-x-2 overflow-x-auto">
+                        <!-- Thumbnails will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Review Modal functionality
+            const reviewModal = document.getElementById('reviewModal');
+            const writeReviewBtn = document.getElementById('writeReviewBtn');
+            const closeReviewModal = document.getElementById('closeReviewModal');
+            const cancelReview = document.getElementById('cancelReview');
+            
+            if (writeReviewBtn && reviewModal) {
+                writeReviewBtn.addEventListener('click', function() {
+                    reviewModal.classList.remove('hidden');
+                });
+            }
+            
+            if (closeReviewModal && reviewModal) {
+                closeReviewModal.addEventListener('click', function() {
+                    reviewModal.classList.add('hidden');
+                });
+            }
+            
+            if (cancelReview && reviewModal) {
+                cancelReview.addEventListener('click', function() {
+                    reviewModal.classList.add('hidden');
+                });
+            }
+            
+            // Close modal when clicking outside
+            if (reviewModal) {
+                reviewModal.addEventListener('click', function(e) {
+                    if (e.target === reviewModal) {
+                        reviewModal.classList.add('hidden');
+                    }
+                });
+            }
+            
+            // Star Rating functionality for review modal
+            const starContainer = document.querySelector('.star-rating');
+            if (starContainer) {
+                const stars = document.querySelectorAll('.star-rating-item');
+                const inputs = document.querySelectorAll('.star-input');
+                
+                // Check if there's a pre-selected value (e.g., from validation errors)
+                let selectedRating = 0;
+                inputs.forEach(input => {
+                    if (input.checked) {
+                        selectedRating = parseInt(input.value);
+                        updateStars(selectedRating);
+                    }
+                });
+                
+                // Add click event for each star
+                stars.forEach(star => {
+                    star.addEventListener('click', function() {
+                        const rating = parseInt(this.dataset.rating);
+                        
+                        // Select the correct radio button
+                        const input = this.querySelector('input');
+                        input.checked = true;
+                        
+                        // Update the UI
+                        updateStars(rating);
+                    });
+                    
+                    // Add hover effect
+                    star.addEventListener('mouseenter', function() {
+                        const rating = parseInt(this.dataset.rating);
+                        hoverStars(rating);
+                    });
+                });
+                
+                // Reset stars on mouse leave if no selection
+                starContainer.addEventListener('mouseleave', function() {
+                    updateStars(selectedRating);
+                });
+                
+                // Function to update stars based on rating
+                function updateStars(rating) {
+                    selectedRating = rating;
+                    stars.forEach(star => {
+                        const starRating = parseInt(star.dataset.rating);
+                        const starSvg = star.querySelector('.star-svg');
+                        
+                        if (starRating <= rating) {
+                            starSvg.classList.add('text-yellow-300');
+                            starSvg.classList.remove('text-gray-300');
+                        } else {
+                            starSvg.classList.remove('text-yellow-400');
+                            starSvg.classList.remove('text-yellow-300');
+                            starSvg.classList.add('text-gray-300');
+                        }
+                    });
+                }
+                
+                // Function for hover effect
+                function hoverStars(rating) {
+                    stars.forEach(star => {
+                        const starRating = parseInt(star.dataset.rating);
+                        const starSvg = star.querySelector('.star-svg');
+                        
+                        if (starRating <= rating) {
+                            starSvg.classList.add('text-yellow-400');
+                            starSvg.classList.remove('text-gray-300');
+                        } else {
+                            starSvg.classList.remove('text-yellow-400');
+                            starSvg.classList.add('text-gray-300');
+                        }
+                    });
+                }
+            }
+            
+            // Image Upload JavaScript
+            let uploadedImages = [];
+            const maxImages = 5;
+            
+            function handleImageUpload(event) {
+                const files = Array.from(event.target.files);
+                
+                // Validate file count
+                if (uploadedImages.length + files.length > maxImages) {
+                    alert(`You can only upload up to ${maxImages} images.`);
+                    return;
+                }
+                
+                // Validate file types and sizes
+                const validFiles = files.filter(file => {
+                    const isValidType = file.type.startsWith('image/');
+                    const isValidSize = file.size <= 2 * 1024 * 1024; // 2MB
+                    
+                    if (!isValidType) {
+                        alert(`${file.name} is not a valid image file.`);
+                        return false;
+                    }
+                    
+                    if (!isValidSize) {
+                        alert(`${file.name} is too large. Please choose files smaller than 2MB.`);
+                        return false;
+                    }
+                    
+                    return true;
+                });
+                
+                // Add valid files to uploadedImages array
+                validFiles.forEach(file => {
+                    uploadedImages.push(file);
+                });
+                
+                // Update preview gallery
+                updateImagePreview();
+                
+                // Update the file input with current files for form submission
+                updateFileInput();
+            }
+            
+            function updateImagePreview() {
+                const gallery = document.getElementById('image-preview-gallery');
+                
+                if (uploadedImages.length === 0) {
+                    gallery.classList.add('hidden');
+                    gallery.classList.remove('grid', 'grid-cols-2', 'md:grid-cols-3', 'lg:grid-cols-5');
+                    return;
+                }
+                
+                gallery.classList.remove('hidden');
+                gallery.classList.add('grid', 'grid-cols-2', 'md:grid-cols-3', 'lg:grid-cols-5');
+                gallery.innerHTML = '';
+                
+                uploadedImages.forEach((file, index) => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const imageDiv = document.createElement('div');
+                        imageDiv.className = 'relative group';
+                        imageDiv.innerHTML = `
+                            <img src=\"${e.target.result}\" alt=\"Preview ${index + 1}\" class=\"w-full h-24 object-cover rounded-lg\">
+                            <button type=\"button\" onclick=\"removeImage(${index})\" class=\"absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 transition-colors\">
+                                ×
+                            </button>
+                        `;
+                        gallery.appendChild(imageDiv);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+            
+            function removeImage(index) {
+                uploadedImages.splice(index, 1);
+                updateImagePreview();
+                updateFileInput();
+            }
+            
+            function updateFileInput() {
+                // Create a new DataTransfer object to update the file input
+                const dt = new DataTransfer();
+                
+                // Add all current files to the DataTransfer object
+                uploadedImages.forEach(file => {
+                    dt.items.add(file);
+                });
+                
+                // Update both file inputs with the new FileList
+                const fileInput1 = document.getElementById('images');
+                const fileInput2 = document.querySelector('input[name=\"images[]\"]');
+                
+                if (fileInput1) {
+                    fileInput1.files = dt.files;
+                }
+                if (fileInput2 && fileInput2 !== fileInput1) {
+                    fileInput2.files = dt.files;
+                }
+            }
+            
+            // Drag and drop functionality
+            const uploadArea = document.getElementById('image-upload-area');
+            if (uploadArea) {
+                uploadArea.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    uploadArea.classList.add('border-purple-400', 'bg-purple-50');
+                });
+                
+                uploadArea.addEventListener('dragleave', function(e) {
+                    e.preventDefault();
+                    uploadArea.classList.remove('border-purple-400', 'bg-purple-50');
+                });
+                
+                uploadArea.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    uploadArea.classList.remove('border-purple-400', 'bg-purple-50');
+                    
+                    const files = Array.from(e.dataTransfer.files);
+                    const imageFiles = files.filter(file => file.type.startsWith('image/'));
+                    
+                    if (imageFiles.length > 0) {
+                        // Add files to our uploadedImages array
+                        const validFiles = imageFiles.filter(file => {
+                            const isValidType = file.type.startsWith('image/');
+                            const isValidSize = file.size <= 2 * 1024 * 1024; // 2MB
+                            
+                            if (!isValidType) {
+                                alert(`${file.name} is not a valid image file.`);
+                                return false;
+                            }
+                            
+                            if (!isValidSize) {
+                                alert(`${file.name} is too large. Please choose files smaller than 2MB.`);
+                                return false;
+                            }
+                            
+                            return true;
+                        });
+                        
+                        if (uploadedImages.length + validFiles.length > maxImages) {
+                            alert(`You can only upload up to ${maxImages} images.`);
+                            return;
+                        }
+                        
+                        validFiles.forEach(file => {
+                            uploadedImages.push(file);
+                        });
+                        
+                        updateImagePreview();
+                        updateFileInput();
+                    }
+                });
+            }
+            
+            // Make functions global so they can be called from HTML
+            window.handleImageUpload = handleImageUpload;
+            window.removeImage = removeImage;
+            
             // Helpful button functionality
             document.querySelectorAll('.helpful-btn').forEach(button => {
                 button.addEventListener('click', function() {
@@ -528,8 +928,10 @@
                             }
                             
                             // Update helpful count
-                            const helpfulCountElement = this.closest('aside').querySelector('p');
-                            helpfulCountElement.textContent = `${data.helpful_count} people found this helpful`;
+                            const helpfulCountElement = this.closest('div').querySelector('p');
+                            if (helpfulCountElement) {
+                                helpfulCountElement.textContent = `${data.helpful_count} people found this helpful`;
+                            }
                         }
                     })
                     .catch(error => {
@@ -609,6 +1011,95 @@
                     console.error('Error:', error);
                     alert('An error occurred. Please try again.');
                 });
+            });
+
+            // Image Modal functionality
+            let currentImageIndex = 0;
+            let currentImages = [];
+            
+            function openImageModal(imageUrl, index, images) {
+                currentImages = images;
+                currentImageIndex = index;
+                
+                const modal = document.getElementById('imageModal');
+                const mainImage = document.getElementById('modalMainImage');
+                const thumbnails = document.getElementById('thumbnails');
+                
+                // Set main image
+                mainImage.src = imageUrl;
+                
+                // Create thumbnails
+                thumbnails.innerHTML = '';
+                images.forEach((img, idx) => {
+                    const thumbnail = document.createElement('img');
+                    thumbnail.src = img;
+                    thumbnail.className = `w-16 h-16 object-cover rounded cursor-pointer border-2 ${idx === index ? 'border-purple-500' : 'border-gray-200'}`;
+                    thumbnail.onclick = () => switchImage(idx);
+                    thumbnails.appendChild(thumbnail);
+                });
+                
+                // Show/hide navigation arrows
+                const prevBtn = document.getElementById('prevImage');
+                const nextBtn = document.getElementById('nextImage');
+                
+                prevBtn.style.display = images.length > 1 ? 'block' : 'none';
+                nextBtn.style.display = images.length > 1 ? 'block' : 'none';
+                
+                modal.classList.remove('hidden');
+            }
+            
+            function switchImage(index) {
+                currentImageIndex = index;
+                const mainImage = document.getElementById('modalMainImage');
+                const thumbnails = document.getElementById('thumbnails');
+                
+                mainImage.src = currentImages[index];
+                
+                // Update thumbnail selection
+                Array.from(thumbnails.children).forEach((thumb, idx) => {
+                    thumb.className = `w-16 h-16 object-cover rounded cursor-pointer border-2 ${idx === index ? 'border-purple-500' : 'border-gray-200'}`;
+                });
+            }
+            
+            function nextImage() {
+                if (currentImageIndex < currentImages.length - 1) {
+                    switchImage(currentImageIndex + 1);
+                }
+            }
+            
+            function prevImage() {
+                if (currentImageIndex > 0) {
+                    switchImage(currentImageIndex - 1);
+                }
+            }
+            
+            // Modal event listeners
+            document.getElementById('closeImageModal').addEventListener('click', function() {
+                document.getElementById('imageModal').classList.add('hidden');
+            });
+            
+            document.getElementById('nextImage').addEventListener('click', nextImage);
+            document.getElementById('prevImage').addEventListener('click', prevImage);
+            
+            // Close modal when clicking outside
+            document.getElementById('imageModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.add('hidden');
+                }
+            });
+            
+            // Keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                const modal = document.getElementById('imageModal');
+                if (!modal.classList.contains('hidden')) {
+                    if (e.key === 'Escape') {
+                        modal.classList.add('hidden');
+                    } else if (e.key === 'ArrowLeft') {
+                        prevImage();
+                    } else if (e.key === 'ArrowRight') {
+                        nextImage();
+                    }
+                }
             });
         });
     </script>

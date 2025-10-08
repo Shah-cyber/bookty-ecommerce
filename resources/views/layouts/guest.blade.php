@@ -16,7 +16,7 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans text-gray-900 antialiased">
+    <body class="font-sans text-gray-900 antialiased" data-layout="customer">
         <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-600 to-pink-500 p-4">
             <!-- Modal-like Authentication Box -->
             <div class="w-full max-w-md bg-white rounded-xl shadow-2xl overflow-hidden">

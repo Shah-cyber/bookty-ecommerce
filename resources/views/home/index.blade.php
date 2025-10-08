@@ -17,11 +17,12 @@
             <div class="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-16 min-h-[70vh] lg:min-h-[80vh]">
                 <!-- Left Content (dynamic details) -->
                 @php $heroBooks = $newArrivals->take(6); $firstHero = $heroBooks->first(); @endphp
+                @if($newArrivals->count() > 0)
                 <div class="flex-1 text-gray-900 order-2 lg:order-1 flex flex-col items-center lg:items-start text-center lg:text-left" data-aos="fade-right" data-aos-duration="1000">
                     <div class="mb-6">
                         <span class="inline-flex items-center px-4 py-2 bg-white bg-opacity-70 rounded-full text-sm font-medium backdrop-blur-md border border-white/60 shadow-sm">
                         <span class="w-2 h-2 bg-yellow-400 rounded-full mr-2 animate-pulse"></span>
-                            <span id="hero-genre">{{ optional($firstHero->genre)->name }}</span>
+                            <span id="hero-genre">{{ optional($firstHero)->genre?->name ?? 'Featured' }}</span>
                         </span>
                     </div>
                     <h1 id="hero-title" class="text-3xl md:text-5xl lg:text-7xl font-extrabold leading-tight mb-4 bg-gradient-to-r from-gray-900 via-purple-800 to-indigo-800 bg-clip-text text-transparent" style="line-height: 1.15; display: inline-block;">
@@ -40,7 +41,7 @@
                             </svg>
                         </a>
                         @if($firstHero)
-                        <button onclick="quickAddToCart({{ $firstHero->id }})" id="hero-quick-add" class="inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 border-2 border-indigo-200 text-indigo-700 font-semibold rounded-full bg-white/70 hover:bg-white transition-all duration-300 shadow-sm">Quick Add</button>
+                        <button onclick="quickAddToCart({{ $firstHero?->id }})" id="hero-quick-add" class="inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 border-2 border-indigo-200 text-indigo-700 font-semibold rounded-full bg-white/70 hover:bg-white transition-all duration-300 shadow-sm">Quick Add</button>
                         @endif
                     </div>
                     
@@ -111,6 +112,31 @@
                         </div>
                     </div>
                 </div>
+                @else
+                <!-- Empty state when no books are available -->
+                <div class="flex-1 text-gray-900 order-2 lg:order-1 flex flex-col items-center lg:items-start text-center lg:text-left" data-aos="fade-right" data-aos-duration="1000">
+                    <div class="mb-6">
+                        <span class="inline-flex items-center px-4 py-2 bg-white bg-opacity-70 rounded-full text-sm font-medium backdrop-blur-md border border-white/60 shadow-sm">
+                        <span class="w-2 h-2 bg-yellow-400 rounded-full mr-2 animate-pulse"></span>
+                            <span>Welcome to Bookty</span>
+                        </span>
+                    </div>
+                    <h1 class="text-3xl md:text-5xl lg:text-7xl font-extrabold leading-tight mb-4 bg-gradient-to-r from-gray-900 via-purple-800 to-indigo-800 bg-clip-text text-transparent" style="line-height: 1.15; display: inline-block;">
+                        Discover Amazing Books
+                    </h1>
+                    <p class="text-base md:text-lg mb-8 max-w-2xl px-1 text-gray-600 leading-relaxed">
+                        Your journey into the world of literature starts here. Browse our collection and find your next favorite read.
+                    </p>
+                    <div class="flex flex-col sm:flex-row w-full items-stretch sm:items-center justify-center sm:justify-start gap-3 sm:gap-6">
+                        <a href="{{ route('books.index') }}" class="group inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-full transition-all duration-300 shadow-xl hover:shadow-purple-400/30 hover:scale-105 transform">
+                            <span class="mr-2">BROWSE BOOKS</span>
+                            <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                @endif
                                 </div>
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
@@ -269,8 +295,9 @@
 
             <!-- Gallery Grid -->
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="genreGallery">
-                @foreach($newArrivals as $book)
-                    <div class="gallery-item group relative" data-genre-id="{{ $book->genre->id }}" data-aos="fade-up">
+                @if($newArrivals->count() > 0)
+                    @foreach($newArrivals as $book)
+                    <div class="gallery-item group relative" data-genre-id="{{ $book->genre?->id ?? '' }}" data-aos="fade-up">
                         <a href="{{ route('books.show', $book) }}" class="block">
                             @if($book->cover_image)
                                 <img class="h-auto w-full rounded-lg object-cover aspect-[3/4]" src="{{ asset('storage/' . $book->cover_image) }}" alt="{{ $book->title }}">
@@ -286,11 +313,22 @@
                             <!-- Caption -->
                             <div class="pointer-events-none absolute bottom-0 left-0 right-0 p-3 text-white">
                                 <div class="text-sm font-semibold line-clamp-1">{{ $book->title }}</div>
-                                <div class="text-xs opacity-80">{{ $book->author }} • {{ $book->genre->name }}</div>
+                                <div class="text-xs opacity-80">{{ $book->author }} • {{ $book->genre?->name ?? 'Unknown' }}</div>
                             </div>
                         </a>
                     </div>
-                @endforeach
+                    @endforeach
+                @else
+                    <!-- Empty state for no books -->
+                    <div class="col-span-full text-center py-12">
+                        <div class="inline-flex items-center px-6 py-3 rounded-full bg-gray-100 text-gray-700 text-sm font-medium">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
+                            No books available yet. Check back soon!
+                        </div>
+                    </div>
+                @endif
             </div>
 
             <!-- Empty state -->
@@ -536,7 +574,7 @@
                                             @else
                                                 <span class="text-lg font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">RM {{ number_format($book->price, 2) }}</span>
                                             @endif
-                                            <span class="text-xs px-2 py-1 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 rounded-full font-medium">{{ $book->genre->name }}</span>
+                                            <span class="text-xs px-2 py-1 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 rounded-full font-medium">{{ $book->genre?->name ?? 'Unknown' }}</span>
                                         </div>
                                         
                                         <!-- Rating Stars -->
@@ -1054,7 +1092,8 @@
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-                @foreach($newArrivals->take(8) as $book)
+                @if($newArrivals->count() > 0)
+                    @foreach($newArrivals->take(8) as $book)
                     <div class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100" data-aos="fade-up" data-aos-delay="{{ $loop->index * 100 }}">
                         <div class="relative overflow-hidden">
                             <a href="{{ route('books.show', $book) }}" class="block">
@@ -1155,11 +1194,22 @@
                                 @else
                                     <span class="text-xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">RM {{ number_format($book->price, 2) }}</span>
                                 @endif
-                                <span class="text-xs px-3 py-1 bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-700 rounded-full font-medium">{{ $book->genre->name }}</span>
+                                <span class="text-xs px-3 py-1 bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-700 rounded-full font-medium">{{ $book->genre?->name ?? 'Unknown' }}</span>
                             </div>
                         </div>
                     </div>
-                @endforeach
+                    @endforeach
+                @else
+                    <!-- Empty state for New Arrivals -->
+                    <div class="col-span-full text-center py-12">
+                        <div class="inline-flex items-center px-6 py-3 rounded-full bg-gray-100 text-gray-700 text-sm font-medium">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
+                            No new arrivals yet. Check back soon!
+                        </div>
+                    </div>
+                @endif
     </div>
 
             <div class="text-center" data-aos="fade-up" data-aos-delay="800">

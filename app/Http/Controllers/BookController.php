@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use App\Models\Genre;
 use App\Models\Trope;
+use App\Models\User;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
 class BookController extends Controller
@@ -81,12 +83,12 @@ class BookController extends Controller
             ->take(4)
             ->get();
         
-        // Get reviews for this book
+        // Get reviews for this book with pagination
         $reviews = $book->reviews()
             ->with('user')
             ->where('is_approved', true)
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(5); // Show 5 reviews per page
         
         // Check if the current user can leave a review (if authenticated)
         $canReview = false;
@@ -94,6 +96,7 @@ class BookController extends Controller
         $orderItem = null;
         
         if (Auth::check()) {
+            /** @var User $user */
             $user = Auth::user();
             $canReview = $user->canReviewBook($book->id);
             $hasReviewed = $user->hasReviewedBook($book->id);
@@ -103,7 +106,64 @@ class BookController extends Controller
                 $orderItem = $user->getOrderItemForBookReview($book->id);
             }
         }
+        
+        // Calculate review statistics
+        $reviewStats = $this->calculateReviewStats($book);
+        
+        // Get reviews with images for gallery
+        $reviewsWithImages = $book->reviews()
+            ->whereNotNull('images')
+            ->where('images', '!=', '[]')
+            ->with('user')
+            ->orderBy('created_at', 'desc')
+            ->take(10)
+            ->get();
             
-        return view('books.show', compact('book', 'relatedBooks', 'reviews', 'canReview', 'hasReviewed', 'orderItem'));
+        return view('books.show', compact('book', 'relatedBooks', 'reviews', 'canReview', 'hasReviewed', 'orderItem', 'reviewStats', 'reviewsWithImages'));
+    }
+    
+    /**
+     * Calculate review statistics for the book
+     */
+    private function calculateReviewStats($book)
+    {
+        $totalReviews = $book->reviews->count();
+        
+        if ($totalReviews === 0) {
+            return [
+                'average' => 0,
+                'total' => 0,
+                'breakdown' => [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0],
+                'percentages' => [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0]
+            ];
+        }
+        
+        // Get rating breakdown
+        $breakdown = $book->reviews()
+            ->selectRaw('rating, COUNT(*) as count')
+            ->groupBy('rating')
+            ->orderBy('rating', 'desc')
+            ->pluck('count', 'rating')
+            ->toArray();
+        
+        // Fill missing ratings with 0
+        for ($i = 1; $i <= 5; $i++) {
+            if (!isset($breakdown[$i])) {
+                $breakdown[$i] = 0;
+            }
+        }
+        
+        // Calculate percentages
+        $percentages = [];
+        foreach ($breakdown as $rating => $count) {
+            $percentages[$rating] = $totalReviews > 0 ? round(($count / $totalReviews) * 100) : 0;
+        }
+        
+        return [
+            'average' => round($book->average_rating ?: 0, 1),
+            'total' => $totalReviews,
+            'breakdown' => $breakdown,
+            'percentages' => $percentages
+        ];
     }
 }

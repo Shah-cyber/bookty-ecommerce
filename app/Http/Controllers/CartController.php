@@ -43,7 +43,7 @@ class CartController extends Controller
             $newQuantity = $cartItem->quantity + $request->quantity;
             
             if ($newQuantity > $book->stock) {
-                return back()->with('error', "⚠️ Sorry! Only {$book->stock} copies of '{$book->title}' are available.");
+                return back()->with('error', "Sorry! Only {$book->stock} copies of '{$book->title}' are available.");
             }
             
             $cartItem->update(['quantity' => $newQuantity]);
@@ -55,7 +55,7 @@ class CartController extends Controller
             ]);
         }
         
-        return back()->with('success', "🛒 '{$book->title}' has been added to your cart!");
+        return back()->with('success', "'{$book->title}' has been added to your cart!");
     }
     
     public function quickAdd(Request $request, Book $book)
@@ -103,7 +103,7 @@ class CartController extends Controller
                         'message' => "Sorry! Only {$book->stock} copies of '{$book->title}' are available."
                     ], 400);
                 }
-                return back()->with('error', "⚠️ Sorry! Only {$book->stock} copies of '{$book->title}' are available.");
+                return back()->with('error', "Sorry! Only {$book->stock} copies of '{$book->title}' are available.");
             }
             
             $cartItem->update(['quantity' => $newQuantity]);
@@ -121,7 +121,7 @@ class CartController extends Controller
         if ($request->wantsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => "🛒 '{$book->title}' has been added to your cart!",
+                'message' => "'{$book->title}' has been added to your cart!",
                 'cart_count' => $cartCount,
                 'book' => [
                     'id' => $book->id,
@@ -131,7 +131,7 @@ class CartController extends Controller
             ]);
         }
         
-        return back()->with('success', "🛒 '{$book->title}' has been added to your cart!");
+        return back()->with('success', "'{$book->title}' has been added to your cart!");
     }
     
     public function update(Request $request, CartItem $cartItem)
@@ -147,7 +147,7 @@ class CartController extends Controller
         
         $cartItem->update(['quantity' => $request->quantity]);
         
-        return back()->with('success', '✅ Cart updated successfully!');
+        return back()->with('success', 'Cart updated successfully!');
     }
     
     public function remove(CartItem $cartItem)
@@ -159,6 +159,6 @@ class CartController extends Controller
         
         $cartItem->delete();
         
-        return back()->with('success', '🗑️ Item removed from cart.');
+        return back()->with('success', 'Item removed from cart.');
     }
 }

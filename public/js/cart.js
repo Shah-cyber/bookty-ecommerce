@@ -4,9 +4,36 @@
  * This file contains JavaScript functions for handling cart operations without page reloads
  */
 
+/**
+ * Safe toast function that checks if the global toast system is available
+ * @param {string} message - The message to display
+ * @param {string} type - The type of toast (success, error, warning, info)
+ */
+function safeShowToast(message, type = 'info') {
+    if (typeof window.showToast === 'function') {
+        window.showToast(message, type);
+    } else {
+        // Fallback - try different approaches
+        console.log(`Toast system not available, trying alternatives for: ${type} - ${message}`);
+        
+        // Try to find toast manager
+        if (window.toastManager) {
+            window.toastManager.show(message, type);
+        } else if (window.toastSuccess && type === 'success') {
+            window.toastSuccess(message);
+        } else if (window.toastError && type === 'error') {
+            window.toastError(message);
+        } else {
+            // Final fallback - show alert for now
+            alert(`${type.toUpperCase()}: ${message}`);
+        }
+    }
+}
+
+// Initialize cart functionality after DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize cart functionality
-    initCartFunctions();
+    // Add a small delay to ensure the Vite-compiled toast system has loaded
+    setTimeout(initCartFunctions, 100);
 });
 
 /**
@@ -16,8 +43,7 @@ function initCartFunctions() {
     // Set up event listeners for add to cart buttons
     setupAddToCartButtons();
     
-    // Set up toast notification system
-    setupToastSystem();
+    // Toast notifications are now handled by the global toast system
 }
 
 /**
@@ -148,7 +174,7 @@ function toggleWishlist(bookId, button) {
         });
         
         // Show success notification
-        showToast(data.message, 'success');
+        safeShowToast(data.message, 'success');
         
         // Trigger custom event for other components to listen to
         document.dispatchEvent(new CustomEvent('wishlist:updated', {
@@ -164,7 +190,7 @@ function toggleWishlist(bookId, button) {
         setButtonLoading(button, false);
         
         // Show error notification
-        showToast(error.message, 'error');
+        safeShowToast(error.message, 'error');
         
         console.error('Error:', error);
     });
@@ -216,7 +242,7 @@ function addToCart(bookId, quantity, button) {
         updateCartCount(data.cart_count);
         
         // Show success notification
-        showToast(data.message, 'success');
+        safeShowToast(data.message, 'success');
         
         // Trigger custom event for other components to listen to
         document.dispatchEvent(new CustomEvent('cart:updated', {
@@ -233,7 +259,7 @@ function addToCart(bookId, quantity, button) {
         setButtonLoading(button, false);
         
         // Show error notification
-        showToast(error.message, 'error');
+        safeShowToast(error.message, 'error');
         
         console.error('Error:', error);
     });
@@ -288,112 +314,8 @@ function updateCartCount(count) {
     });
 }
 
-/**
- * Set up toast notification system
- */
-function setupToastSystem() {
-    // Create toast container if it doesn't exist
-    if (!document.getElementById('toast-container')) {
-        const toastContainer = document.createElement('div');
-        toastContainer.id = 'toast-container';
-        toastContainer.className = 'fixed top-4 right-4 z-50 flex flex-col space-y-4';
-        document.body.appendChild(toastContainer);
-    }
-}
-
-/**
- * Show a toast notification
- * 
- * @param {string} message - The message to display
- * @param {string} type - The type of toast (success, error, info)
- */
-function showToast(message, type = 'info') {
-    const toastContainer = document.getElementById('toast-container');
-    
-    // Create toast element
-    const toast = document.createElement('div');
-    toast.className = 'transform transition-all duration-300 ease-out scale-95 opacity-0 flex items-center p-4 rounded-lg shadow-lg max-w-xs';
-    
-    // Set background color based on type
-    switch (type) {
-        case 'success':
-            toast.classList.add('bg-green-50', 'border-l-4', 'border-green-500');
-            break;
-        case 'error':
-            toast.classList.add('bg-red-50', 'border-l-4', 'border-red-500');
-            break;
-        default:
-            toast.classList.add('bg-blue-50', 'border-l-4', 'border-blue-500');
-    }
-    
-    // Set icon based on type
-    let icon = '';
-    switch (type) {
-        case 'success':
-            icon = `<svg class="w-6 h-6 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>`;
-            break;
-        case 'error':
-            icon = `<svg class="w-6 h-6 text-red-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>`;
-            break;
-        default:
-            icon = `<svg class="w-6 h-6 text-blue-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>`;
-    }
-    
-    // Set toast content
-    toast.innerHTML = `
-        ${icon}
-        <div class="text-sm font-medium ${type === 'success' ? 'text-green-800' : type === 'error' ? 'text-red-800' : 'text-blue-800'}">
-            ${message}
-        </div>
-        <button class="ml-auto text-gray-400 hover:text-gray-900">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-        </button>
-    `;
-    
-    // Add toast to container
-    toastContainer.appendChild(toast);
-    
-    // Animate in
-    setTimeout(() => {
-        toast.classList.remove('scale-95', 'opacity-0');
-        toast.classList.add('scale-100', 'opacity-100');
-    }, 10);
-    
-    // Add click event to close button
-    const closeButton = toast.querySelector('button');
-    closeButton.addEventListener('click', () => {
-        removeToast(toast);
-    });
-    
-    // Auto-remove after 5 seconds
-    setTimeout(() => {
-        removeToast(toast);
-    }, 5000);
-}
-
-/**
- * Remove a toast notification with animation
- * 
- * @param {HTMLElement} toast - The toast element to remove
- */
-function removeToast(toast) {
-    // Animate out
-    toast.classList.remove('scale-100', 'opacity-100');
-    toast.classList.add('scale-95', 'opacity-0');
-    
-    // Remove after animation completes
-    setTimeout(() => {
-        toast.remove();
-    }, 300);
-}
+// Toast functionality is now provided by the global toast system from resources/js/toast.js
+// The showToast function is available globally
 
 /**
  * Quick add to cart function for home page buttons
@@ -459,7 +381,7 @@ function quickAddToCart(bookId) {
         updateCartCount(data.cart_count);
         
         // Show success notification
-        showToast(data.message, 'success');
+        safeShowToast(data.message, 'success');
         
         // Trigger custom event for other components to listen to
         document.dispatchEvent(new CustomEvent('cart:updated', {
@@ -484,7 +406,7 @@ function quickAddToCart(bookId) {
         });
         
         // Show error notification
-        showToast(error.message, 'error');
+        safeShowToast(error.message, 'error');
         
         console.error('Error:', error);
     });
@@ -492,6 +414,5 @@ function quickAddToCart(bookId) {
 
 // Make functions available globally
 window.addToCart = addToCart;
-window.showToast = showToast;
 window.toggleWishlist = toggleWishlist;
 window.quickAddToCart = quickAddToCart;

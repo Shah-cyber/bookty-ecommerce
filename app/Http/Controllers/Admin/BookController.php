@@ -67,7 +67,7 @@ class BookController extends Controller
         }
 
         return redirect()->route('admin.books.index')
-            ->with('success', "📚 '{$book->title}' by {$book->author} has been added to the catalog!");
+            ->with('success', " '{$book->title}' by {$book->author} has been added to the catalog!");
     }
 
     /**
@@ -128,7 +128,7 @@ class BookController extends Controller
         $book->tropes()->sync($request->tropes ?? []);
 
         return redirect()->route('admin.books.show', $book)
-            ->with('success', "📚 '{$book->title}' has been updated successfully!");
+            ->with('success', " '{$book->title}' has been updated successfully!");
     }
 
     /**
@@ -145,6 +145,6 @@ class BookController extends Controller
         $book->delete();
 
         return redirect()->route('admin.books.index')
-            ->with('success', "🗑️ Book '{$book->title}' has been removed from the catalog.");
+            ->with('success', " Book '{$book->title}' has been removed from the catalog.");
     }
 }
