@@ -94,16 +94,18 @@ class OrderController extends Controller
             'status' => 'required|in:pending,processing,shipped,completed,cancelled',
             'payment_status' => 'required|in:pending,paid,failed,refunded',
             'admin_notes' => 'nullable|string',
+            'tracking_number' => 'nullable|string|max:50',
         ]);
 
         $order->update([
             'status' => $request->status,
             'payment_status' => $request->payment_status,
             'admin_notes' => $request->admin_notes,
+            'tracking_number' => $request->tracking_number,
         ]);
 
         return redirect()->route('admin.orders.show', $order)
-            ->with('success', "✅ Order #{$order->id} has been updated successfully!");
+            ->with('success', "✅ Order #" . ($order->public_id ?? $order->id) . " has been updated successfully!");
     }
 
     /**

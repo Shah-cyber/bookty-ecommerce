@@ -13,7 +13,7 @@
         </div>
 
         <div class="mb-6">
-            <h1 class="text-3xl font-serif font-bold text-bookty-black">Order #{{ $order->id }}</h1>
+            <h1 class="text-3xl  font-bold text-bookty-black">Order: {{ $order->public_id ?? $order->id }}</h1>
             <p class="text-bookty-purple-700 mt-2">Placed on {{ $order->created_at->format('F d, Y') }}</p>
         </div>
 
@@ -21,27 +21,7 @@
             <div class="p-6 border-b border-bookty-pink-100">
                 <h2 class="text-xl font-serif font-medium text-bookty-black mb-4">Order Status</h2>
                 
-                <div class="flex items-center">
-                    <div class="relative w-full">
-                        <div class="h-2 bg-bookty-pink-100 rounded-full">
-                            <div class="h-2 bg-bookty-purple-600 rounded-full" style="width: {{ $order->status === 'pending' ? '33%' : ($order->status === 'shipped' ? '66%' : '100%') }}"></div>
-                        </div>
-                        <div class="flex justify-between mt-2">
-                            <div class="text-center">
-                                <div class="w-6 h-6 rounded-full {{ $order->status ? 'bg-bookty-purple-600' : 'bg-bookty-pink-200' }} mx-auto"></div>
-                                <span class="text-xs text-bookty-purple-700 mt-1 block">Order Placed</span>
-                            </div>
-                            <div class="text-center">
-                                <div class="w-6 h-6 rounded-full {{ $order->status === 'shipped' || $order->status === 'completed' ? 'bg-bookty-purple-600' : 'bg-bookty-pink-200' }} mx-auto"></div>
-                                <span class="text-xs text-bookty-purple-700 mt-1 block">Shipped</span>
-                            </div>
-                            <div class="text-center">
-                                <div class="w-6 h-6 rounded-full {{ $order->status === 'completed' ? 'bg-bookty-purple-600' : 'bg-bookty-pink-200' }} mx-auto"></div>
-                                <span class="text-xs text-bookty-purple-700 mt-1 block">Delivered</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <x-order-status-stepper :order="$order" />
                 
                 <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
@@ -61,6 +41,55 @@
                     </div>
                 </div>
             </div>
+
+            @if($order->hasTrackingNumber())
+            <div class="p-6 border-b border-bookty-pink-100">
+                <h2 class="text-xl font-serif font-medium text-bookty-black mb-4">
+                    <svg class="inline w-6 h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                    </svg>
+                    Package Tracking
+                </h2>
+                
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 mb-1">J&T Express Tracking Number</p>
+                            <div class="flex items-center space-x-2">
+                                <p class="font-mono text-lg font-semibold text-blue-900">{{ $order->tracking_number }}</p>
+                                <button onclick="copyTrackingNumber('{{ $order->tracking_number }}')" 
+                                        class="p-1 text-gray-500 hover:text-blue-600 transition-colors duration-200" 
+                                        title="Copy tracking number">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <button onclick="copyAndTrackPackage('{{ $order->tracking_number }}', '{{ $order->getJtTrackingUrl() }}')" 
+                                    class="inline-flex items-center justify-center px-4 py-2 bg-bookty-purple-600 text-white rounded-lg hover:bg-bookty-purple-700 transition-colors duration-200 shadow-sm">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                </svg>
+                                Copy & Track
+                            </button>
+                            <a href="{{ $order->getJtTrackingUrl() }}" target="_blank" class="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-sm">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                </svg>
+                                Track Only
+                            </a>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-blue-200">
+                        <p class="text-xs text-gray-600">
+                            <span class="font-semibold">💡 Tip:</span> Click "Copy & Track" to copy your tracking number and automatically open the J&T tracking page, or use "Track Only" to just view the tracking status.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            @endif
             
             <div class="p-6">
                 <h2 class="text-xl font-serif font-medium text-bookty-black mb-4">Order Items</h2>

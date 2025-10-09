@@ -28,6 +28,9 @@
                                         Status
                                     </th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-bookty-purple-700 uppercase tracking-wider">
+                                        Tracking
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-bookty-purple-700 uppercase tracking-wider">
                                         Actions
                                     </th>
                                 </tr>
@@ -45,17 +48,41 @@
                                         RM {{ number_format($order->total_amount, 2) }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        @if($order->status === 'pending')
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-bookty-pink-100 text-bookty-pink-800">
-                                                Pending
-                                            </span>
-                                        @elseif($order->status === 'shipped')
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-bookty-purple-100 text-bookty-purple-800">
-                                                Shipped
-                                            </span>
-                                        @elseif($order->status === 'completed')
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-bookty-purple-200 text-bookty-purple-900">
-                                                Completed
+                                        @php
+                                            $statusConfig = match($order->status) {
+                                                'pending' => ['Order Placed', 'bg-blue-100 text-blue-800'],
+                                                'processing' => ['Processing', 'bg-yellow-100 text-yellow-800'],
+                                                'shipped' => ['Shipped', 'bg-indigo-100 text-indigo-800'],
+                                                'completed' => ['Delivered', 'bg-green-100 text-green-800'],
+                                                'cancelled' => ['Cancelled', 'bg-red-100 text-red-800'],
+                                                default => ['Unknown', 'bg-gray-100 text-gray-800']
+                                            };
+                                        @endphp
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusConfig[1] }}">
+                                            {{ $statusConfig[0] }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        @if($order->hasTrackingNumber())
+                                            <div class="flex items-center space-x-1">
+                                                <button onclick="copyAndTrackPackage('{{ $order->tracking_number }}', '{{ $order->getJtTrackingUrl() }}')" 
+                                                        class="inline-flex items-center px-2 py-1 text-xs bg-bookty-purple-600 text-white rounded-md hover:bg-bookty-purple-700 transition-colors duration-200">
+                                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                                    </svg>
+                                                    Copy & Track
+                                                </button>
+                                                <button onclick="copyTrackingNumber('{{ $order->tracking_number }}')" 
+                                                        class="p-1 text-gray-500 hover:text-bookty-purple-600 transition-colors duration-200" 
+                                                        title="Copy tracking number">
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        @else
+                                            <span class="px-2 py-1 text-xs text-gray-500 bg-gray-100 rounded-md">
+                                                Not shipped
                                             </span>
                                         @endif
                                     </td>

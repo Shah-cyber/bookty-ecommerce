@@ -26,6 +26,7 @@ class Order extends Model
         'shipping_postal_code',
         'shipping_phone',
         'admin_notes',
+        'tracking_number',
         'coupon_id',
         'discount_amount',
         'coupon_code',
@@ -182,5 +183,29 @@ class Order extends Model
         $this->save();
         
         return true;
+    }
+    
+    /**
+     * Get the J&T Express tracking URL for this order.
+     *
+     * @return string|null
+     */
+    public function getJtTrackingUrl(): ?string
+    {
+        if (!$this->tracking_number) {
+            return null;
+        }
+        
+        return 'https://www.jtexpress.my/track.php?awb=' . $this->tracking_number;
+    }
+    
+    /**
+     * Check if the order has a tracking number.
+     *
+     * @return bool
+     */
+    public function hasTrackingNumber(): bool
+    {
+        return !empty($this->tracking_number);
     }
 }

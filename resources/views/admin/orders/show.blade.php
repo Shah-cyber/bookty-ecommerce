@@ -12,11 +12,6 @@
         </a>
     </div>
 
-    @if(session('success'))
-        <div class="bg-green-100 dark:bg-green-900/30 border border-green-400 dark:border-green-700 text-green-700 dark:text-green-300 px-4 py-3 rounded mb-4">
-            {{ session('success') }}
-        </div>
-    @endif
 
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden mb-6">
         <div class="p-6">
@@ -38,6 +33,13 @@
                             </button>
                         </form>
                     @endif
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-lg font-medium text-bookty-black dark:text-white mb-3">Order Progress</h3>
+                <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                    <x-order-status-stepper :order="$order" size="small" />
                 </div>
             </div>
 
@@ -126,6 +128,49 @@
                     @endif
                 </div>
             </div>
+
+            @if($order->hasTrackingNumber())
+                <div class="mb-6">
+                    <h3 class="text-lg font-medium text-bookty-black dark:text-white mb-3">
+                        <svg class="inline w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                        </svg>
+                        Package Tracking
+                    </h3>
+                    <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-300 mb-1">J&T Express Tracking Number</p>
+                                <div class="flex items-center space-x-2">
+                                    <p class="font-mono text-lg font-semibold text-blue-900 dark:text-blue-100">{{ $order->tracking_number }}</p>
+                                    <button onclick="copyTrackingNumber('{{ $order->tracking_number }}')" 
+                                            class="p-1 text-gray-500 hover:text-blue-600 transition-colors duration-200" 
+                                            title="Copy tracking number">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button onclick="copyAndTrackPackage('{{ $order->tracking_number }}', '{{ $order->getJtTrackingUrl() }}')" 
+                                        class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 shadow-sm">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                    </svg>
+                                    Copy & Track
+                                </button>
+                                <a href="{{ $order->getJtTrackingUrl() }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-sm">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                    </svg>
+                                    Track Only
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
 
             @if($order->admin_notes)
                 <div class="mb-6">

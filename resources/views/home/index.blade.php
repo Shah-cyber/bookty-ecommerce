@@ -46,6 +46,17 @@
     .scroll-down-indicator span {
         animation: scroll-down-animation 2s infinite;
     }
+    
+    /* Quick Add Button Enhancement */
+    .quick-add-btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+    
+    .quick-add-btn.success-state {
+        background: linear-gradient(to right, #10b981, #059669) !important;
+        color: white !important;
+    }
 </style>
 
 <div class="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-100">
@@ -84,7 +95,16 @@
                             </svg>
                         </a>
                         @if($firstHero)
-                        <button onclick="quickAddToCart({{ $firstHero?->id }})" id="hero-quick-add" class="inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 border-2 border-transparent text-indigo-700 font-semibold rounded-full bg-white/80 backdrop-blur-sm hover:bg-white transition-all duration-300 shadow-sm hover:shadow-lg">Quick Add</button>
+                        <button onclick="quickAddToCart({{ $firstHero?->id }})" id="hero-quick-add" class="quick-add-btn inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 border-2 border-transparent text-indigo-700 font-semibold rounded-full bg-white/80 backdrop-blur-sm hover:bg-white transition-all duration-300 shadow-sm hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                            <span class="btn-text">Quick Add</span>
+                            <span class="loading-spinner hidden">
+                                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-indigo-700 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Adding...
+                            </span>
+                        </button>
                         @endif
                     </div>
                     
@@ -195,7 +215,20 @@
                             if (textElements.genre) textElements.genre.textContent = data.genre || 'Featured';
                             if (textElements.synopsis) textElements.synopsis.textContent = data.synopsis || '';
                             if (textElements.detailsLink) textElements.detailsLink.href = data.link || '#';
-                            if (textElements.quickAddBtn) textElements.quickAddBtn.setAttribute('onclick', `quickAddToCart(${data.bookId})`);
+                            if (textElements.quickAddBtn && data.bookId) {
+                                textElements.quickAddBtn.setAttribute('onclick', `quickAddToCart(${data.bookId})`);
+                                // Reset button state in case it was changed
+                                const btnText = textElements.quickAddBtn.querySelector('.btn-text');
+                                const loadingSpinner = textElements.quickAddBtn.querySelector('.loading-spinner');
+                                if (btnText) {
+                                    btnText.textContent = 'Quick Add';
+                                    btnText.classList.remove('hidden');
+                                }
+                                if (loadingSpinner) loadingSpinner.classList.add('hidden');
+                                textElements.quickAddBtn.disabled = false;
+                                textElements.quickAddBtn.classList.remove('bg-green-500');
+                                textElements.quickAddBtn.classList.add('bg-white/80');
+                            }
                             
                             // Remove fade-out effect after updating content
                             Object.values(textElements).forEach(el => el?.classList.remove('text-fade-out'));

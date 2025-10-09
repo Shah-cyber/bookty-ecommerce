@@ -54,11 +54,38 @@
                     </div>
 
                     <div>
-                        <h3 class="text-lg font-medium text-bookty-black mb-4">Admin Notes</h3>
+                        <h3 class="text-lg font-medium text-bookty-black mb-4">Shipping & Notes</h3>
                         
                         <div class="mb-4">
-                            <label for="admin_notes" class="block text-sm font-medium text-gray-700 mb-1">Notes (Internal Only)</label>
-                            <textarea name="admin_notes" id="admin_notes" rows="5" class="w-full rounded-md border-gray-300 focus:border-bookty-purple-300 focus:ring focus:ring-bookty-purple-200 focus:ring-opacity-50">{{ old('admin_notes', $order->admin_notes) }}</textarea>
+                            <label for="tracking_number" class="block text-sm font-medium text-gray-700 mb-1">
+                                <svg class="inline w-4 h-4 mr-1 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                </svg>
+                                J&T Express Tracking Number
+                            </label>
+                            <input type="text" name="tracking_number" id="tracking_number" value="{{ old('tracking_number', $order->tracking_number) }}" placeholder="e.g., JT12345678901" class="w-full rounded-md border-gray-300 focus:border-bookty-purple-300 focus:ring focus:ring-bookty-purple-200 focus:ring-opacity-50">
+                            @error('tracking_number')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                            @if($order->tracking_number)
+                                <div class="mt-2 flex items-center space-x-2">
+                                    <button type="button" onclick="copyAndTrackPackage('{{ $order->tracking_number }}', '{{ $order->getJtTrackingUrl() }}')" 
+                                            class="inline-flex items-center px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700 transition-colors duration-200">
+                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                        </svg>
+                                        Copy & Track
+                                    </button>
+                                    <a href="{{ $order->getJtTrackingUrl() }}" target="_blank" class="text-blue-600 hover:text-blue-800 text-xs underline">
+                                        View tracking status →
+                                    </a>
+                                </div>
+                            @endif
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="admin_notes" class="block text-sm font-medium text-gray-700 mb-1">Admin Notes (Internal Only)</label>
+                            <textarea name="admin_notes" id="admin_notes" rows="4" class="w-full rounded-md border-gray-300 focus:border-bookty-purple-300 focus:ring focus:ring-bookty-purple-200 focus:ring-opacity-50">{{ old('admin_notes', $order->admin_notes) }}</textarea>
                             @error('admin_notes')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
