@@ -39,7 +39,7 @@
                                 @foreach($orders as $order)
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-bookty-black">
-                                        #{{ $order->id }}
+                                        {{ $order->public_id ?? $order->id }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-bookty-black">
                                         {{ $order->created_at->format('M d, Y') }}
