@@ -1,73 +1,115 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="min-h-screen bg-gradient-to-br from-gray-50 to-indigo-50">
+<style>
+    /* Import Google Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap');
+    
+    body {
+        font-family: 'Inter', sans-serif;
+    }
+    .font-serif {
+        font-family: 'Playfair Display', serif;
+    }
+    
+    /* Animation delays for background blobs */
+    .animation-delay-2000 { animation-delay: 2s; }
+    .animation-delay-4000 { animation-delay: 4s; }
+
+    /* Carousel 3D perspective */
+    .perspective-container {
+        perspective: 1000px;
+    }
+    #heroCoverCarousel {
+        transform-style: preserve-3d;
+    }
+    .hero-item {
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+
+    /* Text fade transition */
+    .text-fade {
+        transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    }
+    .text-fade-out {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    
+    /* Scroll down indicator animation */
+    @keyframes scroll-down-animation {
+        0% { transform: translateY(-5px); opacity: 0; }
+        50% { opacity: 1; }
+        100% { transform: translateY(5px); opacity: 0; }
+    }
+    .scroll-down-indicator span {
+        animation: scroll-down-animation 2s infinite;
+    }
+</style>
+
+<div class="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-100">
     <!-- Hero Section -->
-    <div class="relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-indigo-50 min-h-screen">
+    <div class="relative overflow-hidden bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-100 min-h-screen">
         <!-- Animated Background Elements -->
         <div class="absolute inset-0 overflow-hidden">
-            <div class="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-2xl opacity-60 animate-pulse"></div>
-            <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-2xl opacity-60 animate-pulse animation-delay-2000"></div>
-            <div class="absolute top-24 left-16 w-72 h-72 bg-indigo-300 rounded-full mix-blend-multiply filter blur-2xl opacity-60 animate-pulse animation-delay-4000"></div>
-            <!-- subtle radial lighting -->
-            <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(1200px 400px at 20% 10%, rgba(99,102,241,0.10), transparent), radial-gradient(800px 300px at 90% 80%, rgba(236,72,153,0.10), transparent);"></div>
+            <div class="absolute -top-40 -right-40 w-80 h-80 bg-purple-200 rounded-full mix-blend-multiply filter blur-2xl opacity-50 animate-pulse"></div>
+            <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-pink-200 rounded-full mix-blend-multiply filter blur-2xl opacity-50 animate-pulse animation-delay-2000"></div>
+            <div class="absolute top-24 left-16 w-72 h-72 bg-indigo-200 rounded-full mix-blend-multiply filter blur-2xl opacity-50 animate-pulse animation-delay-4000"></div>
         </div>
         
         <div class="container mx-auto px-4 sm:px-6 py-12 sm:py-16 lg:py-20 relative z-10">
-            <div class="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-16 min-h-[70vh] lg:min-h-[80vh]">
+            <div class="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-16 min-h-[70vh] lg:min-h-[80vh]">
                 <!-- Left Content (dynamic details) -->
                 @php $heroBooks = $newArrivals->take(6); $firstHero = $heroBooks->first(); @endphp
                 @if($newArrivals->count() > 0)
                 <div class="flex-1 text-gray-900 order-2 lg:order-1 flex flex-col items-center lg:items-start text-center lg:text-left" data-aos="fade-right" data-aos-duration="1000">
                     <div class="mb-6">
                         <span class="inline-flex items-center px-4 py-2 bg-white bg-opacity-70 rounded-full text-sm font-medium backdrop-blur-md border border-white/60 shadow-sm">
-                        <span class="w-2 h-2 bg-yellow-400 rounded-full mr-2 animate-pulse"></span>
-                            <span id="hero-genre">{{ optional($firstHero)->genre?->name ?? 'Featured' }}</span>
+                            <span class="w-2 h-2 bg-yellow-400 rounded-full mr-2 animate-pulse"></span>
+                            <span id="hero-genre" class="text-fade">{{ optional($firstHero)->genre?->name ?? 'Featured' }}</span>
                         </span>
                     </div>
-                    <h1 id="hero-title" class="text-3xl md:text-5xl lg:text-7xl font-extrabold leading-tight mb-4 bg-gradient-to-r from-gray-900 via-purple-800 to-indigo-800 bg-clip-text text-transparent" style="line-height: 1.15; display: inline-block;">
-                        
-                            {{ $firstHero?->title }}
-                        
+                    <h1 id="hero-title" class="text-fade text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-4 font-serif bg-gradient-to-r from-slate-900 via-purple-800 to-indigo-800 bg-clip-text text-transparent" style="line-height: 1.15; display: inline-block;">
+                        {{ $firstHero?->title }}
                     </h1>
-                    <p id="hero-synopsis" class="text-base md:text-lg mb-8 max-w-2xl px-1 text-gray-600 leading-relaxed">
+                    <p id="hero-synopsis" class="text-fade text-base md:text-lg mb-8 max-w-2xl text-slate-600 leading-relaxed">
                         {{ \Illuminate\Support\Str::limit($firstHero?->synopsis ?? 'Discover your next favorite story.', 200) }}
                     </p>
-                    <div class="flex flex-col sm:flex-row w-full items-stretch sm:items-center justify-center sm:justify-start gap-3 sm:gap-6">
-                        <a id="hero-details-link" href="{{ $firstHero ? route('books.show', $firstHero) : '#' }}" class="group inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-full transition-all duration-300 shadow-xl hover:shadow-purple-400/30 hover:scale-105 transform">
-                            <span class="mr-2">VIEW DETAILS</span>
-                            <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="flex flex-col sm:flex-row w-full items-stretch sm:items-center justify-center lg:justify-start gap-4 sm:gap-6">
+                        <a id="hero-details-link" href="{{ $firstHero ? route('books.show', $firstHero) : '#' }}" class="group inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-full transition-all duration-300 shadow-lg hover:shadow-purple-400/40 hover:scale-105 transform">
+                            <span>VIEW DETAILS</span>
+                            <svg class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
                             </svg>
                         </a>
                         @if($firstHero)
-                        <button onclick="quickAddToCart({{ $firstHero?->id }})" id="hero-quick-add" class="inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 border-2 border-indigo-200 text-indigo-700 font-semibold rounded-full bg-white/70 hover:bg-white transition-all duration-300 shadow-sm">Quick Add</button>
+                        <button onclick="quickAddToCart({{ $firstHero?->id }})" id="hero-quick-add" class="inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 border-2 border-transparent text-indigo-700 font-semibold rounded-full bg-white/80 backdrop-blur-sm hover:bg-white transition-all duration-300 shadow-sm hover:shadow-lg">Quick Add</button>
                         @endif
                     </div>
                     
                     <!-- Stats Row -->
-                    <div class="w-full overflow-x-auto mt-10 sm:mt-16 pt-6 sm:pt-8 border-t border-white border-opacity-20">
-                        <div class="flex items-stretch justify-center sm:justify-start gap-6 sm:gap-8 min-w-max">
-                        <div class="text-center min-w-[120px]" data-aos="fade-up" data-aos-delay="200">
-                            <div class="text-3xl font-bold text-yellow-300">10K+</div>
-                            <div class="text-purple-200 text-sm">Happy Readers</div>
-                        </div>
-                        <div class="text-center min-w-[120px]" data-aos="fade-up" data-aos-delay="400">
-                            <div class="text-3xl font-bold text-yellow-300">5K+</div>
-                            <div class="text-purple-200 text-sm">Books Available</div>
-                        </div>
-                        <div class="text-center min-w-[120px]" data-aos="fade-up" data-aos-delay="600">
-                            <div class="text-3xl font-bold text-yellow-300">98%</div>
-                            <div class="text-purple-200 text-sm">Satisfaction Rate</div>
-                        </div>
+                    <div class="w-full mt-12 sm:mt-16 pt-8 border-t border-purple-100">
+                        <div class="flex items-center justify-center lg:justify-start gap-8 sm:gap-12">
+                            <div class="text-center" data-aos="fade-up" data-aos-delay="200">
+                                <div class="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">10K+</div>
+                                <div class="text-slate-500 text-sm mt-1">Happy Readers</div>
+                            </div>
+                            <div class="text-center" data-aos="fade-up" data-aos-delay="400">
+                                <div class="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">5K+</div>
+                                <div class="text-slate-500 text-sm mt-1">Books Available</div>
+                            </div>
+                            <div class="text-center" data-aos="fade-up" data-aos-delay="600">
+                                <div class="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">4.8/5</div>
+                                <div class="text-slate-500 text-sm mt-1">Average Rating</div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Right Content - Portrait cover slider -->
-                <div class="flex-1 w-full order-1 lg:order-2" data-aos="fade-left" data-aos-duration="1000">
-                    <div class="relative max-w-xs sm:max-w-sm md:max-w-md lg:max-w-sm mx-auto h-[360px] sm:h-[520px]">
-                        <div class="absolute -inset-3 sm:-inset-6 rounded-3xl bg-gradient-to-tr from-indigo-300/30 via-purple-300/30 to-pink-300/30 blur-xl sm:blur-2xl"></div>
+                <!-- Right Content - 3D Portrait cover slider -->
+                <div class="flex-1 w-full order-1 lg:order-2 perspective-container" data-aos="fade-left" data-aos-duration="1000">
+                    <div class="relative max-w-xs sm:max-w-sm md:max-w-md lg:max-w-xs mx-auto h-[400px] sm:h-[520px]">
                         <div id="heroCoverCarousel" class="relative w-full h-full">
                             @foreach($heroBooks as $i => $book)
                                 @php
@@ -81,21 +123,8 @@
                                         $coverUrl = null;
                                     }
                                 @endphp
-                                @php
-                                    // initial positions: 0=front, 1=middle, 2=back, others hidden
-                                    $posClass = '';
-                                    if ($i === 0) {
-                                        $posClass = 'z-30 opacity-100 translate-x-0 translate-y-0 scale-100 ring-2 ring-indigo-300/60';
-                                    } elseif ($i === 1) {
-                                        $posClass = 'z-20 opacity-90 translate-x-6 translate-y-3 scale-95';
-                                    } elseif ($i === 2) {
-                                        $posClass = 'z-10 opacity-70 translate-x-12 translate-y-6 scale-90';
-                                    } else {
-                                        $posClass = 'opacity-0 pointer-events-none';
-                                    }
-                                @endphp
                                 <div
-                                    class="hero-item absolute inset-0 transition-all duration-700 ease-out rounded-2xl shadow-2xl ring-1 ring-indigo-200/50 overflow-hidden bg-white aspect-[3/4] {{ $posClass }}"
+                                    class="hero-item absolute inset-0 transition-all duration-700 ease-out rounded-2xl shadow-2xl ring-1 ring-black/5 overflow-hidden bg-white"
                                     data-title="{{ $book->title }}"
                                     data-genre="{{ optional($book->genre)->name }}"
                                     data-synopsis="{{ \Illuminate\Support\Str::limit($book->synopsis ?? '', 220) }}"
@@ -103,7 +132,7 @@
                                     data-book-id="{{ $book->id }}"
                                 >
                                     @if($coverUrl)
-                                        <img src="{{ $coverUrl }}" alt="{{ $book->title }}" class="w-full h-full object-contain"/>
+                                        <img src="{{ $coverUrl }}" alt="{{ $book->title }}" class="w-full h-full object-cover"/>
                                     @else
                                         <div class="w-full h-full bg-gradient-to-br from-indigo-400 via-purple-400 to-pink-400"></div>
                                     @endif
@@ -117,20 +146,20 @@
                 <div class="flex-1 text-gray-900 order-2 lg:order-1 flex flex-col items-center lg:items-start text-center lg:text-left" data-aos="fade-right" data-aos-duration="1000">
                     <div class="mb-6">
                         <span class="inline-flex items-center px-4 py-2 bg-white bg-opacity-70 rounded-full text-sm font-medium backdrop-blur-md border border-white/60 shadow-sm">
-                        <span class="w-2 h-2 bg-yellow-400 rounded-full mr-2 animate-pulse"></span>
+                            <span class="w-2 h-2 bg-yellow-400 rounded-full mr-2 animate-pulse"></span>
                             <span>Welcome to Bookty</span>
                         </span>
                     </div>
-                    <h1 class="text-3xl md:text-5xl lg:text-7xl font-extrabold leading-tight mb-4 bg-gradient-to-r from-gray-900 via-purple-800 to-indigo-800 bg-clip-text text-transparent" style="line-height: 1.15; display: inline-block;">
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-4 font-serif bg-gradient-to-r from-slate-900 via-purple-800 to-indigo-800 bg-clip-text text-transparent" style="line-height: 1.15; display: inline-block;">
                         Discover Amazing Books
                     </h1>
-                    <p class="text-base md:text-lg mb-8 max-w-2xl px-1 text-gray-600 leading-relaxed">
+                    <p class="text-base md:text-lg mb-8 max-w-2xl text-slate-600 leading-relaxed">
                         Your journey into the world of literature starts here. Browse our collection and find your next favorite read.
                     </p>
-                    <div class="flex flex-col sm:flex-row w-full items-stretch sm:items-center justify-center sm:justify-start gap-3 sm:gap-6">
-                        <a href="{{ route('books.index') }}" class="group inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-full transition-all duration-300 shadow-xl hover:shadow-purple-400/30 hover:scale-105 transform">
-                            <span class="mr-2">BROWSE BOOKS</span>
-                            <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="flex flex-col sm:flex-row w-full items-stretch sm:items-center justify-center lg:justify-start gap-4 sm:gap-6">
+                        <a href="{{ route('books.index') }}" class="group inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-full transition-all duration-300 shadow-lg hover:shadow-purple-400/40 hover:scale-105 transform">
+                            <span>BROWSE BOOKS</span>
+                            <svg class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
                             </svg>
                         </a>
@@ -143,80 +172,81 @@
                     const container = document.getElementById('heroCoverCarousel');
                     if (!container) return;
                     const slides = Array.from(container.querySelectorAll('.hero-item'));
-                    const titleEl = document.getElementById('hero-title');
-                    const genreEl = document.getElementById('hero-genre');
-                    const synopsisEl = document.getElementById('hero-synopsis');
-                    const detailsLinkEl = document.getElementById('hero-details-link');
-                    const quickAddBtnEl = document.getElementById('hero-quick-add');
-                    let i = 0; let timer;
+                    if (slides.length < 1) return;
 
-                    function setText(el, value) {
-                        if (!el) return;
-                        el.textContent = value || '';
-                    }
+                    const textElements = {
+                        title: document.getElementById('hero-title'),
+                        genre: document.getElementById('hero-genre'),
+                        synopsis: document.getElementById('hero-synopsis'),
+                        detailsLink: document.getElementById('hero-details-link'),
+                        quickAddBtn: document.getElementById('hero-quick-add'),
+                    };
 
-                    function applyDetails(slide) {
-                        const t = slide.dataset.title || '';
-                        const g = slide.dataset.genre || '';
-                        const syn = slide.dataset.synopsis || '';
-                        const href = slide.dataset.link || '#';
-                        const id = slide.dataset.bookId || '';
+                    let currentIndex = 0;
+                    let timer;
 
-                        setText(titleEl, t);
-                        setText(synopsisEl, syn);
+                    const updateTextContent = (slide) => {
+                        // Add fade-out effect to all text elements
+                        Object.values(textElements).forEach(el => el?.classList.add('text-fade-out'));
 
-                        if (genreEl) {
-                            if (g) {
-                                genreEl.textContent = g;
-                                genreEl.parentElement?.classList?.remove('invisible');
-                            } else {
-                                genreEl.textContent = '';
-                                genreEl.parentElement?.classList?.add('invisible');
-                            }
-                        }
+                        setTimeout(() => {
+                            const data = slide.dataset;
+                            if (textElements.title) textElements.title.textContent = data.title || '';
+                            if (textElements.genre) textElements.genre.textContent = data.genre || 'Featured';
+                            if (textElements.synopsis) textElements.synopsis.textContent = data.synopsis || '';
+                            if (textElements.detailsLink) textElements.detailsLink.href = data.link || '#';
+                            if (textElements.quickAddBtn) textElements.quickAddBtn.setAttribute('onclick', `quickAddToCart(${data.bookId})`);
+                            
+                            // Remove fade-out effect after updating content
+                            Object.values(textElements).forEach(el => el?.classList.remove('text-fade-out'));
+                        }, 300); // Corresponds to transition duration
+                    };
 
-                        if (detailsLinkEl && href) detailsLinkEl.href = href;
-                        if (quickAddBtnEl && id) quickAddBtnEl.setAttribute('onclick', `quickAddToCart(${id})`);
-                    }
-
-                    function show(n) {
+                    const updateCarousel = (activeIndex) => {
                         const total = slides.length;
-                        const prev = (n - 1 + total) % total;
-                        const next = (n + 1) % total;
+                        slides.forEach((slide, i) => {
+                            slide.classList.remove('z-30', 'z-20', 'z-10', 'opacity-100', 'pointer-events-auto');
+                            slide.style.transform = ''; // Clear previous transforms
 
-                        slides.forEach((el, idx) => {
-                            el.classList.remove('z-30','z-20','z-10','opacity-100','opacity-90','opacity-70','opacity-0','translate-x-0','translate-x-6','translate-x-12','translate-y-0','translate-y-3','translate-y-6','scale-100','scale-95','scale-90','ring-2','ring-indigo-300/60','pointer-events-none');
-                            el.classList.add('absolute');
-                            if (idx === n) {
-                                el.classList.add('z-30','opacity-100','translate-x-0','translate-y-0','scale-100','ring-2','ring-indigo-300/60');
-                            } else if (idx === next) {
-                                el.classList.add('z-20','opacity-90','translate-x-6','translate-y-3','scale-95');
-                            } else if (idx === prev) {
-                                el.classList.add('z-10','opacity-70','translate-x-12','translate-y-6','scale-90');
-                            } else {
-                                el.classList.add('opacity-0','pointer-events-none');
+                            let offset = (i - activeIndex + total) % total;
+                            
+                            if (offset === 0) { // Front
+                                slide.classList.add('z-30', 'opacity-100', 'pointer-events-auto');
+                                slide.style.transform = 'translateX(0) scale(1) rotateY(0deg)';
+                            } else if (offset === 1) { // Right
+                                slide.classList.add('z-20');
+                                slide.style.transform = 'translateX(50%) scale(0.85) rotateY(-45deg)';
+                            } else if (offset === total - 1) { // Left
+                                slide.classList.add('z-20');
+                                slide.style.transform = 'translateX(-50%) scale(0.85) rotateY(45deg)';
+                            } else { // Hidden
+                                slide.classList.add('z-10', 'opacity-0');
+                                slide.style.transform = `translateX(${offset > total / 2 ? '-100%' : '100%'}) scale(0.7)`;
                             }
                         });
-                        applyDetails(slides[n]);
-                    }
+                        updateTextContent(slides[activeIndex]);
+                    };
 
-                    function next() { i = (i + 1) % slides.length; show(i); }
-                    function start() { timer = setInterval(next, 4000); }
-                    function stop() { if (timer) clearInterval(timer); }
+                    const next = () => {
+                        currentIndex = (currentIndex + 1) % slides.length;
+                        updateCarousel(currentIndex);
+                    };
+
+                    const start = () => { timer = setInterval(next, 5000); };
+                    const stop = () => { if (timer) clearInterval(timer); };
 
                     container.addEventListener('mouseenter', stop);
                     container.addEventListener('mouseleave', start);
 
-                    if (slides.length) { show(i); start(); }
+                    updateCarousel(currentIndex);
+                    start();
                 });
             </script>
         </div>
         
         <!-- Scroll Indicator -->
-        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white animate-bounce">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
-            </svg>
+        <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center text-slate-500 scroll-down-indicator">
+            <span class="w-4 h-4 border-l-2 border-b-2 border-slate-400 transform rotate-[-45deg]"></span>
         </div>
     </div>
 

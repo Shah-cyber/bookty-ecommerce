@@ -13,7 +13,7 @@
         <div class="bg-white rounded-lg shadow-lg overflow-hidden">
             <div class="md:flex">
                 <!-- Book Cover -->
-                <div class="md:w-1/3 p-6">
+                <div class="md:w-1/4 p-6">
                     <div class="sticky top-6">
                         @if($book->cover_image)
                             <img src="{{ asset('storage/' . $book->cover_image) }}" alt="{{ $book->title }}" class="w-full h-auto object-cover rounded-lg shadow-md">
@@ -91,50 +91,54 @@
                 </div>
 
                 <!-- Book Details -->
-                <div class="md:w-2/3 p-6 border-t md:border-t-0 md:border-l border-gray-200">
-                    <h1 class="text-3xl font-serif font-bold text-gray-900 mb-2">{{ $book->title }}</h1>
-                    <p class="text-xl text-gray-600 mb-4">by {{ $book->author }}</p>
+                <div class="md:w-3/4 p-8 border-t md:border-t-0 md:border-l border-gray-200">
+                    <h1 class="text-4xl font-bold font-serif text-slate-900 !leading-tight mb-2">{{ $book->title }}</h1>
+                    <p class="text-xl text-slate-500 mb-6">by <a href="#" class="hover:underline">{{ $book->author }}</a></p>
 
-                    <div class="flex flex-wrap gap-2 mb-6">
-                        <span class="px-3 py-1 text-sm font-medium rounded-full bg-purple-100 text-purple-800">
+                    <div class="flex flex-wrap gap-2 mb-8">
+                        <span class="px-3 py-1 text-sm font-medium rounded-full bg-purple-100 text-purple-800 hover:bg-purple-200 transition-colors">
                             {{ $book->genre->name }}
                         </span>
                         @foreach($book->tropes as $trope)
-                            <span class="px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-800">
+                            <span class="px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors">
                                 {{ $trope->name }}
                             </span>
                         @endforeach
                     </div>
 
                     <div class="mb-8">
-                        <h2 class="text-xl font-semibold text-gray-900 mb-4">Synopsis</h2>
-                        <div class="prose max-w-none text-gray-700">
-                            <p>{{ $book->synopsis }}</p>
+                        <h2 class="text-2xl font-bold text-slate-900 mb-4">Synopsis</h2>
+                        <div class="relative">
+                            <div id="synopsis-content" class="prose max-w-none text-slate-600 text-base leading-relaxed max-h-28 overflow-hidden transition-all duration-500 ease-in-out">
+                                <p>{{ $book->synopsis }}</p>
+                            </div>
+                            <div id="synopsis-fade" class="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-white to-transparent pointer-events-none"></div>
+                            <button id="toggle-synopsis" class="text-purple-600 hover:text-purple-800 font-semibold mt-2 text-sm">Read More</button>
                         </div>
                     </div>
 
-                    <div class="border-t border-gray-200 pt-6">
-                        <h2 class="text-xl font-semibold text-gray-900 mb-4">Book Details</h2>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <h3 class="text-sm font-medium text-gray-500">Title</h3>
-                                <p class="mt-1 text-sm text-gray-900">{{ $book->title }}</p>
+                    <div class="border-t border-gray-200 pt-8">
+                        <h2 class="text-2xl font-bold text-slate-900 mb-6">Book Details</h2>
+                        <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                            <div class="border-b border-gray-100 pb-3">
+                                <dt class="text-sm font-medium text-slate-500">Title</dt>
+                                <dd class="mt-1 text-base text-slate-900">{{ $book->title }}</dd>
                             </div>
-                            <div>
-                                <h3 class="text-sm font-medium text-gray-500">Author</h3>
-                                <p class="mt-1 text-sm text-gray-900">{{ $book->author }}</p>
+                            <div class="border-b border-gray-100 pb-3">
+                                <dt class="text-sm font-medium text-slate-500">Author</dt>
+                                <dd class="mt-1 text-base text-slate-900">{{ $book->author }}</dd>
                             </div>
-                            <div>
-                                <h3 class="text-sm font-medium text-gray-500">Genre</h3>
-                                <p class="mt-1 text-sm text-gray-900">{{ $book->genre->name }}</p>
+                            <div class="border-b border-gray-100 pb-3">
+                                <dt class="text-sm font-medium text-slate-500">Genre</dt>
+                                <dd class="mt-1 text-base text-slate-900">{{ $book->genre->name }}</dd>
                             </div>
-                            <div>
-                                <h3 class="text-sm font-medium text-gray-500">Tropes</h3>
-                                <p class="mt-1 text-sm text-gray-900">
+                            <div class="border-b border-gray-100 pb-3">
+                                <dt class="text-sm font-medium text-slate-500">Tropes</dt>
+                                <dd class="mt-1 text-base text-slate-900">
                                     {{ $book->tropes->pluck('name')->join(', ') }}
-                                </p>
+                                </dd>
                             </div>
-                        </div>
+                        </dl>
                     </div>
                 </div>
             </div>
@@ -212,17 +216,53 @@
                     <div class="flex-1">
                         <!-- Reviews with Images Gallery -->
                         @if($reviewsWithImages->count() > 0)
-                            <div>
+                            @php
+                                // Build the complete array of all review images first
+                                $allReviewImages = [];
+                                foreach($reviewsWithImages as $reviewWithImage) {
+                                    foreach($reviewWithImage->image_urls as $imageUrl) {
+                                        $allReviewImages[] = $imageUrl;
+                                    }
+                                }
+                                $totalImages = count($allReviewImages);
+                            @endphp
+                            <div class="group">
                                 <h3 class="text-lg font-semibold text-slate-900 !leading-tight mb-4">Reviews with Images</h3>
-                                <div class="flex items-center gap-4 overflow-auto">
-                                    @foreach($reviewsWithImages as $reviewWithImage)
-                                        @foreach($reviewWithImage->image_urls as $imageUrl)
-                                            <img src="{{ $imageUrl }}" 
-                                                 class="bg-gray-100 object-cover p-2 w-[232px] h-[232px] cursor-pointer hover:opacity-90 transition-opacity" 
-                                                 alt="customer-review-image" 
-                                                 onclick="openImageModal('{{ $imageUrl }}', 0, {{ json_encode([$imageUrl]) }})" />
+                                <div class="relative">
+                                    <!-- Gallery Container -->
+                                    <div id="review-gallery" class="flex items-center gap-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                                        @php $imageIndex = 0; @endphp
+                                        @foreach($reviewsWithImages as $reviewWithImage)
+                                            @foreach($reviewWithImage->image_urls as $imageUrl)
+                                                <img src="{{ $imageUrl }}" 
+                                                     class="bg-gray-100 object-cover p-2 w-[232px] h-[232px] cursor-pointer hover:opacity-90 hover:scale-105 transition-all duration-300 rounded-lg flex-shrink-0" 
+                                                     alt="customer-review-image" 
+                                                     onclick="openImageModal('{{ $imageUrl }}', {{ $imageIndex }}, {!! json_encode($allReviewImages) !!})" />
+                                                @php $imageIndex++; @endphp
+                                            @endforeach
                                         @endforeach
-                                    @endforeach
+                                    </div>
+                                    
+                                    <!-- Gallery Navigation Buttons (show only if more than 4 images) -->
+                                    @if($totalImages > 4)
+                                        <button id="gallery-prev" class="absolute left-0 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white shadow-lg rounded-full p-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                            </svg>
+                                        </button>
+                                        <button id="gallery-next" class="absolute right-0 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white shadow-lg rounded-full p-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                            </svg>
+                                        </button>
+                                    @endif
+                                    
+                                    <!-- Gallery Indicators -->
+                                    @if($totalImages > 1)
+                                        <div class="flex justify-center mt-4 gap-2">
+                                            <span class="text-sm text-gray-500">{{ $totalImages }} photos from customer reviews</span>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         @endif
@@ -617,6 +657,80 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Synopsis toggle functionality
+            const synopsisContent = document.getElementById('synopsis-content');
+            const synopsisFade = document.getElementById('synopsis-fade');
+            const toggleSynopsisBtn = document.getElementById('toggle-synopsis');
+
+            if (synopsisContent && toggleSynopsisBtn && synopsisFade) {
+                // Check if content actually overflows, if not hide the button and fade
+                setTimeout(() => {
+                    if (synopsisContent.scrollHeight <= synopsisContent.clientHeight) {
+                        toggleSynopsisBtn.style.display = 'none';
+                        synopsisFade.style.display = 'none';
+                        synopsisContent.classList.remove('max-h-28');
+                    }
+                }, 100);
+
+                toggleSynopsisBtn.addEventListener('click', function() {
+                    const isCollapsed = synopsisContent.classList.contains('max-h-28');
+                    
+                    if (isCollapsed) {
+                        // Expand
+                        synopsisContent.style.maxHeight = synopsisContent.scrollHeight + 'px';
+                        synopsisContent.classList.remove('max-h-28');
+                        synopsisFade.classList.add('hidden');
+                        this.textContent = 'Read Less';
+                    } else {
+                        // Collapse
+                        synopsisContent.style.maxHeight = null;
+                        synopsisContent.classList.add('max-h-28');
+                        synopsisFade.classList.remove('hidden');
+                        this.textContent = 'Read More';
+                    }
+                });
+            }
+
+            // Gallery Navigation functionality
+            const galleryContainer = document.getElementById('review-gallery');
+            const galleryPrevBtn = document.getElementById('gallery-prev');
+            const galleryNextBtn = document.getElementById('gallery-next');
+            
+            if (galleryContainer && galleryPrevBtn && galleryNextBtn) {
+                const scrollAmount = 240; // Width of one image plus gap
+                
+                galleryPrevBtn.addEventListener('click', function() {
+                    galleryContainer.scrollBy({
+                        left: -scrollAmount,
+                        behavior: 'smooth'
+                    });
+                });
+                
+                galleryNextBtn.addEventListener('click', function() {
+                    galleryContainer.scrollBy({
+                        left: scrollAmount,
+                        behavior: 'smooth'
+                    });
+                });
+                
+                // Update button visibility based on scroll position
+                function updateGalleryButtons() {
+                    const isAtStart = galleryContainer.scrollLeft <= 0;
+                    const isAtEnd = galleryContainer.scrollLeft >= (galleryContainer.scrollWidth - galleryContainer.clientWidth);
+                    
+                    galleryPrevBtn.style.opacity = isAtStart ? '0.3' : '1';
+                    galleryNextBtn.style.opacity = isAtEnd ? '0.3' : '1';
+                    galleryPrevBtn.style.pointerEvents = isAtStart ? 'none' : 'auto';
+                    galleryNextBtn.style.pointerEvents = isAtEnd ? 'none' : 'auto';
+                }
+                
+                // Listen for scroll events to update button states
+                galleryContainer.addEventListener('scroll', updateGalleryButtons);
+                
+                // Initial button state
+                updateGalleryButtons();
+            }
+
             // Review Modal functionality
             const reviewModal = document.getElementById('reviewModal');
             const writeReviewBtn = document.getElementById('writeReviewBtn');

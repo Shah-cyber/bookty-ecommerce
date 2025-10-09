@@ -84,7 +84,7 @@
             </div>
 
             <!-- Enhanced Search -->
-            <div class="flex-1 flex items-center justify-center px-2 lg:ml-6 lg:justify-end">
+            {{-- <div class="flex-1 flex items-center justify-center px-2 lg:ml-6 lg:justify-end">
                 <div class="max-w-lg w-full lg:max-w-xs">
                     <label for="search" class="sr-only">Search</label>
                     <div class="relative group">
@@ -125,7 +125,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             <div class="hidden sm:ml-6 sm:flex sm:items-center">
                 <!-- Enhanced User Actions -->
