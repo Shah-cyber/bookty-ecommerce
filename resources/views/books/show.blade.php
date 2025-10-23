@@ -63,7 +63,6 @@
                                         class="wishlist-btn w-full px-4 py-2 {{ Auth::user()->hasBookInWishlist($book->id) ? 'bg-pink-100 text-pink-700 border border-pink-300 hover:bg-pink-200' : 'bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200' }} rounded-md flex items-center justify-center gap-2"
                                         data-book-id="{{ $book->id }}"
                                         data-in-wishlist="{{ Auth::user()->hasBookInWishlist($book->id) ? 'true' : 'false' }}"
-                                        onclick="toggleWishlist({{ $book->id }}, this)"
                                     >
                                         @if(Auth::user()->hasBookInWishlist($book->id))
                                             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">

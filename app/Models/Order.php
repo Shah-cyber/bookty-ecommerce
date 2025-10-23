@@ -31,6 +31,12 @@ class Order extends Model
         'discount_amount',
         'coupon_code',
         'public_id',
+        'toyyibpay_bill_code',
+        'toyyibpay_payment_url',
+        'toyyibpay_invoice_no',
+        'toyyibpay_payment_date',
+        'toyyibpay_settlement_reference',
+        'toyyibpay_settlement_date',
     ];
     
     public function user(): BelongsTo
@@ -207,5 +213,37 @@ class Order extends Model
     public function hasTrackingNumber(): bool
     {
         return !empty($this->tracking_number);
+    }
+
+    /**
+     * Check if the order has ToyyibPay payment information.
+     *
+     * @return bool
+     */
+    public function hasToyyibPayPayment(): bool
+    {
+        return !empty($this->toyyibpay_bill_code);
+    }
+
+    /**
+     * Get the ToyyibPay payment URL.
+     *
+     * @return string|null
+     */
+    public function getToyyibPayUrl(): ?string
+    {
+        return $this->toyyibpay_payment_url;
+    }
+
+    /**
+     * Check if the order is paid via ToyyibPay.
+     *
+     * @return bool
+     */
+    public function isToyyibPayPaid(): bool
+    {
+        return $this->hasToyyibPayPayment() && 
+               $this->payment_status === 'paid' && 
+               !empty($this->toyyibpay_invoice_no);
     }
 }

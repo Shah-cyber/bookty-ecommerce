@@ -474,15 +474,10 @@
                                     </div>
                                 </div>
                                 <button 
-                                    onclick="quickAddToCart({{ $book->id }})"
-                                    class="mt-3 w-full py-2 bg-gradient-to-r from-red-600 to-pink-600 text-white text-sm font-medium rounded hover:from-red-700 hover:to-pink-700 transition-colors duration-300 flex items-center justify-center">
-                                    <span class="btn-text">Add to Cart</span>
-                                    <span class="loading-spinner hidden">
-                                        <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                    </span>
+                                    class="ajax-add-to-cart mt-3 w-full py-2 bg-gradient-to-r from-red-600 to-pink-600 text-white text-sm font-medium rounded hover:from-red-700 hover:to-pink-700 transition-colors duration-300 flex items-center justify-center"
+                                    data-book-id="{{ $book->id }}"
+                                    data-quantity="1">
+                                    Add to Cart
                                 </button>
                             </div>
                         </div>
@@ -588,7 +583,7 @@
                                         <div class="absolute bottom-3 left-3 right-3 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
                                             <div class="flex justify-between items-center">
                                                 @auth
-                                                    <button onclick="event.preventDefault(); toggleWishlist({{ $book->id }}, this)" 
+                                                    <button type="button" 
                                                         class="wishlist-btn p-2 bg-white/90 rounded-full hover:bg-white transition-colors duration-200 backdrop-blur-sm"
                                                         data-book-id="{{ $book->id }}"
                                                         data-in-wishlist="{{ Auth::user()->hasBookInWishlist($book->id) ? 'true' : 'false' }}">
@@ -1189,7 +1184,7 @@
                                 <!-- Wishlist Button (Top Right) -->
                                 <div class="absolute top-4 right-4 z-10">
                                     @auth
-                                        <button onclick="event.preventDefault(); toggleWishlist({{ $book->id }}, this)" 
+                                        <button type="button" 
                                             class="wishlist-btn p-2 bg-white/90 rounded-full hover:bg-white transition-colors duration-200 backdrop-blur-sm shadow-md"
                                             data-book-id="{{ $book->id }}"
                                             data-in-wishlist="{{ Auth::user()->hasBookInWishlist($book->id) ? 'true' : 'false' }}">
@@ -1404,100 +1399,6 @@
         </div>
     </div>
 
-    <!-- Wishlist JavaScript -->
-    <script>
-        function toggleWishlist(bookId, button) {
-            // Show loading state
-            const originalContent = button.innerHTML;
-            button.disabled = true;
-            button.innerHTML = `
-                <svg class="animate-spin h-4 w-4 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-            `;
-            
-            // Determine if the book is in the wishlist
-            const isInWishlist = button.dataset.inWishlist === 'true';
-            
-            // Determine the endpoint
-            const endpoint = isInWishlist ? 
-                `/wishlist/remove/${bookId}` : 
-                `/wishlist/add/${bookId}`;
-            
-            // Prepare the request
-            const method = isInWishlist ? 'DELETE' : 'POST';
-            
-            // Send the AJAX request
-            fetch(endpoint, {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                credentials: 'same-origin'
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Update all wishlist buttons for this book
-                const allButtons = document.querySelectorAll(`.wishlist-btn[data-book-id="${bookId}"]`);
-                
-                allButtons.forEach(btn => {
-                    if (isInWishlist) {
-                        // Book was removed from wishlist
-                        btn.dataset.inWishlist = 'false';
-                        btn.innerHTML = `
-                            <svg class="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                            </svg>
-                        `;
-                    } else {
-                        // Book was added to wishlist
-                        btn.dataset.inWishlist = 'true';
-                        btn.innerHTML = `
-                            <svg class="w-4 h-4 text-pink-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
-                            </svg>
-                        `;
-                    }
-                    btn.disabled = false;
-                });
-                
-                // Update wishlist count in the header if it exists
-                if (data.wishlist_count !== undefined) {
-                    const wishlistCountElements = document.querySelectorAll('.wishlist-count');
-                    wishlistCountElements.forEach(element => {
-                        if (data.wishlist_count > 0) {
-                            element.textContent = data.wishlist_count;
-                            element.classList.remove('hidden');
-                        } else {
-                            element.classList.add('hidden');
-                        }
-                    });
-                }
-                
-                // Show a toast notification
-                if (window.showToast) {
-                    window.showToast(data.message, isInWishlist ? 'info' : 'success');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                button.innerHTML = originalContent;
-                button.disabled = false;
-                
-                if (window.showToast) {
-                    window.showToast('An error occurred. Please try again.', 'error');
-                }
-            });
-        }
-    </script>
 @endsection
+
 

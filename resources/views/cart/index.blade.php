@@ -4,7 +4,7 @@
     <div class="container mx-auto px-4 py-8">
         <h1 class="text-2xl font-serif font-bold text-gray-900 mb-6">Your Shopping Cart</h1>
 
-        @if(session('success'))
+        {{-- @if(session('success'))
             <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6" role="alert">
                 <p>{{ session('success') }}</p>
             </div>
@@ -14,7 +14,7 @@
             <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
                 <p>{{ session('error') }}</p>
             </div>
-        @endif
+        @endif --}}
 
         @if($cart->items->isEmpty())
             <div class="bg-white p-6 rounded-lg shadow-md text-center">

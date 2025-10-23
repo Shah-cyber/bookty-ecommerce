@@ -142,34 +142,44 @@
 
                         <div class="mb-6">
                             <label for="shipping_phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                            <input type="text" name="shipping_phone" id="shipping_phone" value="{{ old('shipping_phone', auth()->user()->phone_number) }}" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50">
+                            <input type="text" name="shipping_phone" id="shipping_phone" value="{{ old('shipping_phone', auth()->user()->phone_number) }}" required placeholder="e.g., 0123456789 or +60123456789" class="w-full border-gray-300 rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50">
+                            <p class="text-xs text-gray-500 mt-1">Enter Malaysian phone number (e.g., 0123456789)</p>
                             @error('shipping_phone')
                                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <h2 class="text-lg font-semibold text-gray-900 mb-4 mt-8">Payment Information</h2>
-                        <p class="text-gray-500 mb-6">This is a demo application. No actual payment will be processed.</p>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                            <div>
-                                <label for="card_number" class="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
-                                <input type="text" id="card_number" value="4242 4242 4242 4242" class="w-full bg-gray-100 border-gray-300 rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50" readonly>
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                            <div class="flex items-center">
+                                <svg class="h-6 w-6 text-blue-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <div>
+                                    <h3 class="text-sm font-medium text-blue-800">Secure Payment via FPX</h3>
+                                    <p class="text-sm text-blue-600 mt-1">You will be redirected to ToyyibPay for secure online banking payment</p>
+                                </div>
                             </div>
-                            
-                            <div>
-                                <label for="card_name" class="block text-sm font-medium text-gray-700 mb-1">Name on Card</label>
-                                <input type="text" id="card_name" value="Demo User" class="w-full bg-gray-100 border-gray-300 rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50" readonly>
-                            </div>
+                        </div>
 
-                            <div>
-                                <label for="card_expiry" class="block text-sm font-medium text-gray-700 mb-1">Expiry Date</label>
-                                <input type="text" id="card_expiry" value="12/25" class="w-full bg-gray-100 border-gray-300 rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50" readonly>
-                            </div>
-
-                            <div>
-                                <label for="card_cvv" class="block text-sm font-medium text-gray-700 mb-1">CVV</label>
-                                <input type="text" id="card_cvv" value="123" class="w-full bg-gray-100 border-gray-300 rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50" readonly>
+                        <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                            <h3 class="text-sm font-medium text-gray-900 mb-2">Accepted Payment Methods:</h3>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    Maybank2U
+                                </span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                    CIMB Clicks
+                                </span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                    Public Bank
+                                </span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                    RHB Now
+                                </span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                    And more...
+                                </span>
                             </div>
                         </div>
 
@@ -183,8 +193,11 @@
 
                         <div class="mt-8">
                             <button type="submit" class="w-full px-4 py-3 bg-purple-600 text-white text-center font-medium rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
-                                Complete Order
+                                Proceed to Payment
                             </button>
+                            <p class="text-xs text-gray-500 text-center mt-2">
+                                You will be redirected to ToyyibPay for secure payment processing
+                            </p>
                         </div>
                     </form>
                 </div>

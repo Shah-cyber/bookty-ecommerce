@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\PostageRateController;
 use App\Http\Controllers\SuperAdmin\RoleController;
 use App\Http\Controllers\SuperAdmin\AdminController;
 use App\Http\Controllers\SuperAdmin\SettingController;
+use App\Http\Controllers\ToyyibPayController;
 use App\Http\Controllers\SuperAdmin\PermissionController;
 use App\Http\Controllers\BookController as CustomerBookController;
 
@@ -149,6 +150,12 @@ Route::middleware(['auth', 'role:admin,superadmin'])->prefix('admin')->name('adm
 Route::middleware(['auth', 'role:superadmin'])->prefix('superadmin')->name('superadmin.')->group(function () {
     Route::get('/', [App\Http\Controllers\SuperAdmin\DashboardController::class, 'index'])->name('dashboard');
     
+    // Real-time dashboard API endpoints
+    Route::get('/api/stats', [App\Http\Controllers\SuperAdmin\DashboardController::class, 'getRealtimeStats'])->name('api.stats');
+    Route::get('/api/user-registrations', [App\Http\Controllers\SuperAdmin\DashboardController::class, 'getRealtimeUserRegistrations'])->name('api.user-registrations');
+    Route::get('/api/recent-users', [App\Http\Controllers\SuperAdmin\DashboardController::class, 'getRecentUsers'])->name('api.recent-users');
+    Route::get('/api/system-health', [App\Http\Controllers\SuperAdmin\DashboardController::class, 'getSystemHealth'])->name('api.system-health');
+    
     // Admin management
     Route::resource('admins', App\Http\Controllers\SuperAdmin\AdminController::class);
     
@@ -165,6 +172,13 @@ Route::middleware(['auth', 'role:superadmin'])->prefix('superadmin')->name('supe
 Route::prefix('api')->middleware('auth')->group(function () {
     Route::post('/coupons/validate', [App\Http\Controllers\Api\CouponController::class, 'validate'])->name('api.coupons.validate');
     Route::post('/postage/rate', [App\Http\Controllers\Api\PostageController::class, 'rate'])->name('api.postage.rate');
+});
+
+// ToyyibPay routes (no auth required for callbacks)
+Route::prefix('toyyibpay')->name('toyyibpay.')->group(function () {
+    Route::post('/callback', [ToyyibPayController::class, 'callback'])->name('callback');
+    Route::get('/return', [ToyyibPayController::class, 'return'])->name('return');
+    Route::get('/check-status/{order}', [ToyyibPayController::class, 'checkStatus'])->name('check-status')->middleware('auth');
 });
 
 // Authentication routes
