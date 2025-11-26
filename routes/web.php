@@ -27,6 +27,14 @@ use App\Http\Controllers\BookController as CustomerBookController;
 
 // Customer routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
+// Recommendation endpoints (JSON responses)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/api/recommendations/me', [\App\Http\Controllers\Api\RecommendationController::class, 'forUser'])
+        ->name('api.recommendations.me');
+});
+
+Route::get('/api/recommendations/similar/{book}', [\App\Http\Controllers\Api\RecommendationController::class, 'similarToBook'])
+    ->name('api.recommendations.similar');
 Route::get('/books', [CustomerBookController::class, 'index'])->name('books.index');
 Route::get('/books/{book:slug}', [CustomerBookController::class, 'show'])->name('books.show');
 
@@ -53,6 +61,8 @@ Route::middleware('auth')->group(function () {
     // Order history
     Route::get('/profile/orders', [ProfileController::class, 'orders'])->name('profile.orders');
     Route::get('/profile/orders/{order}', [ProfileController::class, 'showOrder'])->name('profile.orders.show');
+    Route::get('/profile/orders/{order}/invoice', [ProfileController::class, 'invoice'])->name('profile.orders.invoice');
+    Route::get('/profile/orders/{order}/invoice/pdf', [ProfileController::class, 'invoicePdf'])->name('profile.orders.invoice.pdf');
 });
 
 // Cart and checkout routes (requires authentication)
@@ -144,6 +154,14 @@ Route::middleware(['auth', 'role:admin,superadmin'])->prefix('admin')->name('adm
 
     // Postage Rates management
     Route::resource('postage-rates', PostageRateController::class)->except(['show']);
+    
+    // Recommendation Analytics
+    Route::prefix('recommendations')->name('recommendations.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\RecommendationAnalyticsController::class, 'index'])->name('index');
+        Route::get('/settings', [\App\Http\Controllers\Admin\RecommendationAnalyticsController::class, 'settings'])->name('settings');
+        Route::post('/settings', [\App\Http\Controllers\Admin\RecommendationAnalyticsController::class, 'updateSettings'])->name('settings.update');
+        Route::get('/user/{user}', [\App\Http\Controllers\Admin\RecommendationAnalyticsController::class, 'userDetails'])->name('user.details');
+    });
 });
 
 // Superadmin routes (requires superadmin role)

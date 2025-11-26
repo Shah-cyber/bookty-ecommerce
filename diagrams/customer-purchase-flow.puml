@@ -1,0 +1,104 @@
+@startuml Customer Purchase Flow
+title Complete Customer Purchase Journey
+
+start
+
+:Customer lands on homepage;
+if (User authenticated?) then (yes)
+    :Load personalized recommendations;
+else (no)
+    :Show popular/new arrivals;
+endif
+
+:Customer browses books;
+if (Apply filters?) then (yes)
+    :Select genre/trope/author/price;
+    :Apply filters;
+endif
+
+:View book details;
+:Load similar books sidebar;
+
+partition "Add to Cart" {
+    if (Add to cart?) then (yes)
+        if (Stock available?) then (no)
+            :Show out of stock error;
+            stop
+        else (yes)
+            :Add item to cart;
+            :Update cart count;
+            :Show success toast;
+        endif
+    else (no)
+        :Continue browsing;
+    endif
+}
+
+if (Go to cart?) then (yes)
+    :View cart items;
+    if (Update quantity?) then (yes)
+        :Validate new quantity;
+        :Update item;
+    endif
+    if (Remove item?) then (yes)
+        :Remove from cart;
+    endif
+    if (Apply coupon?) then (yes)
+        :Validate coupon;
+        if (Coupon valid?) then (yes)
+            :Apply discount;
+        else (no)
+            :Show error;
+        endif
+    endif
+    
+    :Proceed to checkout;
+    
+    partition "Checkout Process" {
+        :Enter shipping details;
+        :Calculate postage rate;
+        if (Free shipping?) then (yes)
+            :Set shipping = 0;
+        else (no)
+            :Calculate shipping cost;
+        endif
+        
+        :Review order summary;
+        :Confirm order;
+        
+        partition "Payment Processing" {
+            :Start database transaction;
+            :Lock book stock;
+            if (All items in stock?) then (no)
+                :Rollback transaction;
+                :Show error;
+                stop
+            else (yes)
+                :Create order record;
+                :Create order items;
+                :Decrement stock;
+                :Create ToyyibPay bill;
+                if (Bill created?) then (yes)
+                    :Save payment info;
+                    :Commit transaction;
+                    :Clear cart;
+                    :Redirect to ToyyibPay;
+                else (no)
+                    :Rollback transaction;
+                    :Show error;
+                    stop
+                endif
+            endif
+        }
+        
+        :Customer completes FPX payment;
+        :ToyyibPay callback received;
+        :Update order status to 'processing';
+        :Display success page;
+    }
+endif
+
+stop
+
+@enduml
+

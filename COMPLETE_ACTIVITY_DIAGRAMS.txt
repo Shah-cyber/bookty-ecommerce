@@ -1,0 +1,917 @@
+================================================================================
+                BOOKTY E-COMMERCE SYSTEM - ACTIVITY DIAGRAMS
+================================================================================
+
+Here are comprehensive ASCII activity diagrams showing all major workflows
+in your Bookty e-commerce system:
+
+================================================================================
+                    1. CUSTOMER PURCHASE JOURNEY
+================================================================================
+
+START
+  |
+  ├─► Customer Lands on Homepage
+  |       |
+  |       ├─► IF Authenticated:
+  |       |     ├─► Load Personalized Recommendations
+  |       |     ├─► Display "For You" Section
+  |       |     └─► Show Hero Carousel with Recommendations
+  |       |
+  |       └─► IF NOT Authenticated:
+  |             └─► Show New Arrivals / Popular Books
+  |
+  ├─► Browse Books
+  |       |
+  |       ├─► Filter by: Genre / Trope / Author / Price
+  |       ├─► Search Functionality
+  |       └─► View Book List
+  |
+  ├─► Click on Book
+  |       |
+  |       ├─► Load Book Details Page
+  |       ├─► Load Similar Books (Sidebar)
+  |       ├─► Display Reviews with Images
+  |       └─► Show Price & Stock Info
+  |
+  ├─► DECISION: What to do?
+  |       |
+  |       ├─► [A] Add to Cart
+  |       |         |
+  |       |         ├─► Check Authentication
+  |       |         |       ├─► NOT AUTH → Prompt Login Modal
+  |       |         |       └─► AUTH → Check Stock Availability
+  |       |         |
+  |       |         ├─► Stock Available?
+  |       |         |       ├─► YES → Add Item to Cart
+  |       |         |       │         ├─► Update Cart Count Badge
+  |       |         |       │         ├─► Show Success Toast
+  |       |         |       │         └─► Update Cart Counter
+  |       |         |       │
+  |       |         |       └─► NO → Show "Out of Stock" Error
+  |       |         |
+  |       |         └─► Return to Book Page
+  |       |
+  |       ├─► [B] Add to Wishlist
+  |       |         |
+  |       |         ├─► Toggle Wishlist Status
+  |       |         ├─► Update Heart Icon
+  |       |         └─► Show Confirmation Toast
+  |       |
+  |       └─► [C] Write Review
+  |                 |
+  |                 ├─► Check: Has Purchased Book?
+  |                 ├─► IF YES → Open Review Form
+  |                 ├─► Upload Images (Optional)
+  |                 ├─► Set Rating (1-5 Stars)
+  |                 ├─► Write Comment
+  |                 └─► Submit Review
+  |
+  ├─► Go to Shopping Cart
+  |       |
+  |       ├─► Display All Cart Items
+  |       ├─► Calculate Subtotal
+  |       │
+  |       ├─► ACTIONS:
+  |       │     ├─► Update Quantity → Validate Stock → Save
+  |       │     ├─► Remove Item → Confirm → Delete
+  |       │     ├─► Apply Coupon → Validate → Calculate Discount
+  |       │     └─► Continue Shopping
+  |       │
+  |       └─► Proceed to Checkout
+  |             |
+  |             ├─► Load Checkout Page
+  |             │
+  |             ├─► Enter Shipping Details:
+  |             │     ├─► Address, City, State
+  |             │     ├─► Postal Code
+  |             │     └─► Phone Number
+  |             │
+  |             ├─► Calculate Postage
+  |             │     ├─► Determine Region (SM, Sabah, Sarawak)
+  |             │     ├─► Get Postage Rate
+  |             │     └─► Check Free Shipping Conditions
+  |             │
+  |             ├─► Review Order Summary
+  |             │     ├─► Items with Prices
+  |             │     ├─► Subtotal
+  |             │     ├─► Discount (if coupon applied)
+  |             │     ├─► Shipping Cost
+  |             │     └─► Total Amount
+  |             │
+  |             └─► Confirm & Process Payment
+  |                   │
+  |                   └─► START CHECKOUT PROCESS
+                          │
+                          ├─► BEGIN DATABASE TRANSACTION
+                          │
+                          ├─► Create Order Record
+                          │     ├─► Generate Public ID
+                          │     ├─► Set Status: 'pending'
+                          │     └─► Store Shipping Info
+                          │
+                          ├─► For Each Cart Item:
+                          │     │
+                          │     ├─► Lock Book Stock (LockForUpdate)
+                          │     ├─► Check Stock >= Quantity
+                          │     │     ├─► INSUFFICIENT → ROLLBACK
+                          │     │     └─► SUFFICIENT → Continue
+                          │     │
+                          │     ├─► Create OrderItem
+                          │     │     ├─► Book ID
+                          │     │     ├─► Quantity
+                          │     │     ├─► Price
+                          │     │     ├─► Cost Price (for profitability)
+                          │     │     ├─► Total Selling Amount
+                          │     │     └─► Total Cost Amount
+                          │     │
+                          │     └─► Decrement Stock
+                          │
+                          ├─► Create ToyyibPay Bill
+                          │     ├─► Call ToyyibPay API
+                          │     ├─► Receive Bill Code
+                          │     └─► Get Payment URL
+                          │
+                          ├─► IF Bill Creation Success:
+                          │     │
+                          │     ├─► Save Payment Info to Order
+                          │     ├─► COMMIT TRANSACTION
+                          │     ├─► Clear Cart
+                          │     └─► Redirect to ToyyibPay
+                          │
+                          └─► IF Bill Creation Failed:
+                                │
+                                ├─► ROLLBACK TRANSACTION
+                                ├─► Restore Stock
+                                └─► Return to Checkout with Error
+
+END
+
+
+================================================================================
+                  2. HYBRID RECOMMENDATION SYSTEM FLOW
+================================================================================
+
+START
+  |
+  ├─► User Requests Recommendations
+  |
+  ├─► Check: User Authenticated?
+  |       |
+  |       ├─► NO → Return Popular Books
+  |       │         └─► END
+  |       │
+  |       └─► YES → Continue
+  |
+  ├─► Check Cache
+  |       |
+  |       ├─► CACHE HIT → Retrieve Cached Results
+  |       │     ├─► Attach Scores to Books
+  |       │     └─► RETURN CACHED (Fast Path)
+  |       │
+  |       └─► CACHE MISS → Start Recommendation Process
+  |
+  ┌────────────────────────────────────────────────────────────────────┐
+  │                  CONTENT-BASED FILTERING                           │
+  └────────────────────────────────────────────────────────────────────┘
+  |
+  ├─► Get User Data
+  |       ├─► Get Purchased Books
+  |       ├─► Get Wishlisted Books
+  |       └─► Get Order History
+  |
+  ├─► Extract Preferences
+  |       ├─► Analyze Purchased Books
+  |       ├─► Extract Favorite Genres
+  |       ├─► Extract Favorite Tropes
+  |       └─► Extract Favorite Authors
+  |
+  ├─► Calculate Weights
+  |       ├─► Genre Weights (Higher for purchased)
+  |       ├─► Trope Weights (Medium weight)
+  |       └─► Author Weights (Lower weight)
+  |
+  ├─► Normalize Content Scores
+  |       └─► Scale to 0-1 range
+  |
+  ┌────────────────────────────────────────────────────────────────────┐
+  │                 COLLABORATIVE FILTERING                             │
+  └────────────────────────────────────────────────────────────────────┘
+  |
+  ├─► Find Similar Users
+  |       ├─► Get Other Users
+  |       ├─► Calculate Purchase Overlap
+  |       └─► Identify "Peer Users"
+  |
+  ├─► Analyze Co-purchase Patterns
+  |       ├─► Find Popular Among Peers
+  |       ├─► Score by Frequency
+  |       └─► Normalize Collaborative Scores
+  |
+  ┌────────────────────────────────────────────────────────────────────┐
+  │                       HYBRID FUSION                                │
+  └────────────────────────────────────────────────────────────────────┘
+  |
+  ├─► Combine Scores
+  |       ├─► Apply 60% Content Weight
+  |       │     └─► final_score += content_score × 0.6
+  |       │
+  |       └─► Apply 40% Collaborative Weight
+  |             └─► final_score += collaborative_score × 0.4
+  |
+  ├─► Apply Filters
+  |       ├─► Exclude Already Purchased Books
+  |       ├─► Filter Only In-Stock Books
+  |       └─► Remove Zero-Score Books
+  |
+  ├─► Sort & Rank
+  |       ├─► Sort by Final Score (Descending)
+  |       ├─► Limit to 12 Books
+  |       └─► Attach Full Book Details
+  |
+  ├─► Cache Results
+  |       ├─► Cache Key: "reco:user:{id}:v1:{limit}"
+  |       ├─► Duration: 30 minutes
+  |       └─► Store Full Book Collection
+  |
+  └─► RETURN RECOMMENDATIONS
+        ├─► Attach Scores to Books
+        └─► Display on Frontend
+            │
+            ├─► Homepage Hero Section
+            ├─► "For You" Section
+            ├─► Book Detail Sidebar
+            └─► Cart Cross-Sell Section
+
+END
+
+
+================================================================================
+                3. ORDER PROCESSING & FULFILLMENT FLOW
+================================================================================
+
+START
+  |
+  ├─► Order Created
+  |       ├─► Status: 'pending'
+  |       ├─► Payment Status: 'pending'
+  |       └─► Generate Public ID
+  |
+  ├─► Store Payment Info
+  |       ├─► Save ToyyibPay Bill Code
+  |       ├─► Save Payment URL
+  |       └─► Store Order in Database
+  |
+  ├─► Inventory Already Updated (from checkout)
+  |
+  ├─► Clear Cart
+  |
+  └─► Redirect Customer to ToyyibPay
+
+  ┌────────────────────────────────────────────────────────────────┐
+  │                     PAYMENT PROCESSING                          │
+  └────────────────────────────────────────────────────────────────┘
+
+  ├─► Customer Completes FPX Payment
+  |
+  ├─► ToyyibPay Calls Callback URL
+  |       ├─► Receive Payment Status
+  |       └─► Receive Transaction Details
+  |
+  ├─► Process Callback
+  |       ├─► Validate Callback Data
+  |       ├─► Find Order by Bill Code
+  |       └─► Check Payment Status
+  |             │
+  |             ├─► Status = 1 (Success)
+  |             │     ├─► Update payment_status → 'paid'
+  |             │     ├─► Update status → 'processing'
+  |             │     ├─► Store Invoice Number
+  |             │     ├─► Store Payment Date
+  |             │     └─► Save Order
+  |             │
+  |             ├─► Status = 2 (Pending)
+  |             │     └─► Keep as Pending
+  |             │
+  |             └─► Status = 3 (Failed)
+  |                   └─► Update to Failed (auto-retry possible)
+  |
+  └─► Notify Admin of New Paid Order
+
+  ┌────────────────────────────────────────────────────────────────┐
+  │                      ADMIN FULFILLMENT                          │
+  └────────────────────────────────────────────────────────────────┘
+
+  ├─► Admin Opens Orders Page
+  |
+  ├─► Filter Orders
+  |       ├─► By Status
+  |       ├─► By Date Range
+  |       └─► By Customer
+  |
+  ├─► Select Order to Process
+  |
+  ├─► View Order Details
+  |       ├─► Customer Info
+  |       ├─► Items List
+  |       ├─► Shipping Address
+  |       ├─► Payment Info
+  |       └─► Current Status
+  |
+  ├─► Admin Actions:
+  |       │
+  |       ├─► [A] Update Order Status
+  |       │     │
+  |       │     ├─► 'processing'
+  |       │     │     └─► Processing items
+  |       │     │
+  |       │     ├─► 'shipped'
+  |       │     │     ├─► Add Tracking Number
+  |       │     │     ├─► Select Courier
+  |       │     │     └─► Generate Tracking URL
+  |       │     │
+  |       │     ├─► 'completed'
+  |       │     │     └─► Mark as Delivered
+  |       │     │
+  |       │     └─► 'cancelled'
+  |       │           ├─► Restore Inventory
+  |       │           └─► Refund Process
+  |       │
+  |       ├─► [B] Add Admin Notes
+  |       │     └─► Save Admin Comments
+  |       │
+  |       └─► [C] Download Invoice
+  |             ├─► Generate PDF
+  |             └─► Download File
+  |
+  ├─► Notify Customer of Status Change
+  |
+  └─► END
+
+
+================================================================================
+            4. ADMIN DASHBOARD & ANALYTICS FLOW
+================================================================================
+
+START
+  |
+  ├─► Admin Opens Dashboard
+  |
+  ├─► Load Statistics (Parallel Operations)
+  |       ├─► Count Total Users
+  |       ├─► Count Total Books
+  |       ├─► Count Total Orders
+  |       ├─► Calculate Total Revenue
+  |       ├─► Count Pending Orders
+  |       ├─► Fetch Low Stock Books (<10 units)
+  |       ├─► Fetch Best Selling Books (This Month)
+  |       ├─► Load Recent Orders (Last 5)
+  |       └─► Load Recent Customers (Last 5)
+  |
+  ├─► Display Metric Cards
+  |       ├─► Total Books
+  |       ├─► Total Orders
+  |       ├─► Total Customers
+  |       └─► Total Revenue
+  |
+  ├─► Display Charts
+  |       ├─► Sales Chart (Revenue over time)
+  |       └─► Top Selling Books Chart
+  |
+  ├─► Display Recent Activity
+  |       ├─► Recent Orders Table
+  |       └─► Recent Customers Table
+  |
+  └─► Dashboard Ready
+
+  ┌────────────────────────────────────────────────────────────────┐
+  │                      ADMIN ACTIONS                             │
+  └────────────────────────────────────────────────────────────────┘
+
+  ├─► Action: View Orders
+  |       ├─► Load All Orders
+  |       ├─► Apply Filters
+  |       ├─► Display Orders Table
+  |       └─► Process Order Actions
+  |
+  ├─► Action: Manage Books
+  |       │
+  |       ├─► Create New Book
+  |       │     ├─► Enter Book Details
+  |       │     ├─► Upload Cover Image
+  |       │     ├─► Select Genre
+  |       │     ├─► Select Tropes
+  |       │     ├─► Set Price & Stock
+  |       │     └─► Save Book
+  |       │
+  |       ├─► Edit Existing Book
+  |       │     ├─► Load Book Data
+  |       │     ├─► Update Details
+  |       │     ├─► Replace Image (Optional)
+  |       │     └─► Save Changes
+  |       │
+  |       └─► Delete Book
+  |             ├─► Confirm Deletion
+  |             └─► Delete Book
+  |
+  ├─► Action: View Reports
+  |       │
+  |       ├─► Sales Report
+  |       │     ├─► Revenue Over Time
+  |       │     ├─► Bestsellers (Revenue)
+  |       │     ├─► Bestsellers (Units)
+  |       │     ├─► Sales by Genre
+  |       │     └─► Sales by Author
+  |       │
+  |       ├─► Customer Report
+  |       │     ├─► New vs Returning Customers
+  |       │     ├─► Top Spenders
+  |       │     └─► Customer Segmentation
+  |       │
+  |       ├─► Inventory Report
+  |       │     ├─► Low Stock Alerts
+  |       │     ├─► Out of Stock Books
+  |       │     └─► Dead Stock Analysis
+  |       │
+  |       └─► Profitability Report
+  |             ├─► Profit by Book
+  |             ├─► Profit by Genre
+  |             └─► Monthly Profit Trends
+  |                   │
+  |                   └─► Export to Excel
+  |
+  ├─► Action: View Recommendation Analytics
+  |       │
+  |       ├─► Display Key Metrics
+  |       │     ├─► Total Users
+  |       │     ├─► Recommendation Coverage %
+  |       │     ├─► Conversion Rate
+  |       │     └─► Average Score
+  |       │
+  |       ├─► Performance Charts
+  |       │     ├─► Algorithm Effectiveness
+  |       │     └─► Accuracy Trend
+  |       │
+  |       ├─► User Behavior Patterns
+  |       │     ├─► Popular Genres
+  |       │     └─► Popular Tropes
+  |       │
+  |       ├─► Top Recommended Books
+  |       └─► Configuration Settings
+  |             ├─► Adjust Weights (Content 60% / Collab 40%)
+  |             ├─► Set Thresholds
+  |             └─► Clear Cache
+  |
+  └─► END
+
+
+================================================================================
+              5. FLASH SALE MANAGEMENT FLOW
+================================================================================
+
+START
+  |
+  ├─► Admin Opens Flash Sales Page
+  |
+  ├─► List Existing Flash Sales
+  |
+  └─► Select Action
+
+      ┌────────────────────────────────────────────────────────────────┐
+      │                  CREATE FLASH SALE                             │
+      └────────────────────────────────────────────────────────────────┘
+
+      ├─► Enter Sale Details
+      |       ├─► Sale Name
+      |       ├─► Description
+      |       ├─► Start Date & Time
+      |       └─► End Date & Time
+      |
+      ├─► Validate Date Range
+      |       └─► IF Invalid: Show Error
+      |
+      ├─► Select Discount Type
+      |       │
+      |       ├─► Type: Percentage
+      |       │     ├─► Set Percentage (1-100%)
+      |       │     └─► Validate: 1 ≤ % ≤ 100
+      |       │
+      |       └─► Type: Fixed Amount
+      |             ├─► Set Fixed Amount
+      |             └─► Validate: Amount < Book Price
+      |
+      ├─► Select Books for Sale
+      |       ├─► Load All Books
+      |       ├─► Filter by Genre (Optional)
+      |       └─► Choose Books
+      |
+      ├─► Set Special Prices (Optional)
+      |       ├─► For Each Selected Book
+      |       ├─► Validate: Special Price < Original Price
+      |       └─► IF Invalid: Show Error
+      |
+      ├─► Set Free Shipping (Optional)
+      |
+      ├─► START DATABASE TRANSACTION
+      |
+      ├─► Deactivate Conflicting Sales
+      |       ├─► Find Active Sales with Same Books
+      |       └─► Deactivate Those Sales
+      |
+      ├─► Create Flash Sale Record
+      |
+      ├─► Create Flash Sale Items
+      |       ├─► For Each Selected Book
+      |       └─► Save with Special Price (if set)
+      |
+      ├─► COMMIT TRANSACTION
+      |
+      └─► Flash Sale Created Successfully
+
+      ┌────────────────────────────────────────────────────────────────┐
+      │                  MANAGE EXISTING SALES                         │
+      └────────────────────────────────────────────────────────────────┘
+
+      ├─► Toggle Active Status
+      |       ├─► IF Activating:
+      |       │     └─► Deactivate Other Active Sales
+      |       └─► Toggle Status
+      |
+      ├─► Edit Flash Sale
+      |       ├─► Load Sale Data
+      |       ├─► Update Details
+      |       └─► Save Changes
+      |
+      └─► Delete Flash Sale
+            ├─► Confirm Deletion
+            ├─► Delete Items
+            └─► Delete Sale
+
+END
+
+
+================================================================================
+                 6. CART MANAGEMENT FLOW
+================================================================================
+
+START
+  |
+  ├─► Customer Views Product Page
+  |
+  └─► Click "Add to Cart"
+
+      ├─► Check Authentication
+      |       ├─► IF NOT AUTH → Open Login Modal
+      |       └─► IF AUTH → Continue
+      |
+      ├─► Get or Create User Cart
+      |
+      ├─► Get Book Details
+      |
+      └─► Check Item in Cart?
+            │
+            ├─► ALREADY IN CART
+            │     │
+            │     ├─► Get Existing Cart Item
+            │     ├─► New Quantity = Old Qty + 1
+            │     └─► Check: Qty ≤ Stock?
+            |           │
+            |           ├─► YES → Update Item
+            |           └─► NO → Show "Insufficient Stock" Error
+            │
+            └─► NOT IN CART
+                  │
+                  ├─► Check: Stock Available?
+                  │     │
+                  │     ├─► YES → Create New Cart Item
+                  │     └─► NO → Show "Out of Stock" Error
+                  │
+                  └─► Save to Database
+                        ├─► Update Cart Count Badge
+                        └─► Show Success Toast
+
+END
+
+  ┌────────────────────────────────────────────────────────────────┐
+  │                      CART PAGE                                   │
+  └────────────────────────────────────────────────────────────────┘
+
+START (Cart Page)
+  |
+  ├─► Load All Cart Items
+  |
+  ├─► Calculate Subtotal
+  |       ├─► Sum (Price × Quantity) for each item
+      │
+  ├─► Display Cart Items
+  |       ├─► Book Cover
+  |       ├─► Title & Author
+      │       ├─► Price
+  |       ├─► Quantity Selector
+  |       └─► Remove Button
+  |
+  ├─► User Actions:
+  |       │
+  |       ├─► Update Quantity
+  |       │     │
+  |       │     ├─► Enter New Quantity
+  |       │     ├─► Validate Quantity ≥ 1
+  |       │     ├─► Check Stock
+  |       │     │     │
+  |       │     │     ├─► IF Insufficient Stock:
+  |       │     │     │     └─► Show Error
+  |       │     │     │
+  |       │     │     └─► IF Sufficient Stock:
+      |       │           │
+      |       │           ├─► Update Cart Item
+      |       │           └─► Recalculate Subtotal
+      |       │
+      |       ├─► Remove Item
+      |       │     │
+      |       │     ├─► Confirm Removal
+      |       │     ├─► Remove from Database
+      |       │     └─► Recalculate Subtotal
+      |       │
+      |       ├─► Apply Coupon
+      |       │     │
+      |       │     ├─► Enter Coupon Code
+      |       │     ├─► Validate via API
+      |       │     │     │
+      |       │     │     ├─► IF Invalid: Show Error
+      |       │     │     │
+      |       │     │     └─► IF Valid:
+      |       │     │           ├─► Calculate Discount
+      |       │     │           ├─► Apply Discount
+      |       │     │           └─► Update Total
+      |       │     │
+      |       │     └─► Display Discount in Summary
+      |       │
+      |       ├─► Continue Shopping
+      |       │     └─► Return to Book Browse
+      |       │
+      |       └─► Proceed to Checkout
+      |             │
+      |             └─► GO TO CHECKOUT FLOW (See Section 1)
+
+END
+
+
+================================================================================
+               7. REVIEW SYSTEM & MODERATION FLOW
+================================================================================
+
+START (Customer Completes Order)
+  |
+  ├─► Receive Book Delivery
+  |
+  └─► Customer Wants to Review
+
+      ├─► Check: Can Review?
+      |       │
+      |       ├─► Has Not Purchased → CANNOT
+      |       ├─► Already Reviewed → CANNOT
+      |       └─► Has Purchased & Not Reviewed → CAN REVIEW
+      |
+      ├─► Open Review Form
+      |       ├─► Select Order Item
+      |       ├─► Set Rating (1-5 Stars)
+      |       ├─► Write Comment
+      |       └─► Upload Images (Optional)
+      |             │
+      |             ├─► Select Image Files
+      |             ├─► Validate File Size & Type
+      |             └─► Upload to Storage
+      |
+      └─► Submit Review
+            │
+            ├─► Save Review to Database
+            │       ├─► Rating
+            │       ├─► Comment
+            │       ├─► Images (JSON array)
+            │       └─► Auto-approve: true
+            │
+            ├─► Update Book Statistics
+            │       ├─► Average Rating
+            │       └─► Review Count
+            │
+            └─► Display Review on Book Page
+
+  ┌────────────────────────────────────────────────────────────────┐
+  │              USER INTERACTIONS WITH REVIEWS                     │
+  └────────────────────────────────────────────────────────────────┘
+
+  ├─► Mark Review as Helpful
+  |       │
+  |       ├─► Check: Already Marked Helpful?
+  |       │     │
+  |       │     ├─► YES → Remove Helpful Vote
+  |       │     │     └─► Decrement Count
+  |       │     │
+      │     │     └─► NO → Add Helpful Vote
+      │     │           └─► Increment Count
+      │     │
+      │     └─► Update Helpful Count Display
+      │
+      └─► Report Review
+            │
+            ├─► Select Reason:
+            │     ├─► Spam
+            │     ├─► Inappropriate
+            │     ├─► Offensive
+            │     ├─► Fake Review
+            │     └─► Other (with description)
+            │
+            ├─► Check: Already Reported?
+            │     │
+            │     ├─► YES → Show "Already Reported" Error
+            │     │
+            │     └─► NO → Create Report Record
+            │           │
+            │           ├─► Review ID
+            │           ├─► Reporter ID
+            │           ├─► Reason
+            │           └─► Status: 'pending'
+            │
+            └─► Notify Admin
+
+  ┌────────────────────────────────────────────────────────────────┐
+  │                    ADMIN MODERATION                              │
+  └────────────────────────────────────────────────────────────────┘
+
+  ├─► Admin Views Reported Reviews
+  |
+  ├─► Load Report Details
+  |       ├─► Review Content
+  |       ├─► Reporter Info
+  |       ├─► Reason for Report
+  |       └─► Current Status
+  |
+  ├─► Admin Decision:
+  |       │
+  |       ├─► Valid Complaint
+  |       │     │
+      │     │     ├─► Review Content is Problematic
+      │     │     ├─► Mark Report as 'resolved'
+      │     │     ├─► Add Admin Notes
+      │     │     ├─► (Optional) Hide or Delete Review
+      │     │     └─► Notify Reporter
+      │     │
+      │     ├─► Invalid Complaint
+      │     │     │
+      │     │     ├─► Review is Valid
+      │     │     ├─► Mark Report as 'dismissed'
+      │     │     ├─► Add Admin Notes
+      │     │     └─► Notify Reporter
+      │     │
+      │     └─► Needs More Review
+      │           │
+      │           ├─► Queue for Manual Review
+      │           └─► Update Status to 'reviewed'
+      │
+      └─► Update Report Status
+            └─► Notify Reporter of Decision
+
+END
+
+
+================================================================================
+             8. RECOMMENDATION ANALYTICS DASHBOARD FLOW
+================================================================================
+
+START (Admin Opens Analytics)
+  |
+  ├─► Load Dashboard Data
+  |
+  ├─► Fetch Basic Statistics (Parallel)
+  |       ├─► Total Users
+  |       ├─► Users with Recommendations
+  |       ├─► Total Books
+  |       ├─► Total Orders
+  |       └─► Recommendation Coverage %
+  |
+  ├─► Fetch Performance Metrics (Parallel)
+  |       ├─► Click-Through Rate (CTR)
+  |       ├─► Conversion Rate
+  |       ├─► Total Conversions
+  |       ├─► Average Score
+      │       └─► Recommendations Generated Today
+      │
+      ├─► Fetch User Behavior Patterns
+      │       ├─► Popular Genres (Top 10)
+      │       ├─► Popular Tropes (Top 10)
+      │       └─► Engagement Patterns
+      │             ├─► Avg Books per Order
+      │             └─► Repeat Customers
+      │
+      ├─► Fetch Algorithm Insights
+      │       ├─► Content-Based Effectiveness
+      │       ├─► Collaborative Effectiveness
+      │       ├─► Recommendation Diversity
+      │       └─► Hybrid Weight Distribution
+      │
+      ├─► Fetch Top Recommended Books
+      │       └─► Books in Most Orders
+      │
+      └─► Fetch Accuracy Metrics
+            ├─► Precision
+            ├─► Recall
+            ├─► F1 Score
+            └─► Accuracy Trend
+
+  ├─► Display Dashboard
+  |       ├─► Metric Cards (4 cards)
+  |       ├─► Charts Section
+  |       │     ├─► Effectiveness Chart (Bar)
+      │       │     └─► Accuracy Chart (Line)
+      │       │
+      │       ├─► User Behavior Panel
+      │       └─► Top Books Table
+      │
+      └─► Dashboard Ready
+
+  ┌────────────────────────────────────────────────────────────────┐
+  │                      ADMIN INTERACTIONS                          │
+  └────────────────────────────────────────────────────────────────┘
+
+  ├─► Action: Switch Chart View
+  |       │
+  |       ├─► Toggle between Effectiveness & Accuracy Charts
+  |       ├─► Update Active Button State
+  |       └─► Trigger Chart Animation
+  |
+  ├─► Action: Refresh Analytics
+  |       │
+  |       ├─► Show Loading Animation
+  |       ├─► Reload All Data
+  |       └─► Update Charts
+  |
+  ├─► Action: Open Settings
+  |       │
+      │       ├─► Load Settings Page
+      │       ├─► Display Current Configuration
+      │       ├─► Show Weight Distribution
+      │       └─► Enable Settings Modification
+      │             │
+      │             └─► User Can Adjust:
+      │                   ├─► Content-Based Weight (60%)
+      │                   ├─► Collaborative Weight (40%)
+      │                   ├─► Minimum Score Threshold
+      │                   ├─► Max Recommendations
+      │                   ├─► Cache Duration
+      │                   └─► Toggle Components ON/OFF
+      │
+      ├─► Action: View User Details
+      │       │
+      │       ├─► Select User
+      │       ├─► Load User Profile
+      │       ├─► Display Preferences
+      │       │     ├─► Top Genres
+      │       │     ├─► Top Tropes
+      │       │     └─► Top Authors
+      │       │
+      │       ├─► Display Current Recommendations
+      │       │     ├─► Book List with Scores
+      │       │     └─► Match Score Progress Bars
+      │       │
+      │       ├─► Display Purchase History
+      │       └─► Display Wishlist
+      │
+      ├─► Action: Export Data
+      │       │
+      │       ├─► Generate JSON Export
+      │       ├─► Include Chart Data
+      │       └─► Download File
+      │
+      └─► Action: Keyboard Shortcuts
+            │
+            ├─► Ctrl+1 → Switch to Effectiveness
+            ├─► Ctrl+2 → Switch to Accuracy
+            ├─► Ctrl+S → Save Settings
+            ├─► Ctrl+E → Export Data
+            └─► Ctrl+R → Refresh Analytics
+
+END
+
+
+================================================================================
+                      END OF ACTIVITY DIAGRAMS
+================================================================================
+
+These diagrams represent all major workflows in your Bookty e-commerce system.
+Each flow shows detailed decision points, error handling, database operations,
+and integration with external services.
+
+Key Features Demonstrated:
+- User Authentication & Authorization
+- Product Catalog Management
+- Shopping Cart Operations
+- Order Processing with Inventory Safety
+- Payment Integration (ToyyibPay)
+- Hybrid Recommendation System
+- Admin Dashboard & Analytics
+- Flash Sale Management
+- Review System & Moderation
+- Comprehensive Reporting
+
+================================================================================
+

@@ -285,6 +285,189 @@ window.toggleWishlist = async function(bookId, button) {
     }
 };
 
+// Recommendation System
+window.RecommendationManager = {
+    async fetchRecommendations(limit = 12) {
+        try {
+            const response = await fetch(`/api/recommendations/me?limit=${limit}`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                credentials: 'same-origin'
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to fetch recommendations');
+            }
+            
+            const data = await response.json();
+            return data.data || [];
+        } catch (error) {
+            console.error('Error fetching recommendations:', error);
+            return [];
+        }
+    },
+
+    async fetchSimilarBooks(bookId, limit = 8) {
+        try {
+            const response = await fetch(`/api/recommendations/similar/${bookId}?limit=${limit}`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to fetch similar books');
+            }
+            
+            const data = await response.json();
+            return data.data || [];
+        } catch (error) {
+            console.error('Error fetching similar books:', error);
+            return [];
+        }
+    },
+
+    renderBookCard(book) {
+        return `
+            <div class="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col h-full">
+                <div class="relative overflow-hidden">
+                    <a href="${book.link}" class="block">
+                        <div class="aspect-[2/3] w-full bg-gray-50">
+                            ${book.cover_image ? 
+                                `<img src="${book.cover_image}" alt="${book.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">` :
+                                `<div class="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                                    <svg class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                    </svg>
+                                </div>`
+                            }
+                        </div>
+                    </a>
+                    
+                    <div class="absolute top-3 left-3">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-white/90 backdrop-blur-sm text-gray-700 shadow-sm">
+                            ${book.genre || 'Book'}
+                        </span>
+                    </div>
+                    
+                    ${book.score ? `
+                        <div class="absolute top-3 right-3">
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 shadow-sm">
+                                ${Math.round(book.score * 100)}% match
+                            </span>
+                        </div>
+                    ` : ''}
+                </div>
+                
+                <div class="p-5 flex flex-col flex-grow">
+                    <a href="${book.link}" class="block group-hover:text-purple-700 transition-colors duration-200">
+                        <h3 class="font-bold text-gray-900 mb-1 line-clamp-2">${book.title}</h3>
+                    </a>
+                    <p class="text-sm text-gray-600 mb-2">by ${book.author}</p>
+                    
+                    <div class="mt-auto pt-3 border-t border-gray-100">
+                        ${book.is_on_sale ? 
+                            `<div class="flex items-baseline space-x-2">
+                                <span class="text-lg font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">RM ${parseFloat(book.final_price).toFixed(2)}</span>
+                                <span class="text-sm text-gray-500 line-through">RM ${parseFloat(book.price).toFixed(2)}</span>
+                            </div>` :
+                            `<span class="text-lg font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">RM ${parseFloat(book.price).toFixed(2)}</span>`
+                        }
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    renderSidebarBookCard(book) {
+        return `
+            <div class="flex space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors duration-200">
+                <div class="flex-shrink-0">
+                    <a href="${book.link}" class="block">
+                        ${book.cover_image ? 
+                            `<img src="${book.cover_image}" alt="${book.title}" class="w-16 h-20 object-cover rounded-md shadow-sm">` :
+                            `<div class="w-16 h-20 bg-gray-200 rounded-md flex items-center justify-center">
+                                <svg class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>`
+                        }
+                    </a>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <a href="${book.link}" class="block">
+                        <h4 class="text-sm font-semibold text-gray-900 line-clamp-2 hover:text-purple-600 transition-colors">${book.title}</h4>
+                        <p class="text-xs text-gray-600 mt-1">by ${book.author}</p>
+                        <div class="mt-2">
+                            ${book.is_on_sale ? 
+                                `<div class="flex items-center space-x-1">
+                                    <span class="text-sm font-bold text-purple-600">RM ${parseFloat(book.final_price).toFixed(2)}</span>
+                                    <span class="text-xs text-gray-500 line-through">RM ${parseFloat(book.price).toFixed(2)}</span>
+                                </div>` :
+                                `<span class="text-sm font-bold text-purple-600">RM ${parseFloat(book.price).toFixed(2)}</span>`
+                            }
+                        </div>
+                        ${book.score ? `<div class="mt-1"><span class="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">${Math.round(book.score * 100)}% match</span></div>` : ''}
+                    </a>
+                </div>
+            </div>
+        `;
+    },
+
+    async loadRecommendations(containerId, limit = 12) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        const books = await this.fetchRecommendations(limit);
+        if (books.length === 0) {
+            container.innerHTML = '<p class="text-gray-500 text-center">No recommendations available at the moment.</p>';
+            return;
+        }
+
+        const html = books.map(book => this.renderBookCard(book)).join('');
+        container.innerHTML = html;
+    },
+
+    async loadSimilarBooks(bookId, containerId, limit = 6) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        // Show loading state
+        container.innerHTML = `
+            <div class="flex justify-center items-center py-8">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+            </div>
+        `;
+
+        try {
+            const books = await this.fetchSimilarBooks(bookId, limit);
+            
+            if (books.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8">
+                        <p class="text-gray-500 text-sm">No similar books found.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const html = books.map(book => this.renderSidebarBookCard(book)).join('');
+            container.innerHTML = html;
+        } catch (error) {
+            console.error('Error loading similar books:', error);
+            container.innerHTML = `
+                <div class="text-center py-8">
+                    <p class="text-red-500 text-sm">Failed to load similar books.</p>
+                </div>
+            `;
+        }
+    }
+};
+
 // AJAX Add to Cart functionality
 document.addEventListener('DOMContentLoaded', function() {
     // Handle wishlist button clicks via event delegation

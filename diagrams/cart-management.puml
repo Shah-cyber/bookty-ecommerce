@@ -1,0 +1,112 @@
+@startuml Cart Management
+title Shopping Cart Operations
+
+start
+
+if (Add item to cart?) then (yes)
+    :Click add to cart button;
+    :Prevent double click;
+    :Show loading state;
+    
+    if (User authenticated?) then (no)
+        :Prompt to login;
+        :Open auth modal;
+        :User logs in;
+    endif
+    
+    :Get or create user cart;
+    :Get book details;
+    
+    if (Item in cart?) then (yes)
+        :Get existing cart item;
+        :Add quantity +1;
+    else (no)
+        :Check stock availability;
+    endif
+    
+    if (Stock available?) then (no)
+        :Show out of stock error;
+        stop
+    else (yes)
+        :Check quantity <= stock;
+        if (Quantity valid?) then (no)
+            :Show insufficient stock error;
+            stop
+        else (yes)
+            :Save cart item;
+            :Update cart count badge;
+            :Show success toast;
+        endif
+    endif
+endif
+
+if (View cart?) then (yes)
+    :Load cart page;
+    :Fetch all cart items;
+    :Calculate subtotal;
+    :Display cart items;
+    
+    if (Update quantity?) then (yes)
+        :Enter new quantity;
+        if (Valid quantity?) then (no)
+            :Show quantity error;
+        else (yes)
+            :Check stock for quantity;
+            if (Sufficient stock?) then (yes)
+                :Update cart item;
+                :Save to database;
+                :Recalculate totals;
+                :Refresh display;
+                :Show updated toast;
+            else (no)
+                :Show stock error;
+            endif
+        endif
+    endif
+    
+    if (Remove item?) then (yes)
+        :Confirm removal;
+        :Remove from database;
+        :Recalculate totals;
+        :Refresh display;
+    endif
+    
+    if (Apply coupon?) then (yes)
+        :Enter coupon code;
+        :Validate via API;
+        if (Valid coupon?) then (yes)
+            :Calculate discount;
+            :Apply discount;
+            :Recalculate totals;
+        else (no)
+            :Show coupon error;
+        endif
+    endif
+    
+    if (Proceed checkout?) then (yes)
+        :Load checkout page;
+        :Enter shipping information;
+        :Select state;
+        :Calculate postage rate;
+        
+        if (Free shipping?) then (yes)
+            :Set shipping = 0;
+        else (no)
+            :Calculate shipping cost;
+        endif
+        
+        if (Use coupon?) then (yes)
+            :Validate coupon;
+            :Apply discount;
+        endif
+        
+        :Review order total;
+        :Confirm payment;
+        :Process payment;
+    endif
+endif
+
+stop
+
+@enduml
+

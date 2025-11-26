@@ -1,0 +1,79 @@
+@startuml Flash Sale Management
+title Creating & Managing Flash Sales
+
+start
+
+:Admin opens flash sales page;
+:List existing sales;
+
+if (Create new sale?) then (yes)
+    partition "Create Flash Sale" {
+        :Enter sale name;
+        :Enter description;
+        :Set start date & time;
+        :Set end date & time;
+        
+        if (Date range valid?) then (no)
+            :Show date error;
+            stop
+        endif
+        
+        :Select discount type;
+        if (Percentage discount?) then (yes)
+            :Set percentage value 1-100%;
+            if (Valid percentage?) then (no)
+                :Show error;
+                stop
+            endif
+        else (Fixed discount?)
+            :Set fixed amount;
+            :Validate amount;
+        endif
+        
+        :Select books for sale;
+        :Load books by genre or all;
+        :Choose books;
+        
+        if (Set special prices?) then (yes)
+            :For each book;
+            :Check special price;
+            if (Special price < original?) then (no)
+                :Show error;
+            else (yes)
+                :Apply special price;
+            endif
+        endif
+        
+        :Validate all discount rules;
+        :Set free shipping option;
+        :Start database transaction;
+        :Deactivate old sales for selected books;
+        :Create flash sale record;
+        :Create flash sale items;
+        :Commit transaction;
+        :Flash sale created successfully;
+    }
+elseif (Edit existing?) then (yes)
+    :Load sale data;
+    :Show edit form;
+    :Update sale details;
+    :Validate changes;
+    :Save changes;
+endif
+
+if (Toggle active status?) then (yes)
+    :Toggle sale status;
+    :Save changes;
+endif
+
+if (Delete sale?) then (yes)
+    :Confirm deletion;
+    :Delete sale and items;
+endif
+
+:Refresh sales list;
+
+stop
+
+@enduml
+

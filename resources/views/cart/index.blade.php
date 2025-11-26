@@ -95,29 +95,76 @@
                 </div>
             </div>
 
-            <div class="mt-8 bg-white rounded-lg shadow-md p-6">
+            <!-- Shipping Information Section -->
+            <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div class="flex items-start">
+                    <svg class="h-5 w-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <div>
+                        <h3 class="text-sm font-medium text-blue-800 mb-1">Shipping Information</h3>
+                        <p class="text-sm text-blue-700 mb-2">Shipping costs are calculated based on your delivery address.</p>
+                        <div class="text-xs text-blue-600">
+                            <p class="mb-1">• <strong>Peninsular Malaysia:</strong> RM 8.00 - RM 12.00</p>
+                            <p class="mb-1">• <strong>East Malaysia:</strong> RM 15.00 - RM 20.00</p>
+                            {{-- <p>• <strong>Free shipping</strong> on orders over RM 100</p> --}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="mt-6 bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Order Summary</h3>
+                
                 <div class="flex justify-between mb-2">
                     <span class="text-gray-700">Subtotal</span>
                     <span class="text-gray-900 font-medium">
                         RM {{ number_format($cart->items->sum(function($item) { return $item->book->price * $item->quantity; }), 2) }}
                     </span>
                 </div>
+                
                 <div class="flex justify-between mb-2">
                     <span class="text-gray-700">Shipping</span>
-                    <span class="text-gray-900 font-medium">Free</span>
+                    <span class="text-gray-500 text-sm">Calculated at checkout</span>
                 </div>
+                
                 <div class="flex justify-between border-t border-gray-200 pt-4 mt-4">
-                    <span class="text-lg font-bold text-gray-900">Total</span>
+                    <span class="text-lg font-bold text-gray-900">Estimated Total</span>
                     <span class="text-lg font-bold text-purple-600">
-                        RM {{ number_format($cart->items->sum(function($item) { return $item->book->price * $item->quantity; }), 2) }}
+                        RM {{ number_format($cart->items->sum(function($item) { return $item->book->price * $item->quantity; }), 2) }}+
                     </span>
                 </div>
+                
                 <div class="mt-6">
                     <a href="{{ route('checkout.index') }}" class="block w-full px-4 py-3 bg-purple-600 text-white text-center font-medium rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
                         Proceed to Checkout
                     </a>
+                    <p class="text-xs text-gray-500 text-center mt-2">
+                        Enter your address to see exact shipping costs
+                    </p>
                 </div>
             </div>
+
+            <!-- Cross-sell Recommendations -->
+            @auth
+                <div class="mt-8 bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                        You Might Also Like
+                    </h3>
+                    <p class="text-sm text-gray-600 mb-4">Based on your cart, here are some books you might enjoy:</p>
+                    
+                    <div id="cart-recommendations-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        <!-- Loading state -->
+                        <div class="col-span-full flex justify-center items-center py-8">
+                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+                        </div>
+                    </div>
+                </div>
+            @endauth
 
             <div class="mt-8 text-center">
                 <a href="{{ route('books.index') }}" class="text-purple-600 hover:text-purple-700">
@@ -126,4 +173,15 @@
             </div>
         @endif
     </div>
+
+    @auth
+        <script>
+            // Load personalized recommendations for cart page
+            document.addEventListener('DOMContentLoaded', function() {
+                if (window.RecommendationManager) {
+                    window.RecommendationManager.loadRecommendations('cart-recommendations-grid', 8);
+                }
+            });
+        </script>
+    @endauth
 @endsection

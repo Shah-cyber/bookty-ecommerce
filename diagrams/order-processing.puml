@@ -1,0 +1,73 @@
+@startuml Order Processing
+title Order Fulfillment & Status Management
+
+start
+
+:Order created with status 'pending';
+
+:Store ToyyibPay payment info;
+:Clear shopping cart;
+:Redirect customer to payment;
+
+partition "Payment Processing" {
+    :Customer completes FPX payment;
+    :ToyyibPay sends callback;
+    
+    if (Payment successful?) then (yes)
+        :Update payment_status to 'paid';
+        :Update order status to 'processing';
+        :Notify admin of new order;
+    else (no)
+        if (Payment expired?) then (yes)
+            :Cancel order;
+            :Restore inventory;
+            :Update status to 'cancelled';
+            stop
+        else (no)
+            :Keep as pending;
+        endif
+    endif
+}
+
+partition "Admin Fulfillment" {
+    :Admin opens orders page;
+    :Filter orders by status/date/customer;
+    :Select order to process;
+    :View order details;
+    
+    if (Update status?) then (yes)
+        if (Set to 'processing'?) then (yes)
+            :Update to processing;
+        endif
+        if (Set to 'shipped'?) then (yes)
+            :Add tracking number;
+            :Update to shipped;
+        endif
+        if (Set to 'completed'?) then (yes)
+            :Update to completed;
+        endif
+        if (Set to 'cancelled'?) then (yes)
+            :Restore inventory;
+            :Update to cancelled;
+        endif
+    endif
+    
+    if (Add tracking?) then (yes)
+        :Enter tracking number;
+        :Select courier;
+        :Save tracking info;
+        :Generate tracking URL;
+    endif
+    
+    if (Download invoice?) then (yes)
+        :Generate PDF invoice;
+        :Download file;
+    endif
+    
+    :Notify customer of status change;
+}
+
+stop
+
+@enduml
+

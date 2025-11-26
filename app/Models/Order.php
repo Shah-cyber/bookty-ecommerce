@@ -38,6 +38,14 @@ class Order extends Model
         'toyyibpay_settlement_reference',
         'toyyibpay_settlement_date',
     ];
+
+    /**
+     * The attributes that should be cast.
+     */
+    protected $casts = [
+        'toyyibpay_payment_date' => 'datetime',
+        'toyyibpay_settlement_date' => 'datetime',
+    ];
     
     public function user(): BelongsTo
     {

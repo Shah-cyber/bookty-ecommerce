@@ -1,0 +1,59 @@
+@startuml Recommendation System
+title Hybrid Recommendation Algorithm Flow
+
+start
+
+:User requests recommendations;
+
+if (User authenticated?) then (no)
+    :Return popular books;
+    stop
+endif
+
+if (Results cached?) then (yes)
+    :Retrieve from cache;
+    :Attach scores;
+    :Return cached results;
+else (no)
+    partition "Content-Based Filtering" {
+        :Get user purchase history;
+        :Get user wishlist items;
+        :Extract favorite genres;
+        :Extract favorite tropes;
+        :Extract favorite authors;
+        :Calculate genre weights;
+        :Calculate trope weights;
+        :Calculate author weights;
+        :Normalize content scores;
+    }
+    
+    partition "Collaborative Filtering" {
+        :Find similar users;
+        :Analyze co-purchase patterns;
+        :Calculate user similarity;
+        :Get peer purchases;
+        :Score by frequency;
+        :Normalize collaborative scores;
+    }
+    
+    partition "Hybrid Fusion" {
+        :Apply 60% content weight;
+        :Apply 40% collaborative weight;
+        :Calculate final scores;
+    }
+    
+    :Filter out already purchased books;
+    :Filter only in-stock books;
+    :Sort by final score;
+    :Limit to 12 books;
+    :Attach book details;
+    :Cache results for 30 minutes;
+    :Return recommendations;
+endif
+
+:Display on frontend;
+
+stop
+
+@enduml
+

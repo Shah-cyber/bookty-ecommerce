@@ -32,12 +32,25 @@
                     </div>
                     <div>
                         <h3 class="text-lg font-medium text-bookty-black mb-2">Payment Information</h3>
-                        <p class="text-bookty-black">Payment Status: 
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $order->payment_status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                                {{ ucfirst($order->payment_status) }}
-                            </span>
-                        </p>
-                        <p class="text-bookty-black">Payment Method: Credit Card</p>
+                        <div class="space-y-3">
+                            <p class="text-bookty-black">Payment Status: 
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $order->payment_status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                                    {{ ucfirst($order->payment_status) }}
+                                </span>
+                            </p>
+                            <p class="text-bookty-black">Payment Method: 
+                                @if($order->hasToyyibPayPayment())
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                                        </svg>
+                                        FPX (ToyyibPay)
+                                    </span>
+                                @else
+                                    <span class="text-gray-500">Not Available</span>
+                                @endif
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -90,6 +103,119 @@
                 </div>
             </div>
             @endif
+
+            @if($order->hasToyyibPayPayment())
+            <div class="p-6 border-b border-bookty-pink-100">
+                <h2 class="text-xl font-serif font-medium text-bookty-black mb-4">
+                    <svg class="inline w-6 h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                    </svg>
+                    Payment Details
+                </h2>
+                
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-sm text-gray-600 mb-1">Payment Gateway</p>
+                            <p class="font-semibold text-blue-900">ToyyibPay FPX</p>
+                        </div>
+                        
+                        @if($order->toyyibpay_invoice_no)
+                        <div>
+                            <p class="text-sm text-gray-600 mb-1">Transaction ID</p>
+                            <div class="flex items-center space-x-2">
+                                <p class="font-mono text-sm font-semibold text-blue-900">{{ $order->toyyibpay_invoice_no }}</p>
+                                <button onclick="copyToClipboard('{{ $order->toyyibpay_invoice_no }}')" 
+                                        class="p-1 text-gray-500 hover:text-blue-600 transition-colors duration-200" 
+                                        title="Copy transaction ID">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        @endif
+                        
+                        @if($order->toyyibpay_payment_date)
+                        <div>
+                            <p class="text-sm text-gray-600 mb-1">Payment Date</p>
+                            <p class="font-semibold text-blue-900">
+                                @if($order->toyyibpay_payment_date instanceof \Carbon\Carbon)
+                                    {{ $order->toyyibpay_payment_date->format('d M Y, h:i A') }}
+                                @else
+                                    {{ \Carbon\Carbon::parse($order->toyyibpay_payment_date)->format('d M Y, h:i A') }}
+                                @endif
+                            </p>
+                        </div>
+                        @endif
+                        
+                        @if($order->toyyibpay_settlement_reference)
+                        <div>
+                            <p class="text-sm text-gray-600 mb-1">Settlement Reference</p>
+                            <p class="font-mono text-sm font-semibold text-blue-900">{{ $order->toyyibpay_settlement_reference }}</p>
+                        </div>
+                        @endif
+                    </div>
+                    
+                    @if($order->toyyibpay_payment_url && $order->payment_status === 'pending')
+                    <div class="mt-4 pt-4 border-t border-blue-200">
+                        <a href="{{ $order->toyyibpay_payment_url }}" target="_blank" 
+                           class="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-sm">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                            </svg>
+                            Complete Payment
+                        </a>
+                        <p class="text-xs text-gray-600 mt-2">
+                            <span class="font-semibold">💡 Note:</span> Click to complete your payment via FPX online banking.
+                        </p>
+                    </div>
+                    @endif
+                </div>
+            </div>
+            @endif
+
+            <!-- Invoice Section -->
+            <div class="p-6 border-b border-bookty-pink-100">
+                <h2 class="text-xl font-serif font-medium text-bookty-black mb-4">
+                    <svg class="inline w-6 h-6 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Invoice
+                </h2>
+                
+                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 mb-1">Order Invoice</p>
+                            <p class="font-semibold text-green-900">Invoice #{{ $order->public_id ?? $order->id }}</p>
+                            <p class="text-xs text-gray-500 mt-1">Generated on {{ $order->created_at->format('d M Y') }}</p>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <a href="{{ route('profile.orders.invoice', $order) }}" target="_blank" 
+                               class="inline-flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 shadow-sm">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                </svg>
+                                View Invoice
+                            </a>
+                            <a href="{{ route('profile.orders.invoice.pdf', $order) }}" 
+                               class="inline-flex items-center justify-center px-4 py-2 bg-bookty-purple-600 text-white rounded-lg hover:bg-bookty-purple-700 transition-colors duration-200 shadow-sm">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                Download PDF
+                            </a>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-green-200">
+                        <p class="text-xs text-gray-600">
+                            <span class="font-semibold"> Tip:</span> Click "View Invoice" to see a printable version in your browser, or "Download PDF" to save the invoice to your device.
+                        </p>
+                    </div>
+                </div>
+            </div>
             
             <div class="p-6">
                 <h2 class="text-xl font-serif font-medium text-bookty-black mb-4">Order Items</h2>
@@ -150,17 +276,28 @@
                 <div class="mt-8 flex justify-end">
                     <div class="w-full md:w-1/3">
                         <div class="bg-bookty-pink-50 p-4 rounded-md">
+                            @php
+                                $orderSubtotal = $order->items->sum(function($item) { return $item->price * $item->quantity; });
+                                $shippingCost = $order->is_free_shipping ? 0 : ($order->shipping_customer_price ?? 0);
+                                $grandTotal = $orderSubtotal + $shippingCost;
+                            @endphp
                             <div class="flex justify-between py-2 text-bookty-black">
                                 <span>Subtotal</span>
-                                <span>RM {{ number_format($order->total_amount, 2) }}</span>
+                                <span>RM {{ number_format($orderSubtotal, 2) }}</span>
                             </div>
                             <div class="flex justify-between py-2 text-bookty-black">
                                 <span>Shipping</span>
-                                <span>Free</span>
+                                <span>
+                                    @if($order->is_free_shipping)
+                                        Free
+                                    @else
+                                        RM {{ number_format($shippingCost, 2) }}
+                                    @endif
+                                </span>
                             </div>
                             <div class="flex justify-between py-2 border-t border-bookty-pink-200 font-semibold text-bookty-black">
                                 <span>Total</span>
-                                <span>RM {{ number_format($order->total_amount, 2) }}</span>
+                                <span>RM {{ number_format($grandTotal, 2) }}</span>
                             </div>
                         </div>
                     </div>
@@ -169,4 +306,38 @@
         </div>
     </div>
 </div>
+
+<script>
+window.copyToClipboard = async function(text) {
+    try {
+        // Copy text to clipboard
+        if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(text);
+            showToast(`Transaction ID copied to clipboard!`, 'success');
+        } else {
+            // Fallback for browsers that don't support clipboard API
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showToast(`Transaction ID copied to clipboard!`, 'success');
+            } catch (err) {
+                showToast('Could not copy transaction ID', 'error');
+            }
+            
+            document.body.removeChild(textArea);
+        }
+    } catch (err) {
+        console.error('Copy failed: ', err);
+        showToast('Could not copy transaction ID', 'error');
+    }
+};
+</script>
 @endsection

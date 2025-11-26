@@ -15,9 +15,28 @@
                 <div class="border-t border-gray-200 pt-6 mt-6">
                     <div class="text-left mb-6">
                         <h2 class="text-lg font-semibold text-gray-900 mb-2">Order Details</h2>
-                        <p class="text-gray-600">Order #: {{ $order->id }}</p>
-                        <p class="text-gray-600">Date: {{ $order->created_at->format('F j, Y') }}</p>
-                        <p class="text-gray-600">Total: RM {{ number_format($order->total_amount, 2) }}</p>
+                        <div class="space-y-2">
+                            <p class="text-gray-600">Order #: {{ $order->public_id ?? $order->id }}</p>
+                            <p class="text-gray-600">Date: {{ $order->created_at->format('F j, Y') }}</p>
+                            <p class="text-gray-600">Total: RM {{ number_format($order->total_amount, 2) }}</p>
+                            <p class="text-gray-600">Payment Method: 
+                                @if($order->hasToyyibPayPayment())
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                                        </svg>
+                                        FPX (ToyyibPay)
+                                    </span>
+                                @else
+                                    <span class="text-gray-500">Not Available</span>
+                                @endif
+                            </p>
+                            <p class="text-gray-600">Payment Status: 
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $order->payment_status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                                    {{ ucfirst($order->payment_status) }}
+                                </span>
+                            </p>
+                        </div>
                     </div>
                     
                     <div class="text-left mb-6">

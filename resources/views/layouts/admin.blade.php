@@ -250,6 +250,20 @@ aria-label="Sidebar">
       </ul>
     </li>
 
+    <!-- Recommendation Analytics -->
+    <li>
+      <a href="{{ route('admin.recommendations.index') }}" 
+        class="flex items-center p-2 rounded-lg 
+               {{ request()->routeIs('admin.recommendations.*') 
+                  ? 'bg-bookty-purple-600 text-white' 
+                  : 'text-bookty-black hover:bg-bookty-pink-50 hover:text-bookty-purple-700 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white' }}">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span class="ms-3">Recommendations</span>
+      </a>
+    </li>
+
     <!-- ========== Reviews (Collapsible) ========== -->
     <li>
       <button type="button"

@@ -1,0 +1,78 @@
+@startuml Admin Dashboard
+title Admin Dashboard & Analytics Flow
+
+start
+
+:Admin opens dashboard;
+
+partition "Load Statistics" {
+    :Count total users;
+    :Count total books;
+    :Count total orders;
+    :Calculate revenue;
+    :Count pending orders;
+    :Fetch low stock books;
+    :Fetch bestsellers;
+    :Load recent orders;
+    :Load recent customers;
+}
+
+:Display metric cards;
+:Display charts;
+:Display recent activity;
+
+if (View orders?) then (yes)
+    :Load all orders;
+    :Filter by status/date;
+    :Display orders table;
+    :Process order actions;
+endif
+
+if (Manage books?) then (yes)
+    :Open book management;
+    :Create/edit/delete books;
+    :Upload cover images;
+endif
+
+if (View reports?) then (yes)
+    :Select report type;
+    if (Sales report?) then (yes)
+        :Generate sales report;
+    endif
+    if (Customer report?) then (yes)
+        :Generate customer report;
+    endif
+    if (Inventory report?) then (yes)
+        :Generate inventory report;
+    endif
+    if (Profitability report?) then (yes)
+        :Generate profitability report;
+    endif
+    :Display charts and data;
+    if (Export to Excel?) then (yes)
+        :Export to Excel;
+        :Download file;
+    endif
+endif
+
+if (View recommendation analytics?) then (yes)
+    :Load recommendation analytics;
+    :Display performance metrics;
+    :Display user behavior patterns;
+    :Display algorithm insights;
+    :Display accuracy metrics;
+    
+    if (Configure settings?) then (yes)
+        :Open settings page;
+        :Adjust algorithm weights;
+        :Set thresholds;
+        :Configure cache;
+        :Save settings;
+        :Clear recommendation cache;
+    endif
+endif
+
+stop
+
+@enduml
+

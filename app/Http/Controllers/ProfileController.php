@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\Order;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -84,5 +85,71 @@ class ProfileController extends Controller
         return view('profile.order-detail', [
             'order' => $order,
         ]);
+    }
+    
+    /**
+     * Display invoice for a specific order.
+     */
+    public function invoice(Request $request, $id): View
+    {
+        $order = Order::where('user_id', $request->user()->id)
+            ->where('id', $id)
+            ->with(['items.book', 'user'])
+            ->firstOrFail();
+
+        // Seller/business details (replace with settings table if available)
+        $seller = [
+            'company' => config('app.name', 'Bookty'),
+            'address' => '123 Book Street, Kuala Lumpur, MY',
+            'tax_number' => 'TAX-1234567890',
+            'email' => 'accounts@bookty.local',
+            'phone' => '+60 12-345 6789',
+        ];
+
+        // Generate an invoice number (public facing); prefer public_id, add date suffix
+        $invoiceNumber = ($order->public_id ?? $order->id) . '-' . $order->created_at->format('Ymd');
+
+        // Calculate proper invoice totals
+        $taxRate = 0.00; // 0% - Tax not included
+        $subTotal = $order->items->sum(function($i){ return $i->price * $i->quantity; });
+        $discount = $order->discount_amount ?? 0;
+        $shippingCost = $order->is_free_shipping ? 0 : ($order->shipping_customer_price ?? 0);
+        $taxable = max(0, $subTotal - $discount);
+        $taxAmount = 0; // No tax
+        $grandTotal = $taxable + $shippingCost; // Subtotal + Shipping
+
+        return view('profile.invoice', compact('order', 'seller', 'invoiceNumber', 'taxRate', 'subTotal', 'discount', 'shippingCost', 'taxAmount', 'grandTotal'));
+    }
+
+    /**
+     * Download invoice as PDF for a specific order.
+     */
+    public function invoicePdf(Request $request, $id)
+    {
+        $order = Order::where('user_id', $request->user()->id)
+            ->where('id', $id)
+            ->with(['items.book', 'user'])
+            ->firstOrFail();
+            
+        $seller = [
+            'company' => config('app.name', 'Bookty'),
+            'address' => '123 Book Street, Kuala Lumpur, MY',
+            'tax_number' => 'TAX-1234567890',
+            'email' => 'accounts@bookty.local',
+            'phone' => '+60 12-345 6789',
+        ];
+        $invoiceNumber = ($order->public_id ?? $order->id) . '-' . $order->created_at->format('Ymd');
+        $taxRate = 0.00; // 0% - Tax not included
+        $subTotal = $order->items->sum(function($i){ return $i->price * $i->quantity; });
+        $discount = $order->discount_amount ?? 0;
+        $shippingCost = $order->is_free_shipping ? 0 : ($order->shipping_customer_price ?? 0);
+        $taxable = max(0, $subTotal - $discount);
+        $taxAmount = 0; // No tax
+        $grandTotal = $taxable + $shippingCost; // Subtotal + Shipping
+
+        $pdf = Pdf::loadView('profile.invoice-pdf', compact('order', 'seller', 'invoiceNumber', 'taxRate', 'subTotal', 'discount', 'shippingCost', 'taxAmount', 'grandTotal'))
+            ->setPaper('a4');
+
+        return $pdf->download('invoice_'.$invoiceNumber.'.pdf');
     }
 }

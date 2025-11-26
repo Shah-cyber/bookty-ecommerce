@@ -1,0 +1,57 @@
+@startuml System Overview
+!define RECTANGLE class
+
+title Bookty E-Commerce System - Complete Architecture
+
+package "Frontend Layer" {
+    [Homepage with Recommendations]
+    [Book Detail Pages]
+    [Cart & Checkout]
+    [User Profile]
+    [Admin Dashboard]
+    [Superadmin Panel]
+}
+
+package "Application Layer" {
+    [Customer Controllers]
+    [Admin Controllers]
+    [Superadmin Controllers]
+    [API Controllers]
+}
+
+package "Business Logic" {
+    [RecommendationService]
+    [ToyyibPayService]
+    [Payment Processing]
+    [Order Processing]
+    [Inventory Management]
+}
+
+package "Data Access Layer" {
+    [Eloquery ORM]
+    [Models]
+    [Relationships]
+}
+
+package "External Services" {
+    [ToyyibPay API]
+    [Google OAuth]
+    [Email Service]
+}
+
+database "MySQL Database" {
+    [users]
+    [books]
+    [orders]
+    [reviews]
+    [cart_items]
+    [wishlists]
+}
+
+cloud "Storage" {
+    [File Storage]
+    [Image Uploads]
+}
+
+@enduml
+
