@@ -500,5 +500,89 @@ aria-label="Sidebar">
             });
         })();
     </script>
+
+    <!-- Global Session Expiration Handler -->
+    <script>
+        (function() {
+            // Intercept all fetch requests
+            const originalFetch = window.fetch;
+            window.fetch = function(...args) {
+                return originalFetch.apply(this, args)
+                    .then(response => {
+                        // Check for session expiration (401 Unauthorized)
+                        if (response.status === 401) {
+                            return response.json().then(data => {
+                                if (data.session_expired) {
+                                    handleSessionExpiration(data);
+                                }
+                                return Promise.reject(response);
+                            }).catch(() => {
+                                // If JSON parsing fails, still handle as expired session
+                                handleSessionExpiration({ redirect: '{{ route("home") }}' });
+                                return Promise.reject(response);
+                            });
+                        }
+                        
+                        // Check for CSRF token expiration (419 Page Expired)
+                        if (response.status === 419) {
+                            return response.json().then(data => {
+                                if (data.session_expired || data.csrf_expired) {
+                                    handleSessionExpiration(data);
+                                }
+                                return Promise.reject(response);
+                            }).catch(() => {
+                                handleSessionExpiration({ redirect: '{{ route("home") }}' });
+                                return Promise.reject(response);
+                            });
+                        }
+                        
+                        return response;
+                    });
+            };
+
+            // Handle session expiration
+            function handleSessionExpiration(data) {
+                const redirectUrl = data.redirect || '{{ route("home") }}';
+                const message = data.message || 'Your session has expired. Redirecting to home page...';
+                
+                // Show notification if toast function exists
+                if (typeof window.showToast === 'function') {
+                    window.showToast(message, 'warning');
+                } else {
+                    alert(message);
+                }
+                
+                // Redirect after short delay
+                setTimeout(() => {
+                    window.location.href = redirectUrl;
+                }, 1500);
+            }
+
+            // Handle XMLHttpRequest (for older AJAX code)
+            const originalOpen = XMLHttpRequest.prototype.open;
+            const originalSend = XMLHttpRequest.prototype.send;
+
+            XMLHttpRequest.prototype.open = function(method, url, ...args) {
+                this._url = url;
+                return originalOpen.apply(this, [method, url, ...args]);
+            };
+
+            XMLHttpRequest.prototype.send = function(...args) {
+                this.addEventListener('load', function() {
+                    if (this.status === 401 || this.status === 419) {
+                        try {
+                            const data = JSON.parse(this.responseText);
+                            if (data.session_expired || data.csrf_expired) {
+                                handleSessionExpiration(data);
+                            }
+                        } catch (e) {
+                            handleSessionExpiration({ redirect: '{{ route("home") }}' });
+                        }
+                    }
+                });
+                return originalSend.apply(this, args);
+            };
+        })();
+    </script>
 </body>
 </html>

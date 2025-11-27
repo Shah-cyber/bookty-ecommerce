@@ -241,15 +241,15 @@
                                     <div class="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-2xl blur-xl opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
                                     <div class="relative px-6 py-3 bg-white/80 backdrop-blur-sm rounded-2xl border border-purple-100">
                                         <div class="text-4xl font-extrabold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent animated-gradient">10K+</div>
-                                    </div>
-                                </div>
+                            </div>
+                            </div>
                                 <div class="text-slate-600 text-sm font-semibold mt-2 flex items-center justify-center">
                                     <svg class="w-4 h-4 mr-1 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
                                     </svg>
                                     Happy Readers
-                                </div>
                             </div>
+                        </div>
                             
                             <div class="hidden sm:block w-px h-12 bg-gradient-to-b from-transparent via-purple-200 to-transparent"></div>
                             
@@ -265,9 +265,9 @@
                                         <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/>
                                     </svg>
                                     Books Available
-                                </div>
-                            </div>
-                            
+                    </div>
+                </div>
+
                             <div class="hidden sm:block w-px h-12 bg-gradient-to-b from-transparent via-purple-200 to-transparent"></div>
                             
                             <div class="group text-center transform hover:scale-110 transition-all duration-300" data-aos="zoom-in" data-aos-delay="600">
@@ -336,7 +336,7 @@
                                                 <span class="px-3 py-1 bg-red-500/90 backdrop-blur-md rounded-full text-white text-xs font-bold">
                                                     -{{ $book->discount_percent }}% OFF
                                                 </span>
-                                                @endif
+                                    @endif
                                             </div>
                                         </div>
                                     </div>
@@ -530,7 +530,7 @@
                     // Event listeners
                     container.addEventListener('mouseenter', stop);
                     container.addEventListener('mouseleave', start);
-                    
+
                     // Dot navigation
                     dots.forEach((dot, index) => {
                         dot.addEventListener('click', () => goToSlide(index));
@@ -1233,30 +1233,30 @@
                             <div class="text-xs text-purple-600 mt-1 flex items-center">
                                 <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                                </svg>
+                            </svg>
                                 {{ \Illuminate\Support\Str::limit($testimonial->book->title, 30) }}
-                            </div>
+                    </div>
                             @endif
                         </div>
+                        </div>
                     </div>
-                </div>
                 @endforeach
-            </div>
+                </div>
             @else
             <!-- Fallback message when no testimonials -->
             <div class="text-center py-16">
                 <div class="bg-white rounded-2xl p-12 shadow-lg max-w-2xl mx-auto border border-gray-100">
                     <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                    </svg>
+                            </svg>
                     <h3 class="text-xl font-semibold text-gray-900 mb-2">Be the First to Share Your Experience!</h3>
                     <p class="text-gray-600">
                         We'd love to hear what you think about your recent book purchases. 
                         <a href="{{ route('login') }}" class="text-purple-600 hover:text-purple-700 font-medium">Sign in</a> 
                         to leave a review.
                     </p>
-                </div>
-            </div>
+                    </div>
+                        </div>
             @endif
 
             <!-- Trust Indicators -->
@@ -1269,7 +1269,7 @@
                             @else
                                 {{ number_format($totalCustomers) }}+
                             @endif
-                        </div>
+                    </div>
                         <div class="text-gray-600 font-medium">Happy Customers</div>
                     </div>
                     <div class="text-center group cursor-pointer transform hover:scale-110 transition-all duration-300">
@@ -1279,15 +1279,15 @@
                             @else
                                 {{ number_format($totalBooksSold) }}+
                             @endif
-                        </div>
+                    </div>
                         <div class="text-gray-600 font-medium">Books Sold</div>
                     </div>
                     <div class="text-center group cursor-pointer transform hover:scale-110 transition-all duration-300">
                         <div class="text-3xl md:text-4xl font-bold text-pink-600 mb-2 group-hover:text-pink-700 transition-colors">
                             {{ $averageRating ? number_format($averageRating, 1) : '5.0' }}/5
-                        </div>
+                </div>
                         <div class="text-gray-600 font-medium">Average Rating</div>
-                    </div>
+            </div>
                     <div class="text-center group cursor-pointer transform hover:scale-110 transition-all duration-300">
                         <div class="text-3xl md:text-4xl font-bold text-orange-600 mb-2 group-hover:text-orange-700 transition-colors">
                             {{ $satisfactionRate }}%
