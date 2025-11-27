@@ -12,11 +12,37 @@ class Authenticate extends Middleware
      */
     protected function redirectTo(Request $request): ?string
     {
-        if (! $request->expectsJson()) {
+        // For AJAX/JSON requests, return null (handled by unauthenticated method)
+        if ($request->expectsJson() || $request->ajax()) {
+            return null;
+        }
+
+        // For regular requests, redirect to home page
             return route('home');
         }
 
-        return null;
+    /**
+     * Handle an unauthenticated user.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  array  $guards
+     * @return void
+     *
+     * @throws \Illuminate\Auth\AuthenticationException
+     */
+    protected function unauthenticated($request, array $guards)
+    {
+        // For AJAX/JSON requests, return JSON response with redirect info
+        if ($request->expectsJson() || $request->ajax()) {
+            abort(response()->json([
+                'message' => 'Your session has expired. Please log in again.',
+                'redirect' => route('home'),
+                'session_expired' => true
+            ], 401));
+        }
+
+        // For regular requests, use parent behavior (redirects to home)
+        parent::unauthenticated($request, $guards);
     }
 }
 

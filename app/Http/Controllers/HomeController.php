@@ -47,7 +47,7 @@ class HomeController extends Controller
                 $recommendations = $newArrivals->take(6);
             }
         }
-
+            
         // Get featured testimonials (highest rated reviews with comments)
         $testimonials = \App\Models\Review::with(['user', 'book'])
             ->where('is_approved', true)

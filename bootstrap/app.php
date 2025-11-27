@@ -21,5 +21,30 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // Handle session expiration (401 Unauthorized)
+        $exceptions->render(function (\Illuminate\Auth\AuthenticationException $e, \Illuminate\Http\Request $request) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'message' => 'Your session has expired. Please log in again.',
+                    'redirect' => route('home'),
+                    'session_expired' => true
+                ], 401);
+            }
+        });
+
+        // Handle CSRF token expiration (419 Page Expired)
+        $exceptions->render(function (\Illuminate\Session\TokenMismatchException $e, \Illuminate\Http\Request $request) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'message' => 'Your session has expired. Please refresh the page.',
+                    'redirect' => route('home'),
+                    'session_expired' => true,
+                    'csrf_expired' => true
+                ], 419);
+            }
+            
+            // For regular form submissions, redirect to home
+            return redirect()->route('home')
+                ->with('error', 'Your session has expired. Please try again.');
+        });
     })->create();
