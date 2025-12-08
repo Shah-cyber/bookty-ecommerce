@@ -3,163 +3,342 @@
 @section('header', 'Add New Book')
 
 @section('content')
-    <div class="mb-6">
-        <a href="{{ route('admin.books.index') }}" class="text-purple-600 dark:text-purple-400 hover:text-purple-900 dark:hover:text-purple-300">
-            &larr; Back to Books
-        </a>
-    </div>
-
-    <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
-        <h2 class="text-2xl font-semibold text-gray-800 dark:text-white mb-6">Add New Book</h2>
-
-        @if ($errors->any())
-            <div class="bg-red-100 dark:bg-red-900 border-l-4 border-red-500 text-red-700 dark:text-red-300 p-4 mb-6" role="alert">
-                <p class="font-bold">Please fix the following errors:</p>
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
+    @section('content')
+    <div class="w-full">
+            <div class="mb-6 flex items-center justify-between">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Add New Book</h2>
+                <a href="{{ route('admin.books.index') }}"
+                    class="text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 flex items-center transition-colors">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18">
+                        </path>
+                    </svg>
+                    Back to Books
+                </a>
             </div>
-        @endif
 
-        <form action="{{ route('admin.books.store') }}" method="POST" enctype="multipart/form-data">
-            @csrf
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <div class="mb-4">
-                        <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title</label>
-                        <input type="text" name="title" id="title" value="{{ old('title') }}" required class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50">
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="slug" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Slug</label>
-                        <input type="text" name="slug" id="slug" value="{{ old('slug') }}" required class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50">
-                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">URL-friendly version of the title (e.g., "the-secret-garden")</p>
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="author" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Author</label>
-                        <input type="text" name="author" id="author" value="{{ old('author') }}" required class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50">
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="genre_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Genre</label>
-                        <select name="genre_id" id="genre_id" required class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50">
-                            <option value="">Select a genre</option>
-                            @foreach($genres as $genre)
-                                <option value="{{ $genre->id }}" {{ old('genre_id') == $genre->id ? 'selected' : '' }}>
-                                    {{ $genre->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="tropes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tropes</label>
-                        <div class="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-md p-2 max-h-48 overflow-y-auto">
-                            @foreach($tropes as $trope)
-                                <div class="flex items-center mb-1">
-                                    <input type="checkbox" name="tropes[]" id="trope_{{ $trope->id }}" value="{{ $trope->id }}" 
-                                        {{ in_array($trope->id, old('tropes', [])) ? 'checked' : '' }}
-                                        class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded">
-                                    <label for="trope_{{ $trope->id }}" class="ml-2 text-sm text-gray-700 dark:text-gray-300">{{ $trope->name }}</label>
-                                </div>
-                            @endforeach
+            @if ($errors->any())
+                <div class="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                    clip-rule="evenodd" />
+                            </svg>
                         </div>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="mb-4">
-                        <label for="price" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Selling Price (RM)</label>
-                        <input type="number" name="price" id="price" value="{{ old('price') }}" required min="0" step="0.01" class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50">
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="cost_price" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cost Price (RM)</label>
-                        <input type="number" name="cost_price" id="cost_price" value="{{ old('cost_price') }}" min="0" step="0.01" class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50">
-                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">How much you paid for this book (for profit calculations)</p>
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="stock" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Stock</label>
-                        <input type="number" name="stock" id="stock" value="{{ old('stock', 0) }}" required min="0" class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50">
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="cover_image" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Cover Image</label>
-                        <input class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" aria-describedby="cover_image_help" id="cover_image" name="cover_image" type="file" accept="image/*">
-                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-300" id="cover_image_help">SVG, PNG, or JPG (MAX. 800x400px).</p>
-                        
-                        <!-- Image Preview -->
-                        <div id="image-preview" class="mt-3 hidden">
-                            <div class="flex items-center justify-between mb-2">
-                                <p class="text-sm text-gray-600 dark:text-gray-400">Selected Image:</p>
-                                <button type="button" id="remove-file" class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-sm font-medium">
-                                    Remove File
-                                </button>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-red-800 dark:text-red-200">There were errors with your submission
+                            </h3>
+                            <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+                                <ul class="list-disc pl-5 space-y-1">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
                             </div>
-                            <img id="preview-img" src="" alt="Preview" class="h-40 w-auto object-cover rounded">
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            <form action="{{ route('admin.books.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                @csrf
+
+                <div
+                    class="bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 rounded-2xl overflow-hidden">
+                    <div class="p-6 md:p-8 space-y-8">
+                        <!-- Book Basic Info -->
+                        <div>
+                            <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white mb-4">Basic Information</h3>
+                            <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                                <div class="sm:col-span-4">
+                                    <label for="title"
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
+                                    <div class="mt-1">
+                                        <input type="text" name="title" id="title" value="{{ old('title') }}" required
+                                            class="shadow-sm focus:ring-purple-500 focus:border-purple-500 block w-full sm:text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg transition-colors placeholder-gray-400"
+                                            placeholder="e.g. The Great Gatsby">
+                                    </div>
+                                </div>
+
+                                <div class="sm:col-span-2">
+                                    <label for="author"
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Author</label>
+                                    <div class="mt-1">
+                                        <input type="text" name="author" id="author" value="{{ old('author') }}" required
+                                            class="shadow-sm focus:ring-purple-500 focus:border-purple-500 block w-full sm:text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg transition-colors"
+                                            placeholder="Author Name">
+                                    </div>
+                                </div>
+
+                                <div class="sm:col-span-6">
+                                    <label for="slug"
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Slug</label>
+                                    <div class="mt-1 flex rounded-md shadow-sm">
+                                        <span
+                                            class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 sm:text-sm">
+                                            {{ config('app.url') }}/books/
+                                        </span>
+                                        <input type="text" name="slug" id="slug" value="{{ old('slug') }}" required
+                                            class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md focus:ring-purple-500 focus:border-purple-500 sm:text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                                            placeholder="the-great-gatsby">
+                                    </div>
+                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Auto-generated from title. Used in
+                                        URLs.</p>
+                                </div>
+
+                                <div class="sm:col-span-3">
+                                    <label for="genre_id"
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Genre</label>
+                                    <div class="mt-1">
+                                        <select id="genre_id" name="genre_id" required
+                                            class="shadow-sm focus:ring-purple-500 focus:border-purple-500 block w-full sm:text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg">
+                                            <option value="">Select a genre</option>
+                                            @foreach($genres as $genre)
+                                                <option value="{{ $genre->id }}" {{ old('genre_id') == $genre->id ? 'selected' : '' }}>{{ $genre->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="sm:col-span-6">
+                                    <label
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tropes</label>
+                                    <div
+                                        class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 max-h-48 overflow-y-auto">
+                                        @foreach($tropes as $trope)
+                                            <label class="relative flex items-start py-1 cursor-pointer group">
+                                                <div class="min-w-0 flex-1 text-sm">
+                                                    <div
+                                                        class="text-gray-700 dark:text-gray-200 select-none group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                                                        {{ $trope->name }}</div>
+                                                </div>
+                                                <div class="ml-3 flex items-center h-5">
+                                                    <input id="trope_{{ $trope->id }}" name="tropes[]" value="{{ $trope->id }}"
+                                                        type="checkbox" {{ in_array($trope->id, old('tropes', [])) ? 'checked' : '' }}
+                                                        class="focus:ring-purple-500 h-4 w-4 text-purple-600 border-gray-300 dark:border-gray-600 rounded cursor-pointer bg-white dark:bg-gray-700">
+                                                </div>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-gray-100 dark:border-gray-700 pt-8">
+                            <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white mb-4">Pricing & Inventory
+                            </h3>
+                            <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2 lg:grid-cols-4">
+                                <div>
+                                    <label for="price"
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Selling Price
+                                        (RM)</label>
+                                    <div class="mt-1 relative rounded-md shadow-sm">
+                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <span class="text-gray-500 sm:text-sm">RM</span>
+                                        </div>
+                                        <input type="number" name="price" id="price" value="{{ old('price') }}" required min="0"
+                                            step="0.01"
+                                            class="focus:ring-purple-500 focus:border-purple-500 block w-full pl-10 sm:text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg"
+                                            placeholder="0.00">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label for="cost_price"
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Cost Price
+                                        (RM)</label>
+                                    <div class="mt-1 relative rounded-md shadow-sm">
+                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <span class="text-gray-500 sm:text-sm">RM</span>
+                                        </div>
+                                        <input type="number" name="cost_price" id="cost_price" value="{{ old('cost_price') }}"
+                                            min="0" step="0.01"
+                                            class="focus:ring-purple-500 focus:border-purple-500 block w-full pl-10 sm:text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg"
+                                            placeholder="0.00">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label for="stock" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Stock
+                                        Quantity</label>
+                                    <div class="mt-1">
+                                        <input type="number" name="stock" id="stock" value="{{ old('stock', 10) }}" required
+                                            min="0"
+                                            class="shadow-sm focus:ring-purple-500 focus:border-purple-500 block w-full sm:text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label for="condition" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Book Condition</label>
+                                    <div class="mt-1">
+                                        <select id="condition" name="condition" required
+                                            class="shadow-sm focus:ring-purple-500 focus:border-purple-500 block w-full sm:text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg">
+                                            <option value="new" {{ old('condition', 'new') == 'new' ? 'selected' : '' }}>New</option>
+                                            <option value="preloved" {{ old('condition') == 'preloved' ? 'selected' : '' }}>Preloved</option>
+                                        </select>
+                                    </div>
+                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Select whether the book is new or preloved (second-hand).</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-gray-100 dark:border-gray-700 pt-8">
+                            <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white mb-4">Book Details</h3>
+                            <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                                <div class="sm:col-span-6 md:col-span-4">
+                                    <label for="synopsis"
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Synopsis</label>
+                                    <div class="mt-1">
+                                        <textarea id="synopsis" name="synopsis" rows="15"
+                                            class="shadow-sm focus:ring-purple-500 focus:border-purple-500 block w-full sm:text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg"
+                                            placeholder="Write a compelling summary...">{{ old('synopsis') }}</textarea>
+                                    </div>
+                                </div>
+
+                                <div class="sm:col-span-6 md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Cover
+                                        Image</label>
+                                    <div class="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                                        id="drop-zone">
+                                        <div class="space-y-1 text-center">
+                                            <div class="flex flex-col items-center">
+                                                <div id="image-preview" class="hidden mb-3 relative group">
+                                                    <img id="preview-img" src="" alt="Preview"
+                                                        class="h-48 w-auto object-cover rounded-lg shadow-md">
+                                                    <button type="button" id="remove-file"
+                                                        class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600 focus:outline-none opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                                <svg id="upload-icon" class="mx-auto h-12 w-12 text-gray-400"
+                                                    stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                                                    <path
+                                                        d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                                </svg>
+                                            </div>
+                                            <div class="flex text-sm text-gray-600 dark:text-gray-400 justify-center">
+                                                <label for="cover_image"
+                                                    class="relative cursor-pointer bg-white dark:bg-gray-700 rounded-md font-medium text-purple-600 dark:text-purple-400 hover:text-purple-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-purple-500 px-2">
+                                                    <span>Upload a file</span>
+                                                    <input id="cover_image" name="cover_image" type="file" class="sr-only"
+                                                        accept="image/*">
+                                                </label>
+                                                <p class="pl-1">or drag and drop</p>
+                                            </div>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                                PNG, JPG up to 2MB
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="mb-4">
-                        <label for="synopsis" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Synopsis</label>
-                        <textarea name="synopsis" id="synopsis" rows="6" class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50">{{ old('synopsis') }}</textarea>
+                    <div
+                        class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-100 dark:border-gray-700 flex items-center justify-end gap-3">
+                        <a href="{{ route('admin.books.index') }}"
+                            class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors">
+                            Cancel
+                        </a>
+                        <button type="submit"
+                            class="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 border border-transparent rounded-lg text-sm font-medium text-white shadow-sm hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transform hover:-translate-y-0.5 transition-all">
+                            Create Book
+                        </button>
                     </div>
                 </div>
-            </div>
+            </form>
+        </div>
 
-            <div class="mt-6">
-                <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800">
-                    Create Book
-                </button>
-            </div>
-        </form>
-    </div>
+        <script>
+            // Auto-generate slug from title
+            const titleInput = document.getElementById('title');
+            const slugInput = document.getElementById('slug');
 
-    <script>
-        // Auto-generate slug from title
-        document.getElementById('title').addEventListener('input', function() {
-            const title = this.value;
-            const slug = title.toLowerCase()
-                .replace(/[^\w\s-]/g, '') // Remove special characters
-                .replace(/\s+/g, '-')     // Replace spaces with hyphens
-                .replace(/-+/g, '-');     // Replace multiple hyphens with single hyphen
-            
-            document.getElementById('slug').value = slug;
-        });
+            titleInput.addEventListener('input', function () {
+                if (this.value) {
+                    const slug = this.value.toLowerCase()
+                        .replace(/[^\w\s-]/g, '') // Remove special characters
+                        .replace(/\s+/g, '-')     // Replace spaces with hyphens
+                        .replace(/-+/g, '-')      // Replace multiple hyphens with single hyphen
+                        .replace(/^-+|-+$/g, ''); // Trim hyphens from start/end
 
-        // Image preview functionality
-        document.getElementById('cover_image').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const previewDiv = document.getElementById('image-preview');
-            const previewImg = document.getElementById('preview-img');
-            
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    previewImg.src = e.target.result;
-                    previewDiv.classList.remove('hidden');
-                };
-                reader.readAsDataURL(file);
-            } else {
-                previewDiv.classList.add('hidden');
-            }
-        });
+                    slugInput.value = slug;
+                } else {
+                    slugInput.value = '';
+                }
+            });
 
-        // Remove file functionality
-        document.getElementById('remove-file').addEventListener('click', function() {
+            // Image preview functionality
             const fileInput = document.getElementById('cover_image');
             const previewDiv = document.getElementById('image-preview');
-            
-            // Clear the file input
-            fileInput.value = '';
-            
-            // Hide the preview
-            previewDiv.classList.add('hidden');
-        });
-    </script>
+            const previewImg = document.getElementById('preview-img');
+            const uploadIcon = document.getElementById('upload-icon');
+            const removeBtn = document.getElementById('remove-file');
+
+            fileInput.addEventListener('change', function (e) {
+                const file = e.target.files[0];
+
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        previewImg.src = e.target.result;
+                        previewDiv.classList.remove('hidden');
+                        uploadIcon.classList.add('hidden');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            removeBtn.addEventListener('click', function () {
+                fileInput.value = '';
+                previewDiv.classList.add('hidden');
+                uploadIcon.classList.remove('hidden');
+            });
+
+            // Drag and drop visual feedback
+            const dropZone = document.getElementById('drop-zone');
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, unhighlight, false);
+            });
+
+            function highlight(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.add('border-purple-500', 'bg-purple-50', 'dark:bg-purple-900/10');
+            }
+
+            function unhighlight(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.remove('border-purple-500', 'bg-purple-50', 'dark:bg-purple-900/10');
+            }
+
+            dropZone.addEventListener('drop', handleDrop, false);
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+
+                if (files.length) {
+                    fileInput.files = files;
+                    // Trigger change event manually
+                    const event = new Event('change');
+                    fileInput.dispatchEvent(event);
+                }
+            }
+        </script>
+    @endsection
 @endsection

@@ -7,6 +7,7 @@ use App\Models\Book;
 use App\Models\Genre;
 use App\Models\Trope;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -44,6 +45,7 @@ class BookController extends Controller
             'price' => 'required|numeric|min:0',
             'cost_price' => 'nullable|numeric|min:0',
             'stock' => 'required|integer|min:0',
+            'condition' => 'required|in:new,preloved',
             'genre_id' => 'required|exists:genres,id',
             'cover_image' => 'nullable|image|max:2048', // 2MB max
             'tropes' => 'nullable|array',
@@ -65,6 +67,8 @@ class BookController extends Controller
         if ($request->has('tropes')) {
             $book->tropes()->sync($request->tropes);
         }
+        
+        // Cache clearing is handled by BookObserver automatically
 
         return redirect()->route('admin.books.index')
             ->with('success', " '{$book->title}' by {$book->author} has been added to the catalog!");
@@ -102,6 +106,7 @@ class BookController extends Controller
             'price' => 'required|numeric|min:0',
             'cost_price' => 'nullable|numeric|min:0',
             'stock' => 'required|integer|min:0',
+            'condition' => 'required|in:new,preloved',
             'genre_id' => 'required|exists:genres,id',
             'cover_image' => 'nullable|image|max:3072', // 3MB max
             'tropes' => 'nullable|array',
@@ -123,9 +128,14 @@ class BookController extends Controller
 
         // Update the book
         $book->update($data);
+        
+        // Refresh the model to ensure fresh data
+        $book->refresh();
 
         // Sync tropes
         $book->tropes()->sync($request->tropes ?? []);
+        
+        // Cache clearing is handled by BookObserver automatically
 
         return redirect()->route('admin.books.show', $book)
             ->with('success', " '{$book->title}' has been updated successfully!");
@@ -143,6 +153,8 @@ class BookController extends Controller
 
         // Delete the book
         $book->delete();
+        
+        // Cache clearing is handled by BookObserver automatically
 
         return redirect()->route('admin.books.index')
             ->with('success', " Book '{$book->title}' has been removed from the catalog.");

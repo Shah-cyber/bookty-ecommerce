@@ -143,4 +143,43 @@ class User extends Authenticatable
             ->whereDoesntHave('review')
             ->first();
     }
+    
+    /**
+     * Check if user profile is incomplete (missing shipping information)
+     * 
+     * @return bool
+     */
+    public function hasIncompleteProfile(): bool
+    {
+        return empty($this->address_line1) || 
+               empty($this->city) || 
+               empty($this->state) || 
+               empty($this->postal_code) || 
+               empty($this->phone_number);
+    }
+    
+    /**
+     * Get profile completion percentage
+     * 
+     * @return int Percentage (0-100)
+     */
+    public function getProfileCompletionPercentage(): int
+    {
+        $fields = [
+            'address_line1',
+            'city',
+            'state',
+            'postal_code',
+            'phone_number',
+        ];
+        
+        $completed = 0;
+        foreach ($fields as $field) {
+            if (!empty($this->$field)) {
+                $completed++;
+            }
+        }
+        
+        return (int) round(($completed / count($fields)) * 100);
+    }
 }

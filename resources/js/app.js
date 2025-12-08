@@ -1,23 +1,29 @@
 import './bootstrap';
 import 'flowbite';
 import Alpine from 'alpinejs';
+import collapse from '@alpinejs/collapse';
+
+Alpine.plugin(collapse);
 import './toast';
 
+import { DataTable } from 'simple-datatables';
+
 window.Alpine = Alpine;
+window.simpleDatatables = { DataTable };
 
 // Quick Add to Cart global function
-window.quickAddToCart = async function(bookId) {
+window.quickAddToCart = async function (bookId) {
     const button = event.target.closest('.quick-add-btn');
     if (!button) return;
-    
+
     const btnText = button.querySelector('.btn-text');
     const loadingSpinner = button.querySelector('.loading-spinner');
-    
+
     // Disable button and show loading state
     button.disabled = true;
     if (btnText) btnText.classList.add('hidden');
     if (loadingSpinner) loadingSpinner.classList.remove('hidden');
-    
+
     try {
         const response = await fetch(`/cart/quick-add/${bookId}`, {
             method: 'POST',
@@ -28,7 +34,7 @@ window.quickAddToCart = async function(bookId) {
                 'Accept': 'application/json'
             }
         });
-        
+
         if (!response.ok) {
             if (response.status === 401) {
                 throw new Error('Please login to add items to your cart.');
@@ -36,25 +42,25 @@ window.quickAddToCart = async function(bookId) {
             const errorData = await response.json();
             throw new Error(errorData.message || 'Failed to add item to cart');
         }
-        
+
         const data = await response.json();
-        
+
         // Show success message
         showToast(data.message || 'Book added to cart!', 'success');
-        
+
         // Update cart count in navigation if it exists
         updateCartCount(data.cart_count);
-        
+
         // Show success state
         if (btnText) {
             btnText.textContent = 'Added!';
             btnText.classList.remove('hidden');
         }
         if (loadingSpinner) loadingSpinner.classList.add('hidden');
-        
+
         // Apply success styling
         button.classList.add('success-state');
-        
+
         // Reset button after 2 seconds
         setTimeout(() => {
             if (btnText) {
@@ -63,14 +69,14 @@ window.quickAddToCart = async function(bookId) {
             button.classList.remove('success-state');
             button.disabled = false;
         }, 2000);
-        
+
     } catch (error) {
         console.error('Quick add to cart error:', error);
-        
+
         // Check if user needs to login
         if (error.message.includes('login') || error.message.includes('Please login')) {
             showToast('Please login to add items to your cart.', 'warning');
-            
+
             // Redirect to login after a short delay
             setTimeout(() => {
                 window.location.href = '/login';
@@ -78,7 +84,7 @@ window.quickAddToCart = async function(bookId) {
         } else {
             showToast(error.message || 'Failed to add item to cart. Please try again.', 'error');
         }
-        
+
         // Reset button state
         if (btnText) btnText.classList.remove('hidden');
         if (loadingSpinner) loadingSpinner.classList.add('hidden');
@@ -87,7 +93,7 @@ window.quickAddToCart = async function(bookId) {
 };
 
 // Update cart count in navigation
-window.updateCartCount = function(count) {
+window.updateCartCount = function (count) {
     const cartCountElements = document.querySelectorAll('.cart-count');
     cartCountElements.forEach(element => {
         element.textContent = count;
@@ -96,7 +102,7 @@ window.updateCartCount = function(count) {
 };
 
 // Copy tracking number and redirect to J&T tracking page
-window.copyAndTrackPackage = async function(trackingNumber, trackingUrl) {
+window.copyAndTrackPackage = async function (trackingNumber, trackingUrl) {
     try {
         // Copy tracking number to clipboard
         if (navigator.clipboard && window.isSecureContext) {
@@ -112,26 +118,26 @@ window.copyAndTrackPackage = async function(trackingNumber, trackingUrl) {
             document.body.appendChild(textArea);
             textArea.focus();
             textArea.select();
-            
+
             try {
                 document.execCommand('copy');
                 showToast(`Tracking number ${trackingNumber} copied to clipboard!`, 'success');
             } catch (err) {
                 showToast('Could not copy tracking number, but opening tracking page...', 'warning');
             }
-            
+
             document.body.removeChild(textArea);
         }
-        
+
         // Redirect to J&T tracking page after a short delay
         setTimeout(() => {
             window.open(trackingUrl, '_blank');
         }, 1000);
-        
+
     } catch (error) {
         console.error('Error copying tracking number:', error);
         showToast('Could not copy tracking number, but opening tracking page...', 'warning');
-        
+
         // Still redirect even if copy fails
         setTimeout(() => {
             window.open(trackingUrl, '_blank');
@@ -140,7 +146,7 @@ window.copyAndTrackPackage = async function(trackingNumber, trackingUrl) {
 };
 
 // Copy tracking number only (without redirect)
-window.copyTrackingNumber = async function(trackingNumber) {
+window.copyTrackingNumber = async function (trackingNumber) {
     try {
         if (navigator.clipboard && window.isSecureContext) {
             await navigator.clipboard.writeText(trackingNumber);
@@ -155,14 +161,14 @@ window.copyTrackingNumber = async function(trackingNumber) {
             document.body.appendChild(textArea);
             textArea.focus();
             textArea.select();
-            
+
             try {
                 document.execCommand('copy');
                 showToast(`Tracking number ${trackingNumber} copied!`, 'success');
             } catch (err) {
                 showToast('Failed to copy tracking number.', 'error');
             }
-            
+
             document.body.removeChild(textArea);
         }
     } catch (error) {
@@ -172,7 +178,7 @@ window.copyTrackingNumber = async function(trackingNumber) {
 };
 
 // Toggle wishlist functionality
-window.toggleWishlist = async function(bookId, button) {
+window.toggleWishlist = async function (bookId, button) {
     // Show loading state
     const originalContent = button.innerHTML;
     button.disabled = true;
@@ -182,7 +188,7 @@ window.toggleWishlist = async function(bookId, button) {
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg>
     `;
-    
+
     try {
         const response = await fetch(`/wishlist/toggle/${bookId}`, {
             method: 'POST',
@@ -208,13 +214,13 @@ window.toggleWishlist = async function(bookId, button) {
 
             // Update all wishlist buttons for this book
             const allButtons = document.querySelectorAll(`.wishlist-btn[data-book-id="${bookId}"]`);
-            
+
             allButtons.forEach(btn => {
                 btn.dataset.inWishlist = isNowInWishlist ? 'true' : 'false';
-                
+
                 // Check if this is a detailed button (with text) or icon-only button
                 const hasText = btn.querySelector('span');
-                
+
                 if (isNowInWishlist) {
                     // Book was added to wishlist - filled heart
                     if (hasText) {
@@ -297,11 +303,11 @@ window.RecommendationManager = {
                 },
                 credentials: 'same-origin'
             });
-            
+
             if (!response.ok) {
                 throw new Error('Failed to fetch recommendations');
             }
-            
+
             const data = await response.json();
             return data.data || [];
         } catch (error) {
@@ -318,11 +324,11 @@ window.RecommendationManager = {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             });
-            
+
             if (!response.ok) {
                 throw new Error('Failed to fetch similar books');
             }
-            
+
             const data = await response.json();
             return data.data || [];
         } catch (error) {
@@ -337,18 +343,35 @@ window.RecommendationManager = {
                 <div class="relative overflow-hidden">
                     <a href="${book.link}" class="block">
                         <div class="aspect-[2/3] w-full bg-gray-50">
-                            ${book.cover_image ? 
-                                `<img src="${book.cover_image}" alt="${book.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">` :
-                                `<div class="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                            ${book.cover_image ?
+                `<img src="${book.cover_image}" alt="${book.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">` :
+                `<div class="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                                     <svg class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                                     </svg>
                                 </div>`
-                            }
+            }
                         </div>
                     </a>
                     
-                    <div class="absolute top-3 left-3">
+                    <!-- Condition Badge -->
+                    <div class="absolute top-3 left-3 flex flex-col gap-2">
+                        ${book.condition === 'preloved' ? `
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/90 backdrop-blur-sm text-white shadow-sm">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                </svg>
+                                Preloved
+                            </span>
+                        ` : `
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-500/90 backdrop-blur-sm text-white shadow-sm">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                New
+                            </span>
+                        `}
+                        <!-- Genre Badge -->
                         <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-white/90 backdrop-blur-sm text-gray-700 shadow-sm">
                             ${book.genre || 'Book'}
                         </span>
@@ -370,13 +393,13 @@ window.RecommendationManager = {
                     <p class="text-sm text-gray-600 mb-2">by ${book.author}</p>
                     
                     <div class="mt-auto pt-3 border-t border-gray-100">
-                        ${book.is_on_sale ? 
-                            `<div class="flex items-baseline space-x-2">
+                        ${book.is_on_sale ?
+                `<div class="flex items-baseline space-x-2">
                                 <span class="text-lg font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">RM ${parseFloat(book.final_price).toFixed(2)}</span>
                                 <span class="text-sm text-gray-500 line-through">RM ${parseFloat(book.price).toFixed(2)}</span>
                             </div>` :
-                            `<span class="text-lg font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">RM ${parseFloat(book.price).toFixed(2)}</span>`
-                        }
+                `<span class="text-lg font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">RM ${parseFloat(book.price).toFixed(2)}</span>`
+            }
                     </div>
                 </div>
             </div>
@@ -386,30 +409,40 @@ window.RecommendationManager = {
     renderSidebarBookCard(book) {
         return `
             <div class="flex space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors duration-200">
-                <div class="flex-shrink-0">
+                <div class="flex-shrink-0 relative">
                     <a href="${book.link}" class="block">
-                        ${book.cover_image ? 
-                            `<img src="${book.cover_image}" alt="${book.title}" class="w-16 h-20 object-cover rounded-md shadow-sm">` :
-                            `<div class="w-16 h-20 bg-gray-200 rounded-md flex items-center justify-center">
+                        ${book.cover_image ?
+                `<img src="${book.cover_image}" alt="${book.title}" class="w-16 h-20 object-cover rounded-md shadow-sm">` :
+                `<div class="w-16 h-20 bg-gray-200 rounded-md flex items-center justify-center">
                                 <svg class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
                             </div>`
-                        }
+            }
                     </a>
+                    <!-- Condition Badge -->
+                    ${book.condition === 'preloved' ? `
+                        <span class="absolute -top-1 -right-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-amber-500 text-white shadow-sm">
+                            Preloved
+                        </span>
+                    ` : `
+                        <span class="absolute -top-1 -right-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-green-500 text-white shadow-sm">
+                            New
+                        </span>
+                    `}
                 </div>
                 <div class="flex-1 min-w-0">
                     <a href="${book.link}" class="block">
                         <h4 class="text-sm font-semibold text-gray-900 line-clamp-2 hover:text-purple-600 transition-colors">${book.title}</h4>
                         <p class="text-xs text-gray-600 mt-1">by ${book.author}</p>
                         <div class="mt-2">
-                            ${book.is_on_sale ? 
-                                `<div class="flex items-center space-x-1">
+                            ${book.is_on_sale ?
+                `<div class="flex items-center space-x-1">
                                     <span class="text-sm font-bold text-purple-600">RM ${parseFloat(book.final_price).toFixed(2)}</span>
                                     <span class="text-xs text-gray-500 line-through">RM ${parseFloat(book.price).toFixed(2)}</span>
                                 </div>` :
-                                `<span class="text-sm font-bold text-purple-600">RM ${parseFloat(book.price).toFixed(2)}</span>`
-                            }
+                `<span class="text-sm font-bold text-purple-600">RM ${parseFloat(book.price).toFixed(2)}</span>`
+            }
                         </div>
                         ${book.score ? `<div class="mt-1"><span class="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">${Math.round(book.score * 100)}% match</span></div>` : ''}
                     </a>
@@ -445,7 +478,7 @@ window.RecommendationManager = {
 
         try {
             const books = await this.fetchSimilarBooks(bookId, limit);
-            
+
             if (books.length === 0) {
                 container.innerHTML = `
                     <div class="text-center py-8">
@@ -469,16 +502,16 @@ window.RecommendationManager = {
 };
 
 // AJAX Add to Cart functionality
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Handle wishlist button clicks via event delegation
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         const button = e.target.closest('.wishlist-btn');
         if (button) {
             e.preventDefault();
             e.stopPropagation(); // Prevent event bubbling
-            
+
             const bookId = button.dataset.bookId;
-            
+
             if (bookId && window.toggleWishlist) {
                 window.toggleWishlist(bookId, button);
             }
@@ -486,27 +519,27 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Handle login buttons for wishlist (for non-authenticated users)
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         const button = e.target.closest('button[aria-label*="Login to add to wishlist"]');
         if (button) {
             e.preventDefault();
             e.stopPropagation();
-            
+
             // Dispatch custom event to open auth modal
             window.dispatchEvent(new CustomEvent('open-auth-modal', { detail: 'login' }));
         }
     });
 
     // Handle AJAX add to cart buttons
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         const button = e.target.closest('.ajax-add-to-cart');
         if (button) {
             e.preventDefault();
             e.stopPropagation(); // Prevent event bubbling
-            
+
             const bookId = button.dataset.bookId;
             const quantity = button.dataset.quantity || 1;
-            
+
             // Show loading state
             const originalContent = button.innerHTML;
             button.disabled = true;
@@ -516,7 +549,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
             `;
-            
+
             // Send AJAX request
             fetch(`/cart/quick-add/${bookId}`, {
                 method: 'POST',
@@ -531,64 +564,64 @@ document.addEventListener('DOMContentLoaded', function() {
                 }),
                 credentials: 'same-origin'
             })
-            .then(response => {
-                if (!response.ok) {
-                    if (response.status === 401) {
-                        // User not authenticated
-                        return response.json().then(data => {
-                            throw new Error(data.message || 'Authentication required');
-                        });
+                .then(response => {
+                    if (!response.ok) {
+                        if (response.status === 401) {
+                            // User not authenticated
+                            return response.json().then(data => {
+                                throw new Error(data.message || 'Authentication required');
+                            });
+                        }
+                        throw new Error('Network response was not ok');
                     }
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    // Update cart count in header if it exists
-                    if (data.cart_count !== undefined) {
-                        const cartCountElements = document.querySelectorAll('.cart-count');
-                        cartCountElements.forEach(element => {
-                            element.textContent = data.cart_count;
-                            element.classList.remove('hidden');
-                        });
-                    }
-                    
-                    // Show success message
-                    showToast(data.message, 'success');
-                    
-                    // Restore button with success state briefly
-                    button.innerHTML = `
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Update cart count in header if it exists
+                        if (data.cart_count !== undefined) {
+                            const cartCountElements = document.querySelectorAll('.cart-count');
+                            cartCountElements.forEach(element => {
+                                element.textContent = data.cart_count;
+                                element.classList.remove('hidden');
+                            });
+                        }
+
+                        // Show success message
+                        showToast(data.message, 'success');
+
+                        // Restore button with success state briefly
+                        button.innerHTML = `
                         <svg class="h-4 w-4 text-green-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                         </svg>
                     `;
-                    
-                    // Restore original content after delay
-                    setTimeout(() => {
-                        button.innerHTML = originalContent;
-                        button.disabled = false;
-                    }, 1000);
-                } else {
-                    throw new Error(data.message || 'Failed to add to cart');
-                }
-            })
-            .catch(error => {
-                console.error('Add to cart error:', error);
-                button.innerHTML = originalContent;
-                button.disabled = false;
-                
-                // Show error message
-                if (error.message.includes('Authentication required') || error.message.includes('login')) {
-                    showToast('Please login to add items to your cart.', 'warning');
-                    // Optionally trigger login modal
-                    setTimeout(() => {
-                        window.dispatchEvent(new CustomEvent('open-auth-modal', { detail: 'login' }));
-                    }, 1000);
-                } else {
-                    showToast(error.message || 'Failed to add item to cart. Please try again.', 'error');
-                }
-            });
+
+                        // Restore original content after delay
+                        setTimeout(() => {
+                            button.innerHTML = originalContent;
+                            button.disabled = false;
+                        }, 1000);
+                    } else {
+                        throw new Error(data.message || 'Failed to add to cart');
+                    }
+                })
+                .catch(error => {
+                    console.error('Add to cart error:', error);
+                    button.innerHTML = originalContent;
+                    button.disabled = false;
+
+                    // Show error message
+                    if (error.message.includes('Authentication required') || error.message.includes('login')) {
+                        showToast('Please login to add items to your cart.', 'warning');
+                        // Optionally trigger login modal
+                        setTimeout(() => {
+                            window.dispatchEvent(new CustomEvent('open-auth-modal', { detail: 'login' }));
+                        }, 1000);
+                    } else {
+                        showToast(error.message || 'Failed to add item to cart. Please try again.', 'error');
+                    }
+                });
         }
     });
 });

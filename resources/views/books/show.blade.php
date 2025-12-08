@@ -95,6 +95,22 @@
                     <p class="text-xl text-slate-500 mb-6">by <a href="#" class="hover:underline">{{ $book->author }}</a></p>
 
                     <div class="flex flex-wrap gap-2 mb-8">
+                        <!-- Condition Badge -->
+                        @if(($book->condition ?? 'new') === 'preloved')
+                            <span class="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-amber-100 text-amber-800 hover:bg-amber-200 transition-colors border border-amber-200">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                </svg>
+                                Preloved
+                            </span>
+                        @else
+                            <span class="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-green-100 text-green-800 hover:bg-green-200 transition-colors border border-green-200">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                New
+                            </span>
+                        @endif
                         <span class="px-3 py-1 text-sm font-medium rounded-full bg-purple-100 text-purple-800 hover:bg-purple-200 transition-colors">
                             {{ $book->genre->name }}
                         </span>
@@ -126,6 +142,26 @@
                             <div class="border-b border-gray-100 pb-3">
                                 <dt class="text-sm font-medium text-slate-500">Author</dt>
                                 <dd class="mt-1 text-base text-slate-900">{{ $book->author }}</dd>
+                            </div>
+                            <div class="border-b border-gray-100 pb-3">
+                                <dt class="text-sm font-medium text-slate-500">Condition</dt>
+                                <dd class="mt-1 text-base text-slate-900">
+                                    @if(($book->condition ?? 'new') === 'preloved')
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200">
+                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                            </svg>
+                                            Preloved
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                            New
+                                        </span>
+                                    @endif
+                                </dd>
                             </div>
                             <div class="border-b border-gray-100 pb-3">
                                 <dt class="text-sm font-medium text-slate-500">Genre</dt>

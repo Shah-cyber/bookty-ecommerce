@@ -22,7 +22,8 @@ class Book extends Model
         'cost_price',
         'stock', 
         'cover_image', 
-        'genre_id'
+        'genre_id',
+        'condition'
     ];
     
     public function genre(): BelongsTo
@@ -243,5 +244,39 @@ class Book extends Model
     public function hasCostData(): bool
     {
         return !is_null($this->cost_price) && $this->cost_price > 0;
+    }
+    
+    /**
+     * Check if the book is new.
+     * 
+     * @return bool
+     */
+    public function isNew(): bool
+    {
+        return $this->condition === 'new';
+    }
+    
+    /**
+     * Check if the book is preloved.
+     * 
+     * @return bool
+     */
+    public function isPreloved(): bool
+    {
+        return $this->condition === 'preloved';
+    }
+    
+    /**
+     * Get the condition label for display.
+     * 
+     * @return string
+     */
+    public function getConditionLabelAttribute(): string
+    {
+        return match($this->condition) {
+            'new' => 'New',
+            'preloved' => 'Preloved',
+            default => ucfirst($this->condition ?? 'New')
+        };
     }
 }

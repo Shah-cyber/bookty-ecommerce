@@ -18,33 +18,50 @@ class RecommendationService
     {
         $cacheKey = "reco:user:{$user->id}:v1:{$limit}";
 
-        return Cache::remember($cacheKey, now()->addMinutes(30), function () use ($user, $limit) {
-            $contentScores = $this->contentBasedScores($user);
-            $collabScores = $this->collaborativeScores($user);
+        // Use cache tags if available for easier cache clearing
+        try {
+            $cache = Cache::tags(['recommendations', "user:{$user->id}"]);
+            return $cache->remember($cacheKey, now()->addMinutes(30), function () use ($user, $limit) {
+                return $this->generateRecommendations($user, $limit);
+            });
+        } catch (\Exception $e) {
+            // Fallback to regular cache if tags not supported
+            return Cache::remember($cacheKey, now()->addMinutes(30), function () use ($user, $limit) {
+                return $this->generateRecommendations($user, $limit);
+            });
+        }
+    }
+    
+    /**
+     * Generate recommendations without caching (internal method).
+     */
+    private function generateRecommendations(User $user, int $limit): Collection
+    {
+        $contentScores = $this->contentBasedScores($user);
+        $collabScores = $this->collaborativeScores($user);
 
-            // Weighted fusion: content 0.6, collaborative 0.4
-            $scores = [];
-            foreach ($contentScores as $bookId => $score) {
-                $scores[$bookId] = ($scores[$bookId] ?? 0) + (0.6 * $score);
-            }
-            foreach ($collabScores as $bookId => $score) {
-                $scores[$bookId] = ($scores[$bookId] ?? 0) + (0.4 * $score);
-            }
+        // Weighted fusion: content 0.6, collaborative 0.4
+        $scores = [];
+        foreach ($contentScores as $bookId => $score) {
+            $scores[$bookId] = ($scores[$bookId] ?? 0) + (0.6 * $score);
+        }
+        foreach ($collabScores as $bookId => $score) {
+            $scores[$bookId] = ($scores[$bookId] ?? 0) + (0.4 * $score);
+        }
 
-            // Fetch books and attach total score
-            $bookIds = array_keys($scores);
-            $books = Book::with(['genre', 'tropes'])
-                ->whereIn('id', $bookIds)
-                ->get()
-                ->map(function (Book $book) use ($scores) {
-                    $book->score = round($scores[$book->id] ?? 0, 4);
-                    return $book;
-                })
-                ->sortByDesc('score')
-                ->values();
+        // Fetch books and attach total score
+        $bookIds = array_keys($scores);
+        $books = Book::with(['genre', 'tropes'])
+            ->whereIn('id', $bookIds)
+            ->get()
+            ->map(function (Book $book) use ($scores) {
+                $book->score = round($scores[$book->id] ?? 0, 4);
+                return $book;
+            })
+            ->sortByDesc('score')
+            ->values();
 
-            return $books->take($limit);
-        });
+        return $books->take($limit);
     }
 
     /**
@@ -170,43 +187,61 @@ class RecommendationService
     public function similarToBook(Book $book, int $limit = 8): Collection
     {
         $cacheKey = "reco:similar:{$book->id}:v1:{$limit}";
-        return Cache::remember($cacheKey, now()->addMinutes(30), function () use ($book, $limit) {
-            $candidates = Book::with(['genre', 'tropes'])
-                ->where('id', '!=', $book->id)
-                ->where('stock', '>', 0)
-                ->get();
+        
+        // Use cache tags if available for easier cache clearing
+        try {
+            $cache = Cache::tags(['recommendations', "book:{$book->id}"]);
+            return $cache->remember($cacheKey, now()->addMinutes(30), function () use ($book, $limit) {
+                return $this->generateSimilarBooks($book, $limit);
+            });
+        } catch (\Exception $e) {
+            // Fallback to regular cache if tags not supported
+            return Cache::remember($cacheKey, now()->addMinutes(30), function () use ($book, $limit) {
+                return $this->generateSimilarBooks($book, $limit);
+            });
+        }
+    }
+    
+    /**
+     * Generate similar books without caching (internal method).
+     */
+    private function generateSimilarBooks(Book $book, int $limit): Collection
+    {
+        $candidates = Book::with(['genre', 'tropes'])
+            ->where('id', '!=', $book->id)
+            ->where('stock', '>', 0)
+            ->get();
 
-            $scores = [];
-            foreach ($candidates as $cand) {
-                $score = 0.0;
-                if ($book->genre && $cand->genre && $book->genre->id === $cand->genre->id) {
-                    $score += 1.0;
-                }
-                $bookTropeIds = $book->tropes->pluck('id')->all();
-                $candTropeIds = $cand->tropes->pluck('id')->all();
-                $overlap = count(array_intersect($bookTropeIds, $candTropeIds));
-                $score += 0.4 * $overlap;
-                if (!empty($book->author) && $book->author === $cand->author) {
-                    $score += 0.3;
-                }
-                if ($score > 0) {
-                    $scores[$cand->id] = $score;
-                }
+        $scores = [];
+        foreach ($candidates as $cand) {
+            $score = 0.0;
+            if ($book->genre && $cand->genre && $book->genre->id === $cand->genre->id) {
+                $score += 1.0;
             }
+            $bookTropeIds = $book->tropes->pluck('id')->all();
+            $candTropeIds = $cand->tropes->pluck('id')->all();
+            $overlap = count(array_intersect($bookTropeIds, $candTropeIds));
+            $score += 0.4 * $overlap;
+            if (!empty($book->author) && $book->author === $cand->author) {
+                $score += 0.3;
+            }
+            if ($score > 0) {
+                $scores[$cand->id] = $score;
+            }
+        }
 
-            $normalized = $this->normalizeVector($scores);
-            $books = Book::with(['genre', 'tropes'])
-                ->whereIn('id', array_keys($normalized))
-                ->get()
-                ->map(function (Book $b) use ($normalized) {
-                    $b->score = round($normalized[$b->id] ?? 0, 4);
-                    return $b;
-                })
-                ->sortByDesc('score')
-                ->values();
+        $normalized = $this->normalizeVector($scores);
+        $books = Book::with(['genre', 'tropes'])
+            ->whereIn('id', array_keys($normalized))
+            ->get()
+            ->map(function (Book $b) use ($normalized) {
+                $b->score = round($normalized[$b->id] ?? 0, 4);
+                return $b;
+            })
+            ->sortByDesc('score')
+            ->values();
 
-            return $books->take($limit);
-        });
+        return $books->take($limit);
     }
 
     /** @return int[] */
