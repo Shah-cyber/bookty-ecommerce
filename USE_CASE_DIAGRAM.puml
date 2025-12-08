@@ -1,0 +1,182 @@
+@startuml Bookty E-Commerce Use Case Diagram
+
+!define RECTANGLE class
+
+' Actors
+actor Guest as guest
+actor Customer as customer
+actor Admin as admin
+actor SuperAdmin as superadmin
+actor "Payment Gateway\n(ToyyibPay)" as payment
+
+' System Boundary
+rectangle "Bookty E-Commerce System" {
+  
+  ' Guest Use Cases
+  package "Guest Use Cases" {
+    usecase UC1 as "Browse Books"
+    usecase UC2 as "View Book Details"
+    usecase UC3 as "Search Books"
+    usecase UC4 as "Filter Books"
+    usecase UC5 as "View About Page"
+    usecase UC6 as "Register Account"
+    usecase UC7 as "Login"
+    usecase UC8 as "Google OAuth Login"
+  }
+  
+  ' Customer Use Cases
+  package "Customer Use Cases" {
+    usecase UC9 as "Manage Profile"
+    usecase UC10 as "Add to Cart"
+    usecase UC11 as "Update Cart"
+    usecase UC12 as "Remove from Cart"
+    usecase UC13 as "View Cart"
+    usecase UC14 as "Add to Wishlist"
+    usecase UC15 as "Remove from Wishlist"
+    usecase UC16 as "View Wishlist"
+    usecase UC17 as "Checkout"
+    usecase UC18 as "Apply Coupon"
+    usecase UC19 as "Calculate Shipping"
+    usecase UC20 as "View Order History"
+    usecase UC21 as "View Order Details"
+    usecase UC22 as "Download Invoice"
+    usecase UC23 as "Write Review"
+    usecase UC24 as "Upload Review Images"
+    usecase UC25 as "Mark Review as Helpful"
+    usecase UC26 as "Report Review"
+    usecase UC27 as "View Recommendations"
+    usecase UC28 as "Process Payment"
+  }
+  
+  ' Admin Use Cases
+  package "Admin Use Cases" {
+    usecase UC29 as "View Dashboard"
+    usecase UC30 as "Manage Books"
+    usecase UC31 as "Manage Genres"
+    usecase UC32 as "Manage Tropes"
+    usecase UC33 as "Manage Orders"
+    usecase UC34 as "Update Order Status"
+    usecase UC35 as "View Customers"
+    usecase UC36 as "Manage Discounts"
+    usecase UC37 as "Manage Coupons"
+    usecase UC38 as "Manage Flash Sales"
+    usecase UC39 as "View Sales Reports"
+    usecase UC40 as "View Customer Reports"
+    usecase UC41 as "View Inventory Reports"
+    usecase UC42 as "View Promotion Reports"
+    usecase UC43 as "View Shipping Reports"
+    usecase UC44 as "View Profitability Reports"
+    usecase UC45 as "Export Reports"
+    usecase UC46 as "Manage Review Reports"
+    usecase UC47 as "View Review Analytics"
+    usecase UC48 as "Manage Postage Rates"
+    usecase UC49 as "View Recommendation Analytics"
+    usecase UC50 as "Manage System Settings"
+  }
+  
+  ' SuperAdmin Use Cases
+  package "SuperAdmin Use Cases" {
+    usecase UC51 as "Manage Admins"
+    usecase UC52 as "Manage Roles"
+    usecase UC53 as "Manage Permissions"
+    usecase UC54 as "View System Health"
+    usecase UC55 as "Configure System Settings"
+  }
+  
+  ' Payment Gateway Use Cases
+  package "Payment Gateway Use Cases" {
+    usecase UC56 as "Process Payment Callback"
+    usecase UC57 as "Return Payment Status"
+  }
+}
+
+' Guest Relationships
+guest --> UC1
+guest --> UC2
+guest --> UC3
+guest --> UC4
+guest --> UC5
+guest --> UC6
+guest --> UC7
+guest --> UC8
+
+' Customer Relationships (inherits Guest)
+customer --> UC1
+customer --> UC2
+customer --> UC3
+customer --> UC4
+customer --> UC5
+customer --> UC9
+customer --> UC10
+customer --> UC11
+customer --> UC12
+customer --> UC13
+customer --> UC14
+customer --> UC15
+customer --> UC16
+customer --> UC17
+customer --> UC18
+customer --> UC19
+customer --> UC20
+customer --> UC21
+customer --> UC22
+customer --> UC23
+customer --> UC24
+customer --> UC25
+customer --> UC26
+customer --> UC27
+customer --> UC28
+
+' Admin Relationships (inherits Customer)
+admin --> UC29
+admin --> UC30
+admin --> UC31
+admin --> UC32
+admin --> UC33
+admin --> UC34
+admin --> UC35
+admin --> UC36
+admin --> UC37
+admin --> UC38
+admin --> UC39
+admin --> UC40
+admin --> UC41
+admin --> UC42
+admin --> UC43
+admin --> UC44
+admin --> UC45
+admin --> UC46
+admin --> UC47
+admin --> UC48
+admin --> UC49
+admin --> UC50
+
+' SuperAdmin Relationships (inherits Admin)
+superadmin --> UC51
+superadmin --> UC52
+superadmin --> UC53
+superadmin --> UC54
+superadmin --> UC55
+
+' Payment Gateway Relationships
+payment --> UC56
+payment --> UC57
+
+' Use Case Relationships
+UC17 ..> UC18 : <<include>>
+UC17 ..> UC19 : <<include>>
+UC17 ..> UC28 : <<include>>
+UC28 ..> UC56 : <<include>>
+UC23 ..> UC24 : <<include>>
+UC30 ..> UC31 : <<extend>>
+UC30 ..> UC32 : <<extend>>
+UC33 ..> UC34 : <<extend>>
+UC39 ..> UC45 : <<extend>>
+UC40 ..> UC45 : <<extend>>
+UC41 ..> UC45 : <<extend>>
+UC42 ..> UC45 : <<extend>>
+UC43 ..> UC45 : <<extend>>
+UC44 ..> UC45 : <<extend>>
+
+@enduml
+

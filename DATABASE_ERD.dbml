@@ -1,0 +1,368 @@
+// Bookty E-Commerce Database ERD
+// Compatible with dbdiagram.io
+// Import this file at https://dbdiagram.io/
+
+// ============================================
+// CORE ENTITIES
+// ============================================
+
+Table users {
+  id bigint [pk, increment]
+  name string
+  email string [unique]
+  email_verified_at timestamp [null]
+  password string
+  phone_number string [null]
+  age integer [null]
+  address_line1 string [null]
+  address_line2 string [null]
+  city string [null]
+  state string [null]
+  postal_code string [null]
+  country string [null]
+  remember_token string [null]
+  created_at timestamp
+  updated_at timestamp
+  
+  Note: 'User accounts (customers, admins)'
+}
+
+Table genres {
+  id bigint [pk, increment]
+  name string
+  slug string [unique]
+  description text [null]
+  created_at timestamp
+  updated_at timestamp
+  
+  Note: 'Book genres/categories'
+}
+
+Table tropes {
+  id bigint [pk, increment]
+  name string
+  slug string [unique]
+  description text [null]
+  created_at timestamp
+  updated_at timestamp
+  
+  Note: 'Story tropes/themes'
+}
+
+Table books {
+  id bigint [pk, increment]
+  title string
+  slug string [unique]
+  author string
+  synopsis text [null]
+  price decimal(10,2)
+  cost_price decimal(10,2) [null]
+  stock integer [default: 0]
+  cover_image string [null]
+  genre_id bigint [ref: > genres.id]
+  created_at timestamp
+  updated_at timestamp
+  
+  Note: 'Product catalog'
+}
+
+// ============================================
+// PIVOT TABLES
+// ============================================
+
+Table book_trope {
+  id bigint [pk, increment]
+  book_id bigint [ref: > books.id, note: 'CASCADE DELETE']
+  trope_id bigint [ref: > tropes.id, note: 'CASCADE DELETE']
+  created_at timestamp
+  updated_at timestamp
+  
+  indexes {
+    (book_id, trope_id) [unique]
+  }
+  
+  Note: 'Many-to-many: Books ↔ Tropes'
+}
+
+// ============================================
+// SHOPPING ENTITIES
+// ============================================
+
+Table carts {
+  id bigint [pk, increment]
+  user_id bigint [ref: - users.id, unique]
+  created_at timestamp
+  updated_at timestamp
+  
+  Note: 'Shopping carts (one per user)'
+}
+
+Table cart_items {
+  id bigint [pk, increment]
+  cart_id bigint [ref: > carts.id, note: 'CASCADE DELETE']
+  book_id bigint [ref: > books.id, note: 'CASCADE DELETE']
+  quantity integer
+  created_at timestamp
+  updated_at timestamp
+  
+  Note: 'Items in shopping carts'
+}
+
+Table orders {
+  id bigint [pk, increment]
+  user_id bigint [ref: > users.id]
+  public_id string [unique]
+  total_amount decimal(10,2)
+  status enum('pending', 'processing', 'shipped', 'completed', 'cancelled')
+  payment_status enum('pending', 'paid', 'failed', 'refunded')
+  shipping_address string
+  shipping_city string
+  shipping_state string
+  shipping_region enum('sm', 'sabah', 'sarawak', 'labuan') [null]
+  shipping_customer_price decimal(10,2) [default: 0, note: 'Denormalized from postage_rates']
+  shipping_actual_cost decimal(10,2) [default: 0, note: 'Denormalized from postage_rates']
+  is_free_shipping boolean [default: false]
+  shipping_postal_code string
+  shipping_phone string
+  admin_notes text [null]
+  tracking_number string [null]
+  coupon_id bigint [ref: > coupons.id, null]
+  discount_amount decimal(10,2) [default: 0]
+  coupon_code string [null, note: 'Denormalized']
+  toyyibpay_bill_code string [null]
+  toyyibpay_payment_url string [null]
+  toyyibpay_invoice_no string [null]
+  toyyibpay_payment_date datetime [null]
+  toyyibpay_settlement_reference string [null]
+  toyyibpay_settlement_date datetime [null]
+  created_at timestamp
+  updated_at timestamp
+  
+  Note: 'Customer orders'
+}
+
+Table order_items {
+  id bigint [pk, increment]
+  order_id bigint [ref: > orders.id, note: 'CASCADE DELETE']
+  book_id bigint [ref: > books.id]
+  quantity integer
+  price decimal(10,2) [note: 'Denormalized from books.price']
+  cost_price decimal(10,2) [null, note: 'Denormalized from books.cost_price']
+  total_selling decimal(10,2)
+  total_cost decimal(10,2) [null]
+  created_at timestamp
+  updated_at timestamp
+  
+  Note: 'Order line items (prices denormalized for historical accuracy)'
+}
+
+Table wishlists {
+  id bigint [pk, increment]
+  user_id bigint [ref: > users.id, note: 'CASCADE DELETE']
+  book_id bigint [ref: > books.id, note: 'CASCADE DELETE']
+  created_at timestamp
+  updated_at timestamp
+  
+  indexes {
+    (user_id, book_id) [unique]
+  }
+  
+  Note: 'User wishlists (many-to-many: Users ↔ Books)'
+}
+
+// ============================================
+// PROMOTION ENTITIES
+// ============================================
+
+Table coupons {
+  id bigint [pk, increment]
+  code string [unique]
+  description text [null]
+  discount_type enum('fixed', 'percentage')
+  discount_value decimal(10,2)
+  min_purchase_amount decimal(10,2) [null]
+  max_uses_per_user integer [null]
+  max_uses_total integer [null]
+  starts_at datetime [null]
+  expires_at datetime [null]
+  is_active boolean [default: true]
+  free_shipping boolean [default: false]
+  created_at timestamp
+  updated_at timestamp
+  
+  Note: 'Discount coupons'
+}
+
+Table coupon_usages {
+  id bigint [pk, increment]
+  coupon_id bigint [ref: > coupons.id]
+  user_id bigint [ref: > users.id]
+  order_id bigint [ref: > orders.id]
+  discount_amount decimal(10,2)
+  created_at timestamp
+  updated_at timestamp
+  
+  Note: 'Coupon usage tracking'
+}
+
+Table book_discounts {
+  id bigint [pk, increment]
+  book_id bigint [ref: > books.id, unique]
+  discount_amount decimal(10,2) [null]
+  discount_percent decimal(5,2) [null]
+  starts_at datetime [null]
+  ends_at datetime [null]
+  is_active boolean [default: true]
+  description text [null]
+  free_shipping boolean [default: false]
+  created_at timestamp
+  updated_at timestamp
+  
+  Note: 'Individual book discounts (one per book)'
+}
+
+Table flash_sales {
+  id bigint [pk, increment]
+  name string
+  description text [null]
+  starts_at datetime
+  ends_at datetime
+  discount_type enum('fixed', 'percentage')
+  discount_value decimal(10,2)
+  free_shipping boolean [default: false]
+  is_active boolean [default: true]
+  created_at timestamp
+  updated_at timestamp
+  
+  Note: 'Time-limited sales events'
+}
+
+Table flash_sale_items {
+  id bigint [pk, increment]
+  flash_sale_id bigint [ref: > flash_sales.id, note: 'CASCADE DELETE']
+  book_id bigint [ref: > books.id, note: 'CASCADE DELETE']
+  special_price decimal(10,2) [null, note: 'Override price for this sale']
+  created_at timestamp
+  updated_at timestamp
+  
+  indexes {
+    (flash_sale_id, book_id) [unique]
+  }
+  
+  Note: 'Books in flash sales (pivot table with special_price)'
+}
+
+// ============================================
+// REVIEW ENTITIES
+// ============================================
+
+Table reviews {
+  id bigint [pk, increment]
+  user_id bigint [ref: > users.id]
+  book_id bigint [ref: > books.id]
+  order_item_id bigint [ref: > order_items.id, null, unique, note: 'Optional link to order item']
+  rating integer [note: '1-5 stars']
+  comment text [null]
+  images json [null, note: 'Array of image paths']
+  is_approved boolean [default: false]
+  created_at timestamp
+  updated_at timestamp
+  
+  Note: 'Product reviews'
+}
+
+Table review_helpfuls {
+  id bigint [pk, increment]
+  review_id bigint [ref: > reviews.id]
+  user_id bigint [ref: > users.id]
+  created_at timestamp
+  updated_at timestamp
+  
+  Note: 'Helpful votes on reviews'
+}
+
+Table review_reports {
+  id bigint [pk, increment]
+  review_id bigint [ref: > reviews.id]
+  user_id bigint [ref: > users.id, note: 'Reporter']
+  admin_id bigint [ref: > users.id, null, note: 'Admin reviewer']
+  reason string
+  description text [null]
+  status enum('pending', 'reviewed', 'resolved', 'dismissed')
+  admin_notes text [null]
+  reviewed_at datetime [null]
+  created_at timestamp
+  updated_at timestamp
+  
+  Note: 'Review moderation/reports'
+}
+
+// ============================================
+// SYSTEM ENTITIES
+// ============================================
+
+Table postage_rates {
+  id bigint [pk, increment]
+  region enum('sm', 'sabah', 'sarawak') [note: 'Indexed']
+  customer_price decimal(10,2)
+  actual_cost decimal(10,2)
+  created_at timestamp
+  updated_at timestamp
+  
+  Note: 'Shipping rates by region (values denormalized into orders)'
+}
+
+Table settings {
+  id bigint [pk, increment]
+  key string [unique]
+  value text
+  group string [null]
+  created_at timestamp
+  updated_at timestamp
+  
+  Note: 'System configuration (key-value store)'
+}
+
+// ============================================
+// RELATIONSHIP NOTES
+// ============================================
+
+// Users Relationships
+// - hasMany orders
+// - hasOne cart
+// - hasMany reviews
+// - hasMany wishlists
+// - hasMany review_helpfuls
+// - hasMany review_reports (as reporter)
+// - hasMany review_reports (as admin reviewer)
+// - hasMany coupon_usages
+
+// Books Relationships
+// - belongsTo genre
+// - belongsToMany tropes (via book_trope)
+// - hasMany cart_items
+// - hasMany order_items
+// - hasMany reviews
+// - hasMany wishlists
+// - hasOne book_discounts
+// - belongsToMany flash_sales (via flash_sale_items)
+
+// Orders Relationships
+// - belongsTo user
+// - hasMany order_items
+// - belongsTo coupon (optional)
+// - hasMany coupon_usages
+
+// Reviews Relationships
+// - belongsTo user
+// - belongsTo book
+// - belongsTo order_item (optional)
+// - hasMany review_helpfuls
+// - hasMany review_reports
+
+// Denormalization Notes:
+// - orders.shipping_customer_price and shipping_actual_cost are copied from postage_rates
+// - order_items.price and cost_price are copied from books at time of order
+// - orders.coupon_code is denormalized from coupons.code
+// This ensures historical accuracy even if rates/prices change
+

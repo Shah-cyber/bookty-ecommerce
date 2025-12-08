@@ -1,0 +1,356 @@
+BOOKTY E-COMMERCE - VISUAL ERD GUIDE
+=====================================
+
+This file provides a text-based visual representation of the database ERD.
+You can use this to recreate the diagram in tools like:
+- draw.io (diagrams.net)
+- Lucidchart
+- dbdiagram.io
+- MySQL Workbench
+- Visual Paradigm
+
+=====================================
+ENTITY POSITIONING GUIDE
+=====================================
+
+TOP ROW (User & Authentication):
+[users] ────────────────
+
+SECOND ROW (Product Catalog):
+[genres] ──→ [books] ←── [tropes]
+              ↓
+         [book_trope] (pivot)
+
+THIRD ROW (Shopping):
+[carts] ──→ [cart_items] ──→ [books]
+[orders] ──→ [order_items] ──→ [books]
+[wishlists] ──→ [books] ←── [users]
+
+FOURTH ROW (Promotions):
+[coupons] ──→ [coupon_usages] ──→ [orders]
+[book_discounts] ──→ [books]
+[flash_sales] ──→ [flash_sale_items] ──→ [books]
+
+FIFTH ROW (Reviews):
+[reviews] ←── [users]
+[reviews] ←── [books]
+[reviews] ←── [order_items]
+[reviews] ──→ [review_helpfuls] ←── [users]
+[reviews] ──→ [review_reports] ←── [users]
+
+BOTTOM ROW (System):
+[postage_rates] (standalone, referenced by orders)
+[settings] (standalone)
+
+=====================================
+RELATIONSHIP DETAILS
+=====================================
+
+USERS
+├── hasMany → orders (user_id)
+├── hasOne → carts (user_id)
+├── hasMany → reviews (user_id)
+├── hasMany → wishlists (user_id)
+├── hasMany → review_helpfuls (user_id)
+├── hasMany → review_reports (user_id, as reporter)
+├── hasMany → review_reports (admin_id, as reviewer)
+└── hasMany → coupon_usages (user_id)
+
+GENRES
+└── hasMany → books (genre_id)
+
+TROPES
+└── belongsToMany → books (via book_trope pivot)
+
+BOOKS
+├── belongsTo → genres (genre_id)
+├── belongsToMany → tropes (via book_trope)
+├── hasMany → cart_items (book_id)
+├── hasMany → order_items (book_id)
+├── hasMany → reviews (book_id)
+├── hasMany → wishlists (book_id)
+├── hasOne → book_discounts (book_id)
+└── belongsToMany → flash_sales (via flash_sale_items)
+
+CARTS
+├── belongsTo → users (user_id)
+└── hasMany → cart_items (cart_id)
+
+CART_ITEMS
+├── belongsTo → carts (cart_id)
+└── belongsTo → books (book_id)
+
+ORDERS
+├── belongsTo → users (user_id)
+├── hasMany → order_items (order_id)
+├── belongsTo → coupons (coupon_id, nullable)
+└── hasMany → coupon_usages (order_id)
+
+ORDER_ITEMS
+├── belongsTo → orders (order_id)
+├── belongsTo → books (book_id)
+└── hasOne → reviews (order_item_id, nullable)
+
+WISHLISTS
+├── belongsTo → users (user_id)
+└── belongsTo → books (book_id)
+Unique: (user_id, book_id)
+
+COUPONS
+├── hasMany → orders (coupon_id)
+└── hasMany → coupon_usages (coupon_id)
+
+COUPON_USAGES
+├── belongsTo → coupons (coupon_id)
+├── belongsTo → users (user_id)
+└── belongsTo → orders (order_id)
+
+BOOK_DISCOUNTS
+└── belongsTo → books (book_id)
+
+FLASH_SALES
+└── hasMany → flash_sale_items (flash_sale_id)
+
+FLASH_SALE_ITEMS
+├── belongsTo → flash_sales (flash_sale_id)
+└── belongsTo → books (book_id)
+Unique: (flash_sale_id, book_id)
+
+REVIEWS
+├── belongsTo → users (user_id)
+├── belongsTo → books (book_id)
+├── belongsTo → order_items (order_item_id, nullable)
+├── hasMany → review_helpfuls (review_id)
+└── hasMany → review_reports (review_id)
+
+REVIEW_HELPFULS
+├── belongsTo → reviews (review_id)
+└── belongsTo → users (user_id)
+
+REVIEW_REPORTS
+├── belongsTo → reviews (review_id)
+├── belongsTo → users (user_id, as reporter)
+└── belongsTo → users (admin_id, as reviewer, nullable)
+
+POSTAGE_RATES
+└── (No direct relationship - values denormalized into orders)
+
+SETTINGS
+└── (Standalone configuration table)
+
+=====================================
+COLOR CODING SUGGESTION
+=====================================
+
+For visual diagrams, use these colors:
+
+🔵 BLUE - Core Entities
+   - users, genres, tropes, books
+
+🟢 GREEN - Shopping Entities
+   - carts, cart_items, orders, order_items, wishlists
+
+🟡 YELLOW - Promotion Entities
+   - coupons, coupon_usages, book_discounts, flash_sales, flash_sale_items
+
+🟣 PURPLE - Review Entities
+   - reviews, review_helpfuls, review_reports
+
+⚪ GRAY - System Entities
+   - postage_rates, settings
+
+🟠 ORANGE - Pivot Tables
+   - book_trope, flash_sale_items (also acts as pivot)
+
+=====================================
+KEY ATTRIBUTES TO DISPLAY
+=====================================
+
+USERS
+- id (PK)
+- name, email
+- phone_number, address fields
+
+GENRES
+- id (PK)
+- name, slug
+
+TROPES
+- id (PK)
+- name, slug
+
+BOOKS
+- id (PK)
+- title, author, price, stock
+- genre_id (FK)
+
+CARTS
+- id (PK)
+- user_id (FK, unique)
+
+CART_ITEMS
+- id (PK)
+- cart_id (FK)
+- book_id (FK)
+- quantity
+
+ORDERS
+- id (PK)
+- user_id (FK)
+- public_id (unique)
+- total_amount
+- status, payment_status
+- shipping fields
+- coupon_id (FK, nullable)
+
+ORDER_ITEMS
+- id (PK)
+- order_id (FK)
+- book_id (FK)
+- quantity, price, cost_price
+- total_selling, total_cost
+
+WISHLISTS
+- id (PK)
+- user_id (FK)
+- book_id (FK)
+- Unique: (user_id, book_id)
+
+COUPONS
+- id (PK)
+- code (unique)
+- discount_type, discount_value
+- starts_at, expires_at
+- is_active
+
+COUPON_USAGES
+- id (PK)
+- coupon_id (FK)
+- user_id (FK)
+- order_id (FK)
+- discount_amount
+
+BOOK_DISCOUNTS
+- id (PK)
+- book_id (FK, unique)
+- discount_amount, discount_percent
+- starts_at, ends_at
+- is_active
+
+FLASH_SALES
+- id (PK)
+- name
+- starts_at, ends_at
+- discount_type, discount_value
+- is_active
+
+FLASH_SALE_ITEMS
+- id (PK)
+- flash_sale_id (FK)
+- book_id (FK)
+- special_price
+- Unique: (flash_sale_id, book_id)
+
+REVIEWS
+- id (PK)
+- user_id (FK)
+- book_id (FK)
+- order_item_id (FK, nullable, unique)
+- rating, comment
+- images (json)
+- is_approved
+
+REVIEW_HELPFULS
+- id (PK)
+- review_id (FK)
+- user_id (FK)
+
+REVIEW_REPORTS
+- id (PK)
+- review_id (FK)
+- user_id (FK, reporter)
+- admin_id (FK, nullable, reviewer)
+- reason, status
+
+POSTAGE_RATES
+- id (PK)
+- region (enum)
+- customer_price
+- actual_cost
+
+SETTINGS
+- id (PK)
+- key (unique)
+- value
+- group
+
+=====================================
+NOTES FOR DIAGRAM CREATION
+=====================================
+
+1. Use CROWS FOOT notation:
+   - ||--o{ = One-to-Many
+   - ||--o| = One-to-One
+   - }o--o{ = Many-to-Many
+
+2. Show Foreign Keys:
+   - Draw lines from child to parent
+   - Label with FK name
+
+3. Show Unique Constraints:
+   - Mark with (U) or unique icon
+   - Important: wishlists, book_trope, flash_sale_items
+
+4. Show Optional Relationships:
+   - Use dashed lines for nullable FKs
+   - Examples: orders.coupon_id, reviews.order_item_id
+
+5. Denormalization Notes:
+   - Add note near orders: "Shipping prices denormalized from postage_rates"
+   - Add note near order_items: "Prices denormalized from books"
+
+6. Cascade Delete:
+   - Mark with (C) or cascade icon
+   - Examples: cart_items, order_items, wishlists
+
+=====================================
+SIMPLIFIED GROUPING
+=====================================
+
+GROUP 1: User & Authentication
+├── users
+└── (Spatie Permissions tables - not shown in detail)
+
+GROUP 2: Product Catalog
+├── genres
+├── tropes
+├── books
+└── book_trope (pivot)
+
+GROUP 3: Shopping
+├── carts
+├── cart_items
+├── orders
+├── order_items
+└── wishlists
+
+GROUP 4: Promotions
+├── coupons
+├── coupon_usages
+├── book_discounts
+├── flash_sales
+└── flash_sale_items
+
+GROUP 5: Reviews
+├── reviews
+├── review_helpfuls
+└── review_reports
+
+GROUP 6: System
+├── postage_rates
+└── settings
+
+=====================================
+END OF VISUAL GUIDE
+=====================================
+

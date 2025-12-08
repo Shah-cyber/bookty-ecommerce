@@ -169,6 +169,38 @@ class CheckoutController extends Controller
                     'toyyibpay_payment_url' => $paymentResult['payment_url'],
                 ]);
 
+                // 6.5. SUCCESS: Auto-save shipping info to user profile if profile is incomplete
+                // This improves UX by automatically filling profile from checkout data
+                /** @var \App\Models\User $user */
+                $user = Auth::user();
+                $profileUpdated = false;
+                
+                // Only update if the field is empty (don't overwrite existing data)
+                if (empty($user->address_line1) && !empty($request->shipping_address)) {
+                    $user->address_line1 = $request->shipping_address;
+                    $profileUpdated = true;
+                }
+                if (empty($user->city) && !empty($request->shipping_city)) {
+                    $user->city = $request->shipping_city;
+                    $profileUpdated = true;
+                }
+                if (empty($user->state) && !empty($request->shipping_state)) {
+                    $user->state = $request->shipping_state;
+                    $profileUpdated = true;
+                }
+                if (empty($user->postal_code) && !empty($request->shipping_postal_code)) {
+                    $user->postal_code = $request->shipping_postal_code;
+                    $profileUpdated = true;
+                }
+                if (empty($user->phone_number) && !empty($request->shipping_phone)) {
+                    $user->phone_number = $request->shipping_phone;
+                    $profileUpdated = true;
+                }
+                
+                if ($profileUpdated) {
+                    $user->save();
+                }
+
                 // 7. SUCCESS: Clear the cart
                 $cart->items()->delete();
                 
