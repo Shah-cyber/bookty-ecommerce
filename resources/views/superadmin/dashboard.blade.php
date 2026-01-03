@@ -3,6 +3,128 @@
 @section('header', 'SuperAdmin Dashboard')
 
 @section('content')
+    <!-- SuperAdmin Dashboard Skeleton Loader -->
+    <div id="superadmin-dashboard-skeleton" class="animate-pulse space-y-8">
+        <!-- Skeleton: Welcome Section -->
+        <div class="mb-8">
+            <div class="bg-gradient-to-r from-bookty-purple-600 to-bookty-pink-600 rounded-2xl p-8 text-white shadow-xl">
+                <div class="flex items-center justify-between">
+                    <div class="space-y-3">
+                        <div class="h-7 w-64 bg-white/30 rounded-full"></div>
+                        <div class="h-4 w-80 bg-white/20 rounded-full"></div>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-sm">
+                            <div class="w-20 h-20 bg-white/30 rounded-full"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Skeleton: Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+            @for ($i = 0; $i < 4; $i++)
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <div class="p-4 bg-gradient-to-br from-gray-200 to-gray-300">
+                        <div class="flex items-center justify-between">
+                            <div class="p-3 bg-white/40 rounded-xl">
+                                <div class="w-8 h-8 bg-gray-200 rounded-lg"></div>
+                            </div>
+                            <div class="text-right space-y-2">
+                                <div class="h-3 w-20 bg-white/70 rounded-full"></div>
+                                <div class="h-6 w-16 bg-white/90 rounded-md"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-gray-50">
+                        <div class="h-3 w-32 bg-gray-200 rounded-full"></div>
+                    </div>
+                </div>
+            @endfor
+        </div>
+
+        <!-- Skeleton: Order & Registrations -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Order Statistics Skeleton -->
+            <div class="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="space-y-2">
+                        <div class="h-4 w-40 bg-gray-200 rounded-full"></div>
+                        <div class="h-3 w-48 bg-gray-200 rounded-full"></div>
+                    </div>
+                    <div class="p-3 bg-blue-50 rounded-xl">
+                        <div class="w-6 h-6 bg-blue-100 rounded-lg"></div>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    @for ($i = 0; $i < 5; $i++)
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-3 h-3 bg-gray-300 rounded-full"></div>
+                                <div class="h-3 w-28 bg-gray-200 rounded-full"></div>
+                            </div>
+                            <div class="h-5 w-10 bg-gray-200 rounded-md"></div>
+                        </div>
+                    @endfor
+                </div>
+            </div>
+
+            <!-- User Registration Chart Skeleton -->
+            <div class="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 relative overflow-hidden">
+                <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full opacity-60"></div>
+                <div class="relative space-y-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="space-y-2">
+                            <div class="h-4 w-40 bg-gray-200 rounded-full"></div>
+                            <div class="h-3 w-48 bg-gray-200 rounded-full"></div>
+                        </div>
+                        <div class="p-3 bg-gray-100 rounded-xl">
+                            <div class="w-6 h-6 bg-gray-200 rounded-lg"></div>
+                        </div>
+                    </div>
+                    <div class="h-80 w-full bg-gray-50 rounded-xl"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Skeleton: Recent Users -->
+        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+            <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-8 py-6 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <div class="space-y-2">
+                        <div class="h-4 w-40 bg-gray-200 rounded-full"></div>
+                        <div class="h-3 w-48 bg-gray-200 rounded-full"></div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <div class="p-2 bg-white rounded-lg shadow-sm">
+                            <div class="w-5 h-5 bg-gray-200 rounded-md"></div>
+                        </div>
+                        <div class="h-8 w-24 bg-bookty-purple-200 rounded-lg"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="divide-y divide-gray-100">
+                @for ($i = 0; $i < 4; $i++)
+                    <div class="px-8 py-6">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full"></div>
+                                <div class="space-y-2">
+                                    <div class="h-4 w-32 bg-gray-200 rounded-full"></div>
+                                    <div class="h-3 w-40 bg-gray-200 rounded-full"></div>
+                                </div>
+                            </div>
+                            <div class="h-3 w-24 bg-gray-200 rounded-full"></div>
+                        </div>
+                    </div>
+                @endfor
+            </div>
+        </div>
+    </div>
+
+    <!-- Real SuperAdmin Dashboard Content -->
+    <div id="superadmin-dashboard-content" class="hidden">
     <!-- Welcome Section -->
     <div class="mb-8">
         <div class="bg-gradient-to-r from-bookty-purple-600 to-bookty-pink-600 rounded-2xl p-8 text-white shadow-xl">
@@ -380,6 +502,22 @@
             @endif
         </div>
     </div>
+    </div> <!-- /#superadmin-dashboard-content -->
+
+    <!-- Skeleton Toggle Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var skeleton = document.getElementById('superadmin-dashboard-skeleton');
+            var content = document.getElementById('superadmin-dashboard-content');
+
+            if (!skeleton || !content) return;
+
+            setTimeout(function () {
+                skeleton.classList.add('hidden');
+                content.classList.remove('hidden');
+            }, 500);
+        });
+    </script>
 
     @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>

@@ -296,8 +296,13 @@
                 </a>
                 <a href="{{ route('admin.postage-rates.index') }}"
                     class="block py-2 text-sm rounded-lg transition-colors duration-200
-                          {{ request()->routeIs('admin.postage-rates.*') ? 'text-purple-600 dark:text-purple-400 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200' }}">
+                          {{ request()->routeIs('admin.postage-rates.index') || request()->routeIs('admin.postage-rates.edit') || request()->routeIs('admin.postage-rates.create') ? 'text-purple-600 dark:text-purple-400 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200' }}">
                     Postage Rates
+                </a>
+                <a href="{{ route('admin.postage-rates.all-history') }}"
+                    class="block py-2 text-sm rounded-lg transition-colors duration-200
+                          {{ request()->routeIs('admin.postage-rates.all-history') || request()->routeIs('admin.postage-rates.history') ? 'text-purple-600 dark:text-purple-400 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200' }}">
+                     Postage Rate History
                 </a>
             </div>
         </div>

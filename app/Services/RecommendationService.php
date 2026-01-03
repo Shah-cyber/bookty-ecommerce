@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Book;
 use App\Models\OrderItem;
 use App\Models\User;
+use App\Models\UserBookInteraction;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
@@ -40,6 +41,11 @@ class RecommendationService
         $contentScores = $this->contentBasedScores($user);
         $collabScores = $this->collaborativeScores($user);
 
+        // If user has no data at all (cold-start), use fallback
+        if (empty($contentScores) && empty($collabScores)) {
+            return $this->fallbackRecommendations($limit);
+        }
+
         // Weighted fusion: content 0.6, collaborative 0.4
         $scores = [];
         foreach ($contentScores as $bookId => $score) {
@@ -51,6 +57,10 @@ class RecommendationService
 
         // Fetch books and attach total score
         $bookIds = array_keys($scores);
+        if (empty($bookIds)) {
+            return $this->fallbackRecommendations($limit);
+        }
+
         $books = Book::with(['genre', 'tropes'])
             ->whereIn('id', $bookIds)
             ->get()
@@ -65,16 +75,61 @@ class RecommendationService
     }
 
     /**
+     * Fallback recommendations for cold-start users (no purchases, no interactions).
+     * Returns popular/trending books.
+     */
+    protected function fallbackRecommendations(int $limit): Collection
+    {
+        return Book::with(['genre', 'tropes'])
+            ->where('stock', '>', 0)
+            ->orderByDesc('reviews_count')
+            ->orderByDesc('created_at')
+            ->take($limit)
+            ->get()
+            ->each(function (Book $book) {
+                $book->score = 1.0; // Default score for fallback
+            });
+    }
+
+    /**
      * Content-based scoring using genres, tropes, author affinity.
+     * Now includes implicit feedback (views, clicks, cart) for cold-start users.
      * Returns [book_id => score].
      */
     protected function contentBasedScores(User $user): array
     {
-        // Build user preference profile
+        // Build user preference profile from multiple sources
         $purchasedBookIds = $this->getPurchasedBookIds($user);
         $wishlistBookIds = $user->wishlistBooks()->pluck('books.id')->all();
+        
+        // Get interactions (views, clicks, cart) - this helps cold-start users!
+        $interactions = UserBookInteraction::where('user_id', $user->id)
+            ->whereIn('action', ['view', 'click', 'cart', 'wishlist'])
+            ->get()
+            ->groupBy('book_id')
+            ->map(function ($group) {
+                // Aggregate weight: sum of (weight * count) for each interaction
+                return $group->sum(function ($interaction) {
+                    return $interaction->weight * $interaction->count;
+                });
+            })
+            ->toArray();
+        
+        $interactionBookIds = array_keys($interactions);
 
-        $baseBooks = Book::whereIn('id', array_unique(array_merge($purchasedBookIds, $wishlistBookIds)))
+        // Combine all book IDs that indicate user interest
+        $allInterestBookIds = array_unique(array_merge(
+            $purchasedBookIds,
+            $wishlistBookIds,
+            $interactionBookIds
+        ));
+
+        // If user has NO data at all (cold-start), return empty (fallback handled elsewhere)
+        if (empty($allInterestBookIds)) {
+            return [];
+        }
+
+        $baseBooks = Book::whereIn('id', $allInterestBookIds)
             ->with(['genre', 'tropes'])
             ->get();
 
@@ -83,16 +138,31 @@ class RecommendationService
         $authorWeights = [];
 
         foreach ($baseBooks as $book) {
-            // Higher weight for purchased vs wishlisted
-            $weight = in_array($book->id, $purchasedBookIds, true) ? 2.0 : 1.0;
-            if ($book->genre) {
-                $genreWeights[$book->genre->id] = ($genreWeights[$book->genre->id] ?? 0) + $weight;
+            // Determine weight based on action type
+            $weight = 0.0;
+            
+            if (in_array($book->id, $purchasedBookIds, true)) {
+                // Purchase: highest weight
+                $weight = 5.0;
+            } elseif (in_array($book->id, $wishlistBookIds, true)) {
+                // Wishlist: high weight
+                $weight = 3.0;
+            } elseif (isset($interactions[$book->id])) {
+                // Interactions: use aggregated weight (already includes count multiplier)
+                // Normalize interaction weight to be lower than wishlist but still meaningful
+                $weight = min($interactions[$book->id] * 0.3, 2.0); // Cap at 2.0
             }
-            foreach ($book->tropes as $trope) {
-                $tropeWeights[$trope->id] = ($tropeWeights[$trope->id] ?? 0) + ($weight * 0.7);
-            }
-            if (!empty($book->author)) {
-                $authorWeights[$book->author] = ($authorWeights[$book->author] ?? 0) + ($weight * 0.5);
+
+            if ($weight > 0) {
+                if ($book->genre) {
+                    $genreWeights[$book->genre->id] = ($genreWeights[$book->genre->id] ?? 0) + $weight;
+                }
+                foreach ($book->tropes as $trope) {
+                    $tropeWeights[$trope->id] = ($tropeWeights[$trope->id] ?? 0) + ($weight * 0.7);
+                }
+                if (!empty($book->author)) {
+                    $authorWeights[$book->author] = ($authorWeights[$book->author] ?? 0) + ($weight * 0.5);
+                }
             }
         }
 

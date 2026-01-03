@@ -121,6 +121,7 @@ class ToyyibPayService
     public function getBillTransactions($billCode, $status = null)
     {
         $data = [
+            'userSecretKey' => $this->userSecretKey,
             'billCode' => $billCode
         ];
 

@@ -6,6 +6,7 @@ use App\Models\Book;
 use App\Models\Genre;
 use App\Models\Trope;
 use App\Models\User;
+use App\Models\UserBookInteraction;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -105,6 +106,9 @@ class BookController extends Controller
             if ($canReview && !$hasReviewed) {
                 $orderItem = $user->getOrderItemForBookReview($book->id);
             }
+            
+            // Track 'view' interaction for recommendations
+            UserBookInteraction::record($user->id, $book->id, 'view');
         }
         
         // Calculate review statistics

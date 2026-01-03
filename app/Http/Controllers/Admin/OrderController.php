@@ -97,12 +97,27 @@ class OrderController extends Controller
             'tracking_number' => 'nullable|string|max:50',
         ]);
 
+        // Track 'purchase' interaction when order is marked as completed
+        $wasCompleted = $order->status === 'completed';
+        $isNowCompleted = $request->status === 'completed';
+        
         $order->update([
             'status' => $request->status,
             'payment_status' => $request->payment_status,
             'admin_notes' => $request->admin_notes,
             'tracking_number' => $request->tracking_number,
         ]);
+
+        // If order was just marked as completed, track purchase interactions
+        if (!$wasCompleted && $isNowCompleted) {
+            foreach ($order->items as $item) {
+                \App\Models\UserBookInteraction::record(
+                    $order->user_id,
+                    $item->book_id,
+                    'purchase'
+                );
+            }
+        }
 
         return redirect()->route('admin.orders.show', $order)
             ->with('success', "✅ Order #" . ($order->public_id ?? $order->id) . " has been updated successfully!");

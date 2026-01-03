@@ -4,6 +4,106 @@
 
 @section('content')
    
+    <!-- Dashboard Skeleton Loader -->
+    <div id="dashboard-skeleton" class="animate-pulse space-y-8">
+        <!-- Skeleton: Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+            @for ($i = 0; $i < 5; $i++)
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                    <div class="flex items-center justify-between">
+                        <div class="space-y-2">
+                            <div class="h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                            <div class="h-6 w-24 bg-gray-200 dark:bg-gray-700 rounded-md"></div>
+                        </div>
+                        <div class="h-10 w-10 rounded-xl bg-gray-200 dark:bg-gray-700"></div>
+                    </div>
+                </div>
+            @endfor
+        </div>
+
+        <!-- Skeleton: Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Recent Orders Skeleton -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                    <div class="h-3 w-16 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                </div>
+                <div class="space-y-4">
+                    @for ($i = 0; $i < 4; $i++)
+                        <div class="flex items-center justify-between">
+                            <div class="h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                            <div class="h-3 w-24 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                            <div class="h-3 w-16 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                        </div>
+                    @endfor
+                </div>
+            </div>
+
+            <!-- Top Selling Books Skeleton -->
+            <div class="w-full bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                <div class="flex justify-between items-start border-b border-gray-100 dark:border-gray-700 pb-4 mb-4">
+                    <div class="space-y-2">
+                        <div class="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                        <div class="h-3 w-40 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                    </div>
+                    <div class="h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl space-y-2">
+                        <div class="h-3 w-16 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                        <div class="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                    </div>
+                    <div class="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl space-y-2">
+                        <div class="h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded-full ml-auto"></div>
+                        <div class="h-5 w-16 bg-gray-200 dark:bg-gray-700 rounded-full ml-auto"></div>
+                    </div>
+                </div>
+                <div class="h-48 w-full bg-gray-100 dark:bg-gray-700 rounded-xl"></div>
+            </div>
+
+            <!-- Sales This Period Skeleton -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="space-y-2">
+                        <div class="h-6 w-28 bg-gray-200 dark:bg-gray-700 rounded-md"></div>
+                        <div class="h-3 w-32 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                    </div>
+                    <div class="h-6 w-24 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                </div>
+                <div class="h-40 w-full bg-gray-100 dark:bg-gray-700 rounded-xl mb-4"></div>
+                <div class="flex items-center justify-between">
+                    <div class="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                    <div class="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Skeleton: Low Stock Books -->
+        <div class="mt-8">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                    <div class="h-3 w-16 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                </div>
+                <div class="space-y-4">
+                    @for ($i = 0; $i < 4; $i++)
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="h-10 w-8 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                                <div class="h-3 w-32 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                            </div>
+                            <div class="h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                            <div class="h-3 w-12 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                        </div>
+                    @endfor
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Real Dashboard Content -->
+    <div id="dashboard-content" class="hidden">
 
     <!-- Stats Cards -->
     <!-- Stats Cards -->
@@ -325,6 +425,24 @@
             </div>
         </div>
     </div>
+
+    </div> <!-- /#dashboard-content -->
+
+    <!-- Skeleton Toggle Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var skeleton = document.getElementById('dashboard-skeleton');
+            var content = document.getElementById('dashboard-content');
+
+            if (!skeleton || !content) return;
+
+            // Small delay to show skeleton before revealing the real content
+            setTimeout(function () {
+                skeleton.classList.add('hidden');
+                content.classList.remove('hidden');
+            }, 500);
+        });
+    </script>
     
     <!-- ApexCharts: Top Selling Books Bar Chart -->
     <script>

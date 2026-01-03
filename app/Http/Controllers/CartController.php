@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\UserBookInteraction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -113,6 +114,9 @@ class CartController extends Controller
                 'book_id' => $book->id,
                 'quantity' => 1,
             ]);
+            
+            // Track 'cart' interaction for recommendations (only when first added)
+            UserBookInteraction::record(Auth::id(), $book->id, 'cart');
         }
         
         // Get updated cart count
