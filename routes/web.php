@@ -89,6 +89,22 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/wishlist/add/{book}', [WishlistController::class, 'add'])->name('wishlist.add');
     Route::delete('/wishlist/remove/{book}', [WishlistController::class, 'remove'])->name('wishlist.remove');
     Route::post('/wishlist/toggle/{book}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
+    
+    // Track user interactions for recommendations
+    Route::post('/api/track-interaction', function (\Illuminate\Http\Request $request) {
+        $request->validate([
+            'book_id' => 'required|integer|exists:books,id',
+            'action' => 'required|string|in:view,click,wishlist,cart,purchase'
+        ]);
+        
+        \App\Models\UserBookInteraction::record(
+            Auth::id(),
+            $request->book_id,
+            $request->action
+        );
+        
+        return response()->json(['success' => true]);
+    })->name('api.track-interaction');
 });
 
 // Admin routes (requires admin or superadmin role)
@@ -153,6 +169,11 @@ Route::middleware(['auth', 'role:admin,superadmin'])->prefix('admin')->name('adm
     });
 
     // Postage Rates management
+    Route::prefix('postage-rates')->name('postage-rates.')->group(function () {
+        Route::get('/history/all', [PostageRateController::class, 'allHistory'])->name('all-history');
+        Route::get('/history/{region}', [PostageRateController::class, 'history'])->name('history');
+        Route::get('/verify-integrity', [PostageRateController::class, 'verifyIntegrity'])->name('verify-integrity');
+    });
     Route::resource('postage-rates', PostageRateController::class)->except(['show']);
     
     // Recommendation Analytics

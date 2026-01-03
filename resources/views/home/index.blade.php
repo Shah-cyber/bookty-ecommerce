@@ -147,6 +147,106 @@
         }
     </style>
 
+    <!-- Homepage Skeleton Loader -->
+    <div id="home-skeleton" class="animate-pulse">
+        <div class="min-h-screen bg-[#FAF7F5]">
+            <!-- Hero Skeleton -->
+            <div class="relative min-h-screen bg-[#FAF7F5]">
+                <div class="container mx-auto px-4 sm:px-6 py-16 lg:py-24">
+                    <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+                        <!-- Left: Text skeleton -->
+                        <div class="flex-1 w-full lg:max-w-[45%] space-y-6">
+                            <div class="h-8 w-40 bg-white/80 rounded-full"></div>
+                            <div class="space-y-3 mt-4">
+                                <div class="h-10 w-3/4 bg-white rounded-xl"></div>
+                                <div class="h-10 w-2/3 bg-white rounded-xl"></div>
+                            </div>
+                            <div class="space-y-2 mt-6">
+                                <div class="h-4 w-full bg-white/90 rounded-lg"></div>
+                                <div class="h-4 w-5/6 bg-white/80 rounded-lg"></div>
+                                <div class="h-4 w-2/3 bg-white/70 rounded-lg"></div>
+                            </div>
+                            <div class="flex flex-col sm:flex-row gap-4 mt-8 w-full">
+                                <div class="h-12 w-full sm:w-40 bg-[#9D84B7]/40 rounded-full"></div>
+                                <div class="h-12 w-full sm:w-40 bg-white/80 rounded-full"></div>
+                            </div>
+                            <div class="mt-10 pt-6 border-t border-[#9D84B7]/20 flex flex-wrap gap-8">
+                                <div class="space-y-2">
+                                    <div class="h-6 w-20 bg-white rounded-lg"></div>
+                                    <div class="h-3 w-24 bg-white/80 rounded-full"></div>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="h-6 w-24 bg-white rounded-lg"></div>
+                                    <div class="h-3 w-28 bg-white/80 rounded-full"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Cover carousel skeleton -->
+                        <div class="flex-1 w-full">
+                            <div class="mx-auto max-w-md lg:max-w-lg">
+                                <div class="relative">
+                                    <div class="h-80 sm:h-96 bg-gradient-to-br from-[#E6D5E9] to-[#C7B3D9] rounded-3xl shadow-2xl"></div>
+                                    <div class="absolute -right-6 -bottom-6 w-40 h-40 bg-white/80 rounded-3xl shadow-xl"></div>
+                                    <div class="absolute -left-6 -top-6 w-32 h-32 bg-white/60 rounded-3xl shadow-lg"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Featured / New Arrivals Skeleton -->
+            <div class="py-16 bg-white/60">
+                <div class="container mx-auto px-4 sm:px-6">
+                    <div class="flex items-center justify-between mb-8">
+                        <div class="space-y-2">
+                            <div class="h-4 w-32 bg-gray-200 rounded-full"></div>
+                            <div class="h-7 w-48 bg-gray-300 rounded-lg"></div>
+                        </div>
+                        <div class="h-10 w-32 bg-gray-200 rounded-full hidden sm:block"></div>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                        @for ($i = 0; $i < 4; $i++)
+                            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 space-y-4">
+                                <div class="h-40 md:h-48 bg-gray-200 rounded-xl"></div>
+                                <div class="space-y-2">
+                                    <div class="h-4 w-5/6 bg-gray-200 rounded-full"></div>
+                                    <div class="h-3 w-1/2 bg-gray-200 rounded-full"></div>
+                                </div>
+                                <div class="h-5 w-2/3 bg-gray-200 rounded-full"></div>
+                            </div>
+                        @endfor
+                    </div>
+                </div>
+            </div>
+
+            <!-- Newsletter Skeleton -->
+            <div class="py-16 bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
+                <div class="container mx-auto px-6">
+                    <div class="max-w-3xl mx-auto text-center space-y-6">
+                        <div class="h-4 w-40 bg-white/30 rounded-full mx-auto"></div>
+                        <div class="space-y-3">
+                            <div class="h-8 w-56 bg-white/70 rounded-lg mx-auto"></div>
+                            <div class="h-8 w-64 bg-white/60 rounded-lg mx-auto"></div>
+                        </div>
+                        <div class="space-y-2 mt-4">
+                            <div class="h-4 w-5/6 bg-white/40 rounded-full mx-auto"></div>
+                            <div class="h-4 w-4/6 bg-white/30 rounded-full mx-auto"></div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-4 mt-8 max-w-xl mx-auto">
+                            <div class="h-12 flex-1 bg-white/80 rounded-2xl"></div>
+                            <div class="h-12 w-40 bg-yellow-300/90 rounded-2xl mx-auto sm:mx-0"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Real Homepage Content -->
+    <div id="home-content" class="hidden">
+
     <div class="min-h-screen bg-[#FAF7F5]">
         <!-- Hero Section -->
         <div class="relative overflow-x-hidden bg-[#FAF7F5] min-h-screen">
@@ -170,13 +270,14 @@
                 <div class="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-12 lg:gap-32 xl:gap-40 min-h-[70vh] lg:min-h-[80vh] overflow-visible">
                     <!-- Left Content (dynamic details) -->
                     @php 
-                                            // Use recommendations for authenticated users, fallback to new arrivals
-                        $heroBooks = Auth::check() && $recommendations && $recommendations->count() > 0
+                        // Use recommendations for authenticated users (up to 6 books)
+                        // Use heroBooks for guest users (3 newest books)
+                        $displayHeroBooks = Auth::check() && $recommendations && $recommendations->count() > 0
                             ? $recommendations
-                            : $newArrivals->take(6);
-                        $firstHero = $heroBooks->first(); 
+                            : $heroBooks;
+                        $firstHero = $displayHeroBooks->first(); 
                     @endphp
-                    @if($heroBooks->count() > 0)
+                    @if($displayHeroBooks->count() > 0)
                         <div class="flex-1 lg:max-w-[42%] xl:max-w-[45%] text-gray-900 order-2 lg:order-1 flex flex-col items-center lg:items-start text-center lg:text-left flex-shrink-0" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100">
                             <div class="mb-6" data-aos="fade-down" data-aos-delay="200">
                                 <span class="inline-flex items-center px-5 py-2.5 bg-white/90 rounded-full text-sm font-semibold backdrop-blur-md border border-white/80 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
@@ -296,7 +397,7 @@
 
                                 <!-- Carousel container -->
                                 <div id="heroCoverCarousel" class="relative w-full h-full overflow-visible">
-                                    @foreach($heroBooks as $i => $book)
+                                    @foreach($displayHeroBooks as $i => $book)
                                         @php
                                             $coverPath = $book->cover_image;
                                             $coverUrl = null;
@@ -375,7 +476,7 @@
 
                                 <!-- Navigation dots -->
                                 <div class="absolute -bottom-12 left-1/2 transform -translate-x-1/2 flex gap-2" id="carousel-dots">
-                                    @foreach($heroBooks as $i => $book)
+                                    @foreach($displayHeroBooks as $i => $book)
                                         <button 
                                             class="carousel-dot w-2.5 h-2.5 rounded-full transition-all duration-300 {{ $i === 0 ? 'bg-[#9D84B7] w-8' : 'bg-[#9D84B7]/40 hover:bg-[#9D84B7]/60' }}"
                                             data-index="{{ $i }}"
@@ -435,7 +536,7 @@
                         };
 
                         const dots = Array.from(document.querySelectorAll('.carousel-dot'));
-                        let currentIndex = 0;
+                        let currentIndex = 0; // Currently centered book
                         let timer;
                         let isTransitioning = false;
 
@@ -468,60 +569,61 @@
 
                                 // Remove fade-out effect after updating content
                                 Object.values(textElements).forEach(el => el?.classList.remove('text-fade-out'));
-                            }, 500); // Corresponds to transition duration
+                            }, 500);
                         };
 
                         const updateDots = (activeIndex) => {
+                            // Highlight only the current centered book
                             dots.forEach((dot, i) => {
                                 if (i === activeIndex) {
-                                    dot.classList.add('bg-purple-600', 'w-8');
-                                    dot.classList.remove('bg-purple-300', 'w-2.5');
+                                    dot.classList.add('bg-[#9D84B7]', 'w-8');
+                                    dot.classList.remove('bg-[#9D84B7]/40', 'w-2.5');
                                 } else {
-                                    dot.classList.remove('bg-purple-600', 'w-8');
-                                    dot.classList.add('bg-purple-300', 'w-2.5');
+                                    dot.classList.remove('bg-[#9D84B7]', 'w-8');
+                                    dot.classList.add('bg-[#9D84B7]/40', 'w-2.5');
                                 }
                             });
                         };
 
-                        const updateCarousel = (activeIndex, skipTransition = false) => {
+                        const updateCarousel = (centerIndex, skipTransition = false) => {
                             if (isTransitioning && !skipTransition) return;
                             if (!skipTransition) isTransitioning = true;
 
+                            currentIndex = centerIndex;
                             const total = slides.length;
+                            
                             slides.forEach((slide, i) => {
-                                slide.classList.remove('z-30', 'z-20', 'z-10', 'opacity-100', 'opacity-60', 'opacity-30', 'opacity-0', 'pointer-events-auto', 'pointer-events-none');
+                                slide.classList.remove('z-30', 'z-20', 'z-10', 'opacity-100', 'opacity-60', 'opacity-0', 'pointer-events-auto', 'pointer-events-none');
 
-                                let offset = (i - activeIndex + total) % total;
-
-                                if (offset === 0) { // Front - center stage
+                                // Calculate position relative to center
+                                let offset = i - centerIndex;
+                                
+                                if (offset === 0) { 
+                                    // CENTER - Main book in focus
                                     slide.classList.add('z-30', 'opacity-100', 'pointer-events-auto');
                                     slide.style.transform = 'translateX(0) translateZ(0) scale(1.0) rotateY(0deg)';
                                     slide.style.filter = 'brightness(1)';
-                                } else if (offset === 1) { // Right side
-                                    slide.classList.add('z-20', 'opacity-60', 'pointer-events-none');
-                                    slide.style.transform = 'translateX(60%) translateZ(-150px) scale(0.8) rotateY(-35deg)';
-                                    slide.style.filter = 'brightness(0.7)';
-                                } else if (offset === total - 1) { // Left side
-                                    slide.classList.add('z-20', 'opacity-60', 'pointer-events-none');
+                                } else if (offset === -1 || (centerIndex === 0 && i === total - 1)) { 
+                                    // LEFT - Previous book
+                                    slide.classList.add('z-20', 'opacity-60', 'pointer-events-auto');
                                     slide.style.transform = 'translateX(-60%) translateZ(-150px) scale(0.8) rotateY(35deg)';
                                     slide.style.filter = 'brightness(0.7)';
-                                } else if (offset === 2) { // Far right
-                                    slide.classList.add('z-10', 'opacity-30', 'pointer-events-none');
-                                    slide.style.transform = 'translateX(110%) translateZ(-300px) scale(0.6) rotateY(-50deg)';
-                                    slide.style.filter = 'brightness(0.5)';
-                                } else if (offset === total - 2) { // Far left
-                                    slide.classList.add('z-10', 'opacity-30', 'pointer-events-none');
-                                    slide.style.transform = 'translateX(-110%) translateZ(-300px) scale(0.6) rotateY(50deg)';
-                                    slide.style.filter = 'brightness(0.5)';
-                                } else { // Hidden
+                                } else if (offset === 1 || (centerIndex === total - 1 && i === 0)) { 
+                                    // RIGHT - Next book
+                                    slide.classList.add('z-20', 'opacity-60', 'pointer-events-auto');
+                                    slide.style.transform = 'translateX(60%) translateZ(-150px) scale(0.8) rotateY(-35deg)';
+                                    slide.style.filter = 'brightness(0.7)';
+                                } else {
+                                    // HIDDEN - All other books
                                     slide.classList.add('z-10', 'opacity-0', 'pointer-events-none');
-                                    slide.style.transform = `translateX(${offset > total / 2 ? '-150%' : '150%'}) translateZ(-400px) scale(0.5)`;
+                                    slide.style.transform = 'translateX(0) translateZ(-500px) scale(0.5)';
                                     slide.style.filter = 'brightness(0.3)';
                                 }
                             });
 
-                            updateTextContent(slides[activeIndex]);
-                            updateDots(activeIndex);
+                            // Update text content with the center book
+                            updateTextContent(slides[centerIndex]);
+                            updateDots(centerIndex);
 
                             if (!skipTransition) {
                                 setTimeout(() => {
@@ -531,20 +633,24 @@
                         };
 
                         const next = () => {
-                            currentIndex = (currentIndex + 1) % slides.length;
-                            updateCarousel(currentIndex);
+                            const nextIndex = (currentIndex + 1) % slides.length;
+                            updateCarousel(nextIndex);
                         };
 
-                        const goToSlide = (index) => {
+                        const prev = () => {
+                            const prevIndex = (currentIndex - 1 + slides.length) % slides.length;
+                            updateCarousel(prevIndex);
+                        };
+
+                        const goToBook = (index) => {
                             if (index !== currentIndex && !isTransitioning) {
-                                currentIndex = index;
-                                updateCarousel(currentIndex);
+                                updateCarousel(index);
                                 restart();
                             }
                         };
 
                         const start = () => { 
-                            timer = setInterval(next, 6000); // Increased to 6 seconds
+                            timer = setInterval(next, 6000);
                         };
 
                         const stop = () => { 
@@ -560,17 +666,19 @@
                         container.addEventListener('mouseenter', stop);
                         container.addEventListener('mouseleave', start);
 
-                        // Dot navigation
+                        // Dot navigation - each dot goes to that specific book
                         dots.forEach((dot, index) => {
-                            dot.addEventListener('click', () => goToSlide(index));
+                            dot.addEventListener('click', () => {
+                                goToBook(index);
+                            });
                         });
 
-                        // Click on slides to navigate
+                        // Click on slides to center them
                         slides.forEach((slide, index) => {
                             slide.addEventListener('click', (e) => {
                                 if (index !== currentIndex) {
                                     e.preventDefault();
-                                    goToSlide(index);
+                                    goToBook(index);
                                 }
                             });
                         });
@@ -1628,6 +1736,90 @@
                 });
             </script>
         @endauth
+
+    </div> <!-- /#home-content -->
+
+    <!-- Skeleton Toggle Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var skeleton = document.getElementById('home-skeleton');
+            var content = document.getElementById('home-content');
+
+            if (!skeleton || !content) return;
+
+            setTimeout(function () {
+                skeleton.classList.add('hidden');
+                content.classList.remove('hidden');
+            }, 500);
+        });
+    </script>
+
+    <!-- Track Book Interactions for Recommendations -->
+    @auth
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Track 'click' interaction when user clicks on hero carousel "View Details" link
+            var heroDetailsLink = document.getElementById('hero-details-link');
+            if (heroDetailsLink) {
+                heroDetailsLink.addEventListener('click', function(e) {
+                    var bookId = this.getAttribute('href').match(/\/books\/(\d+)/);
+                    if (bookId && bookId[1]) {
+                        // Track click interaction via AJAX
+                        fetch('/api/track-interaction', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: JSON.stringify({
+                                book_id: parseInt(bookId[1]),
+                                action: 'click'
+                            }),
+                            credentials: 'same-origin'
+                        }).catch(function(err) {
+                            console.log('Interaction tracking failed:', err);
+                        });
+                    }
+                });
+            }
+
+            // Track 'click' interactions on book cards (homepage, search results, etc.)
+            document.querySelectorAll('a[href*="/books/"]').forEach(function(link) {
+                // Skip if it's the hero link (already tracked above)
+                if (link.id === 'hero-details-link') return;
+                
+                link.addEventListener('click', function(e) {
+                    var bookId = this.getAttribute('href').match(/\/books\/(\d+)/);
+                    if (bookId && bookId[1]) {
+                        // Only track if it's a book detail page link (not admin, not cart, etc.)
+                        if (this.getAttribute('href').includes('/books/') && 
+                            !this.getAttribute('href').includes('/admin') &&
+                            !this.getAttribute('href').includes('/cart')) {
+                            fetch('/api/track-interaction', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                                    'Accept': 'application/json',
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                },
+                                body: JSON.stringify({
+                                    book_id: parseInt(bookId[1]),
+                                    action: 'click'
+                                }),
+                                credentials: 'same-origin'
+                            }).catch(function(err) {
+                                console.log('Interaction tracking failed:', err);
+                            });
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+    @endauth
 
 @endsection
 

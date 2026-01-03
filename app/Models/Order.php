@@ -22,6 +22,7 @@ class Order extends Model
         'shipping_region',
         'shipping_customer_price',
         'shipping_actual_cost',
+        'postage_rate_history_id', // Hybrid: FK to history for audit trail
         'is_free_shipping',
         'shipping_postal_code',
         'shipping_phone',
@@ -55,6 +56,63 @@ class Order extends Model
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+    
+    /**
+     * Get the postage rate history record for this order
+     * This provides audit trail for shipping prices
+     */
+    public function postageRateHistory(): BelongsTo
+    {
+        return $this->belongsTo(PostageRateHistory::class, 'postage_rate_history_id');
+    }
+    
+    /**
+     * Hybrid Approach Helper Methods
+     */
+    
+    /**
+     * Verify that denormalized shipping prices match history record
+     * Useful for data integrity checks
+     */
+    public function verifyShippingPrice(): bool
+    {
+        if (!$this->postageRateHistory) {
+            return true; // No history to verify against
+        }
+        
+        return $this->shipping_customer_price == $this->postageRateHistory->customer_price
+            && $this->shipping_actual_cost == $this->postageRateHistory->actual_cost;
+    }
+    
+    /**
+     * Get shipping price (uses denormalized field for speed)
+     */
+    public function getShippingPrice(): float
+    {
+        return (float) $this->shipping_customer_price;
+    }
+    
+    /**
+     * Get audit information about shipping price
+     * Uses history FK for accountability
+     */
+    public function getShippingAuditInfo(): ?array
+    {
+        if (!$this->postageRateHistory) {
+            return null;
+        }
+        
+        return [
+            'rate_id' => $this->postageRateHistory->id,
+            'customer_price' => $this->postageRateHistory->customer_price,
+            'actual_cost' => $this->postageRateHistory->actual_cost,
+            'updated_by' => $this->postageRateHistory->updater_name,
+            'valid_from' => $this->postageRateHistory->valid_from,
+            'valid_until' => $this->postageRateHistory->valid_until,
+            'comment' => $this->postageRateHistory->comment,
+            'is_current' => $this->postageRateHistory->isCurrent(),
+        ];
     }
     
     protected static function booted(): void

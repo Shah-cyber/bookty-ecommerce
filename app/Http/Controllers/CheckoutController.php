@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Services\PostageRateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -62,9 +63,21 @@ class CheckoutController extends Controller
         elseif (in_array($state, ['labuan','wilayah persekutuan labuan'])) { $region = 'labuan'; }
         elseif (!in_array($state, $smStates)) { $region = 'sm'; }
 
-        $rateModel = \App\Models\PostageRate::where('region', $region === 'labuan' ? 'sabah' : $region)->first();
-        $shippingCustomerPrice = $rateModel?->customer_price ?? 0;
-        $shippingActualCost = $rateModel?->actual_cost ?? 0;
+        // HYBRID APPROACH: Get current history record for audit trail
+        $postageRateService = app(PostageRateService::class);
+        $historyRecord = $postageRateService->getCurrentHistory($region === 'labuan' ? 'sabah' : $region);
+        
+        // Fallback to direct model if no history (shouldn't happen after seeding)
+        if (!$historyRecord) {
+            $rateModel = \App\Models\PostageRate::where('region', $region === 'labuan' ? 'sabah' : $region)->first();
+            $shippingCustomerPrice = $rateModel?->customer_price ?? 0;
+            $shippingActualCost = $rateModel?->actual_cost ?? 0;
+            $historyRecordId = null;
+        } else {
+            $shippingCustomerPrice = $historyRecord->customer_price;
+            $shippingActualCost = $historyRecord->actual_cost;
+            $historyRecordId = $historyRecord->id;
+        }
 
         // Check for free shipping via promotions or coupons
         $isFreeShipping = false;
@@ -104,7 +117,7 @@ class CheckoutController extends Controller
             // 1. Start the database transaction
             DB::beginTransaction();
             
-            // 2. Create the order
+            // 2. Create the order with HYBRID APPROACH
             $order = Order::create([
                 'user_id' => Auth::id(),
                 'total_amount' => $totalAmount,
@@ -114,8 +127,14 @@ class CheckoutController extends Controller
                 'shipping_city' => $request->shipping_city,
                 'shipping_state' => $request->shipping_state,
                 'shipping_region' => $region,
+                
+                // HYBRID: Denormalized prices (for fast queries) ✅
                 'shipping_customer_price' => $shippingCustomerPrice,
                 'shipping_actual_cost' => $shippingActualCost,
+                
+                // HYBRID: History FK (for audit trail) ✅
+                'postage_rate_history_id' => $historyRecordId,
+                
                 'shipping_postal_code' => $request->shipping_postal_code,
                 'shipping_phone' => $request->shipping_phone,
                 'is_free_shipping' => $isFreeShipping,
@@ -247,15 +266,38 @@ class CheckoutController extends Controller
     {
         $secretKey = config('services.toyyibpay.secret_key');
         $categoryCode = config('services.toyyibpay.category_code');
+        $apiUrl = config('services.toyyibpay.api_url', 'https://dev.toyyibpay.com/index.php/api/createBill');
 
         if (!$secretKey || !$categoryCode) {
+            Log::error("ToyyibPay Configuration Missing", [
+                'has_secret_key' => !empty($secretKey),
+                'has_category_code' => !empty($categoryCode)
+            ]);
+            
             return [
                 'success' => false,
-                'message' => 'ToyyibPay configuration is missing. Please check your .env file.'
+                'message' => 'ToyyibPay configuration is missing. Please check your .env file. Make sure TOYYIBPAY_SECRET_KEY and TOYYIBPAY_CATEGORY_CODE are set.'
             ];
         }
 
-        $response = Http::asForm()->post('https://dev.toyyibpay.com/index.php/api/createBill', [
+        // Validate required bill data
+        $requiredFields = ['bill_name', 'bill_description', 'amount', 'return_url', 'callback_url', 'reference_no', 'customer_name', 'customer_email', 'customer_phone'];
+        foreach ($requiredFields as $field) {
+            if (empty($billData[$field])) {
+                Log::error("ToyyibPay Missing Required Field", ['field' => $field]);
+                return [
+                    'success' => false,
+                    'message' => "Missing required field: {$field}"
+                ];
+            }
+        }
+
+        try {
+            // Increase timeout and add retry logic for ToyyibPay server issues
+            $response = Http::timeout(60)
+                ->retry(2, 2000) // Retry 2 times with 2 second delay
+                ->asForm()
+                ->post($apiUrl, [
             'userSecretKey' => $secretKey,
             'categoryCode' => $categoryCode,
             'billName' => $billData['bill_name'],
@@ -273,30 +315,211 @@ class CheckoutController extends Controller
             'billContentEmail' => $billData['email_content'],
             'billChargeToCustomer' => 0, // Charge FPX to customer
             'billExpiryDays' => 3
-        ]);
+            ]);
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            Log::error("ToyyibPay Connection Error", [
+                'message' => $e->getMessage(),
+                'url' => $apiUrl
+            ]);
+            
+            return [
+                'success' => false,
+                'message' => 'Unable to connect to payment gateway. The payment service may be temporarily unavailable. Please try again in a few minutes.'
+            ];
+        } catch (\Illuminate\Http\Client\RequestException $e) {
+            // Handle timeout and gateway errors
+            $statusCode = $e->response?->status();
+            
+            Log::error("ToyyibPay Request Exception", [
+                'message' => $e->getMessage(),
+                'status_code' => $statusCode,
+                'url' => $apiUrl
+            ]);
+            
+            if ($statusCode == 504 || $statusCode == 502 || $statusCode == 503) {
+                return [
+                    'success' => false,
+                    'message' => 'Payment gateway is temporarily unavailable (Server timeout). Please try again in a few minutes. If the problem persists, the payment service may be experiencing issues.'
+                ];
+            }
+            
+            return [
+                'success' => false,
+                'message' => 'Payment gateway error: ' . $e->getMessage()
+            ];
+        } catch (\Exception $e) {
+            Log::error("ToyyibPay Request Exception", [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return [
+                'success' => false,
+                'message' => 'Payment gateway error: ' . $e->getMessage()
+            ];
+        }
 
         // Log the status code and response body for debugging
+        Log::info("ToyyibPay API Request", [
+            'url' => $apiUrl,
+            'data' => [
+                'billName' => $billData['bill_name'],
+                'billAmount' => $billData['amount'],
+                'customerEmail' => $billData['customer_email'],
+                'categoryCode' => $categoryCode,
+            ]
+        ]);
+        
         Log::info("ToyyibPay API Response Status: " . $response->status());
         Log::info("ToyyibPay API Response Body: " . $response->body());
 
+        $responseBody = trim($response->body());
         $result = $response->json();
 
+        // Check for gateway timeout or server errors
+        if ($response->status() == 504 || $response->status() == 502 || $response->status() == 503) {
+            Log::error("ToyyibPay Server Error", [
+                'status' => $response->status(),
+                'response_body' => $responseBody,
+                'url' => $apiUrl
+            ]);
+            
+            return [
+                'success' => false,
+                'message' => 'Payment gateway server is temporarily unavailable (Gateway Timeout). This is a server-side issue with the payment provider. Please try again in a few minutes.'
+            ];
+        }
+        
+        // Check if response is successful (HTTP 200)
         if ($response->successful()) {
-            if (isset($result[0]['BillCode'])) {
-                $billCode = $result[0]['BillCode'];
-                return [
-                    'success' => true,
-                    'bill_code' => $billCode,
-                    'payment_url' => "https://dev.toyyibpay.com/{$billCode}"
-                ];
+            // FIRST: Try to parse as JSON and check for SUCCESS (BillCode exists)
+            if ($result !== null && is_array($result) && isset($result[0])) {
+                // Check for SUCCESS first - if BillCode exists, it's a success!
+                if (isset($result[0]['BillCode']) && !empty($result[0]['BillCode'])) {
+                    $billCode = $result[0]['BillCode'];
+                    Log::info("ToyyibPay Bill Created Successfully", [
+                        'bill_code' => $billCode,
+                        'order_reference' => $billData['reference_no']
+                    ]);
+                    
+                    return [
+                        'success' => true,
+                        'bill_code' => $billCode,
+                        'payment_url' => "https://dev.toyyibpay.com/{$billCode}"
+                    ];
+                }
+                
+                // Check if the response contains an error message (ToyyibPay returns errors even with 200 status)
+                if (isset($result[0]['msg'])) {
+                    $errorMessage = $result[0]['msg'];
+                    Log::error("ToyyibPay API Error Message", [
+                        'message' => $errorMessage,
+                        'full_response' => $result
+                    ]);
+                    
+                    return [
+                        'success' => false,
+                        'message' => 'Payment gateway error: ' . $errorMessage
+                    ];
+                }
+                
+                // Check if response contains error code
+                if (isset($result[0]['code']) && $result[0]['code'] != '0') {
+                    $errorMessage = $result[0]['msg'] ?? 'Unknown error from payment gateway';
+                    Log::error("ToyyibPay API Error Code", [
+                        'code' => $result[0]['code'],
+                        'message' => $errorMessage,
+                        'full_response' => $result
+                    ]);
+                    
+                    return [
+                        'success' => false,
+                        'message' => 'Payment gateway error: ' . $errorMessage
+                    ];
+                }
+            }
+            
+            // SECOND: If not valid JSON or no BillCode, check for plain text error responses
+            // Only check for error patterns if it's NOT valid JSON with BillCode
+            if ($result === null || !isset($result[0]['BillCode'])) {
+                // Check for plain text error responses (ToyyibPay sometimes returns plain text errors)
+                // Only match if it's a known error pattern, not JSON
+                if (preg_match('/\[(CATEGORY-NOT-MATCH|INVALID-SECRET-KEY|INVALID-CATEGORY|.*?)\]/', $responseBody, $matches)) {
+                    $errorCode = $matches[1];
+                    
+                    // Skip if it looks like JSON (contains quotes and BillCode)
+                    if (strpos($errorCode, 'BillCode') !== false || strpos($errorCode, '"') !== false) {
+                        // This is actually JSON, not an error - skip this check
+                    } else {
+                        $errorMessages = [
+                            'CATEGORY-NOT-MATCH' => 'The category code does not match your ToyyibPay account. Please check your TOYYIBPAY_CATEGORY_CODE in .env file.',
+                            'INVALID-SECRET-KEY' => 'Invalid secret key. Please check your TOYYIBPAY_SECRET_KEY in .env file.',
+                            'INVALID-CATEGORY' => 'Invalid category code. Please verify the category exists in your ToyyibPay dashboard.',
+                        ];
+                        
+                        $errorMessage = $errorMessages[$errorCode] ?? "Payment gateway error: [{$errorCode}]";
+                        
+                        Log::error("ToyyibPay API Plain Text Error", [
+                            'error_code' => $errorCode,
+                            'response_body' => $responseBody,
+                            'category_code_used' => $categoryCode
+                        ]);
+                        
+                        return [
+                            'success' => false,
+                            'message' => $errorMessage
+                        ];
+                    }
+                }
+                
+                // If response is not valid JSON and no error pattern matched
+                if ($result === null && !empty($responseBody)) {
+                    Log::error("ToyyibPay API Invalid JSON Response", [
+                        'response_body' => $responseBody,
+                        'category_code_used' => $categoryCode
+                    ]);
+                    
+                    return [
+                        'success' => false,
+                        'message' => 'Payment gateway returned an invalid response. Please check your ToyyibPay configuration.'
+                    ];
+                }
             }
         }
 
         // Log the error if the bill creation failed
-        Log::error("ToyyibPay Error: Failed to create bill. Response: " . json_encode($result));
+        Log::error("ToyyibPay Error: Failed to create bill", [
+            'status' => $response->status(),
+            'response_body' => $responseBody,
+            'response_json' => $result,
+            'request_data' => [
+                'billName' => $billData['bill_name'],
+                'amount' => $billData['amount'],
+                'categoryCode' => $categoryCode,
+            ]
+        ]);
+        
+        // Extract error message from response if available
+        $errorMessage = 'Failed to create payment bill.';
+        if (isset($result[0]['msg'])) {
+            $errorMessage = $result[0]['msg'];
+        } elseif (isset($result['msg'])) {
+            $errorMessage = $result['msg'];
+        } elseif (is_string($result)) {
+            $errorMessage = $result;
+        } elseif (!empty($responseBody)) {
+            // Try to extract error from plain text response
+            if (preg_match('/\[(.*?)\]/', $responseBody, $matches)) {
+                $errorCode = $matches[1];
+                $errorMessage = "Payment gateway error: [{$errorCode}]";
+            } else {
+                $errorMessage = "Payment gateway error: " . substr($responseBody, 0, 100);
+            }
+        }
+        
         return [
             'success' => false,
-            'message' => 'Failed to create ToyyibPay bill. Please try again.'
+            'message' => $errorMessage
         ];
     }
 

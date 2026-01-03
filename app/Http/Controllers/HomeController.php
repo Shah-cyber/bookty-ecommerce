@@ -22,17 +22,27 @@ class HomeController extends Controller
             ->latest() // orders by created_at desc
             ->take(20)
             ->get();
-            
+
+        // Get newest books for the hero section (for guest users)
+        // The carousel will display all these books, showing them one at a time
+        // Limit to 12 to keep good performance while showing all recent additions
+        $heroBooks = Book::with(['genre', 'reviews'])
+            ->latest()
+            ->take(12)
+            ->get();
+
         // Get genres with book count
         $genres = Genre::withCount('books')
             ->orderBy('books_count', 'desc')
             ->take(8)
             ->get();
-        
+
         // Get active flash sales
-        $activeFlashSale = FlashSale::with(['books' => function($query) {
+        $activeFlashSale = FlashSale::with([
+            'books' => function ($query) {
                 $query->with(['genre', 'reviews']);
-            }])
+            }
+        ])
             ->active()
             ->orderBy('ends_at', 'asc')
             ->first();
@@ -47,7 +57,7 @@ class HomeController extends Controller
                 $recommendations = $newArrivals->take(6);
             }
         }
-            
+
         // Get featured testimonials (highest rated reviews with comments)
         $testimonials = \App\Models\Review::with(['user', 'book'])
             ->where('is_approved', true)
@@ -62,26 +72,27 @@ class HomeController extends Controller
         // Calculate testimonial statistics
         // Count unique customers who have made orders
         $totalCustomers = \App\Models\Order::distinct('user_id')->count('user_id');
-        
+
         // If no orders yet, count all users
         if ($totalCustomers === 0) {
             $totalCustomers = \App\Models\User::count();
         }
-        
+
         $totalBooksSold = \App\Models\OrderItem::sum('quantity') ?: 0;
         $averageRating = \App\Models\Review::where('is_approved', true)->avg('rating');
         $totalReviews = \App\Models\Review::where('is_approved', true)->count();
-        
+
         // Calculate satisfaction rate (percentage of 4 and 5 star reviews)
         $positiveReviews = \App\Models\Review::where('is_approved', true)
             ->where('rating', '>=', 4)
             ->count();
         $satisfactionRate = $totalReviews > 0 ? round(($positiveReviews / $totalReviews) * 100) : 95; // Default to 95% if no reviews
-            
+
         return view('home.index', compact(
-            'newArrivals', 
-            'genres', 
-            'activeFlashSale', 
+            'newArrivals',
+            'heroBooks',
+            'genres',
+            'activeFlashSale',
             'recommendations',
             'testimonials',
             'totalCustomers',

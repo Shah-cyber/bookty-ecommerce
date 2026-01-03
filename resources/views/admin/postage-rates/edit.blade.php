@@ -46,7 +46,19 @@
             </div>
 
             <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">{{ __('Comment (Optional)') }}</label>
+                <textarea name="comment" rows="3" class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50" placeholder="Reason for price change (e.g., 'Courier fee increased', 'Promotional discount')">{{ old('comment') }}</textarea>
+                <p class="text-xs text-gray-500 mt-1 dark:text-gray-400">💡 This comment will be saved in the audit trail for accountability</p>
+                @error('comment')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="flex items-center gap-4">
                 <button type="submit" class="px-4 py-2 bg-bookty-purple-600 text-white rounded-md hover:bg-bookty-purple-700">{{ __('Update') }}</button>
+                <a href="{{ route('admin.postage-rates.history', $rate->region) }}" class="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400">
+                    📜 View Price History
+                </a>
             </div>
         </form>
     </div>

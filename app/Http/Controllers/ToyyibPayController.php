@@ -169,6 +169,18 @@ class ToyyibPayController extends Controller
         $statusId = $request->status_id;
         $billCode = $request->billcode;
         $orderId = $request->order_id;
+        // ToyyibPay sends invoice number as 'transaction_id' in return URL, not 'refno'
+        $refNo = $request->transaction_id ?? $request->refno; // Invoice/Reference number
+        $transactionTime = $request->transaction_time; // Payment date/time
+        
+        Log::info('ToyyibPay Return: Extracted Parameters', [
+            'status_id' => $statusId,
+            'billcode' => $billCode,
+            'transaction_id' => $request->transaction_id,
+            'refno' => $request->refno,
+            'transaction_time' => $transactionTime,
+            'all_params' => $request->all()
+        ]);
 
         // Find the order
         $order = Order::where('toyyibpay_bill_code', $billCode)
@@ -177,6 +189,154 @@ class ToyyibPayController extends Controller
 
         if (!$order) {
             return redirect()->route('home')->with('error', 'Order not found.');
+        }
+
+        // Update order with payment information from return URL
+        try {
+            DB::beginTransaction();
+            
+            $updateData = [];
+            
+            // If payment is successful, update invoice and payment date
+            if ($statusId == 1) {
+                $updateData['payment_status'] = 'paid';
+                $updateData['status'] = 'processing';
+                
+                // Update invoice number if provided
+                if ($refNo) {
+                    $updateData['toyyibpay_invoice_no'] = $refNo;
+                }
+                
+                // Update payment date
+                if ($transactionTime) {
+                    // Handle ToyyibPay format: DD-MM-YYYY HH:MM:SS
+                    if (preg_match('/(\d{2})-(\d{2})-(\d{4}) (\d{2}:\d{2}:\d{2})/', $transactionTime, $matches)) {
+                        $updateData['toyyibpay_payment_date'] = $matches[3] . '-' . $matches[2] . '-' . $matches[1] . ' ' . $matches[4];
+                    } else {
+                        $updateData['toyyibpay_payment_date'] = now();
+                    }
+                } else {
+                    $updateData['toyyibpay_payment_date'] = now();
+                }
+                
+                // If invoice number not in return URL, try to fetch from API
+                // Note: Invoice number is usually generated after payment, so it might not be in return URL
+                if (!$refNo && $billCode) {
+                    Log::info('ToyyibPay Return: Fetching transaction details from API', [
+                        'bill_code' => $billCode,
+                        'order_id' => $order->id
+                    ]);
+                    
+                    $transactions = $this->toyyibPayService->getBillTransactions($billCode);
+                    
+                    Log::info('ToyyibPay Return: API Response', [
+                        'bill_code' => $billCode,
+                        'transactions' => $transactions
+                    ]);
+                    
+                    if ($transactions && is_array($transactions) && !empty($transactions)) {
+                        // Try to find the first successful transaction
+                        $transaction = null;
+                        foreach ($transactions as $txn) {
+                            if (isset($txn['billpaymentStatus']) && $txn['billpaymentStatus'] == '1') {
+                                $transaction = $txn;
+                                break;
+                            }
+                        }
+                        // If no successful transaction found, use the first one
+                        if (!$transaction && isset($transactions[0])) {
+                            $transaction = $transactions[0];
+                        }
+                        
+                        if ($transaction) {
+                            Log::info('ToyyibPay Return: Processing Transaction', [
+                                'transaction' => $transaction
+                            ]);
+                            
+                            // Try multiple possible field names for invoice number
+                            // Note: ToyyibPay API uses 'billpaymentInvoiceNo' for the invoice number
+                            $invoiceNo = $transaction['billpaymentInvoiceNo'] ??
+                                        $transaction['refno'] ?? 
+                                        $transaction['transaction_id'] ?? 
+                                        $transaction['invoice_no'] ?? 
+                                        $transaction['transactionId'] ??
+                                        $transaction['RefNo'] ??
+                                        $transaction['billpaymentInvoiceNo'] ??
+                                        null;
+                            
+                            if ($invoiceNo && !empty($invoiceNo)) {
+                                $updateData['toyyibpay_invoice_no'] = $invoiceNo;
+                                Log::info('ToyyibPay Return: Invoice number found', ['invoice_no' => $invoiceNo]);
+                            } else {
+                                Log::warning('ToyyibPay Return: No invoice number in transaction', [
+                                    'transaction_keys' => array_keys($transaction)
+                                ]);
+                            }
+                            
+                            // Try multiple possible field names for transaction time
+                            // Note: ToyyibPay API uses 'billPaymentDate' for the payment date
+                            $transTime = $transaction['billPaymentDate'] ??
+                                        $transaction['transactionTime'] ?? 
+                                        $transaction['transaction_time'] ?? 
+                                        $transaction['paid_at'] ??
+                                        $transaction['TransactionTime'] ??
+                                        null;
+                            
+                            if ($transTime && !empty($transTime)) {
+                                $dateStr = $transTime;
+                                if (preg_match('/(\d{2})-(\d{2})-(\d{4}) (\d{2}:\d{2}:\d{2})/', $dateStr, $matches)) {
+                                    $updateData['toyyibpay_payment_date'] = $matches[3] . '-' . $matches[2] . '-' . $matches[1] . ' ' . $matches[4];
+                                } elseif (preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}:\d{2}:\d{2})/', $dateStr, $matches)) {
+                                    // Already in correct format
+                                    $updateData['toyyibpay_payment_date'] = $dateStr;
+                                }
+                                Log::info('ToyyibPay Return: Payment date found', ['payment_date' => $updateData['toyyibpay_payment_date'] ?? null]);
+                            }
+                        } else {
+                            Log::warning('ToyyibPay Return: No valid transaction found', [
+                                'transactions_count' => count($transactions)
+                            ]);
+                        }
+                    } else {
+                        Log::warning('ToyyibPay Return: No transactions returned from API', [
+                            'bill_code' => $billCode
+                        ]);
+                    }
+                }
+            } elseif ($statusId == 3) {
+                // Payment failed
+                $updateData['payment_status'] = 'failed';
+                $updateData['status'] = 'cancelled';
+                
+                if ($refNo) {
+                    $updateData['toyyibpay_invoice_no'] = $refNo;
+                }
+                if ($transactionTime) {
+                    if (preg_match('/(\d{2})-(\d{2})-(\d{4}) (\d{2}:\d{2}:\d{2})/', $transactionTime, $matches)) {
+                        $updateData['toyyibpay_payment_date'] = $matches[3] . '-' . $matches[2] . '-' . $matches[1] . ' ' . $matches[4];
+                    } else {
+                        $updateData['toyyibpay_payment_date'] = now();
+                    }
+                }
+            }
+            
+            // Update order if we have data to update
+            if (!empty($updateData)) {
+                $order->update($updateData);
+                Log::info('ToyyibPay Return: Order Updated', [
+                    'order_id' => $order->id,
+                    'status_id' => $statusId,
+                    'update_data' => $updateData
+                ]);
+            }
+            
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('ToyyibPay Return: Update Error', [
+                'message' => $e->getMessage(),
+                'order_id' => $order->id
+            ]);
         }
 
         // Redirect based on payment status
