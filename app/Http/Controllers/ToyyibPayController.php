@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\CouponUsage;
 use App\Services\ToyyibPayService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -85,10 +86,37 @@ class ToyyibPayController extends Controller
                     }
                     
                     if ($request->has('settlement_date') && $request->settlement_date) {
-                        $updateData['toyyibpay_settlement_date'] = $request->settlement_date;
+                        // Handle settlement_date format (ToyyibPay format: DD-MM-YYYY HH:MM:SS)
+                        $dateStr = $request->settlement_date;
+                        if (preg_match('/(\d{2})-(\d{2})-(\d{4}) (\d{2}:\d{2}:\d{2})/', $dateStr, $matches)) {
+                            $updateData['toyyibpay_settlement_date'] = $matches[3] . '-' . $matches[2] . '-' . $matches[1] . ' ' . $matches[4];
+                        } elseif (preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}:\d{2}:\d{2})/', $dateStr, $matches)) {
+                            // Already in correct format (YYYY-MM-DD HH:MM:SS)
+                            $updateData['toyyibpay_settlement_date'] = $dateStr;
+                        } else {
+                            // Try to parse as-is (Laravel will attempt conversion)
+                            $updateData['toyyibpay_settlement_date'] = $dateStr;
+                        }
                     }
                     
                     $order->update($updateData);
+                    
+                    // Record coupon usage if a coupon was applied (only if not already recorded)
+                    if ($order->coupon_id && !$order->couponUsage()->exists()) {
+                        CouponUsage::create([
+                            'coupon_id' => $order->coupon_id,
+                            'user_id' => $order->user_id,
+                            'order_id' => $order->id,
+                            'discount_amount' => $order->discount_amount ?? 0,
+                        ]);
+                        
+                        Log::info('Coupon Usage Recorded', [
+                            'order_id' => $order->id,
+                            'coupon_id' => $order->coupon_id,
+                            'coupon_code' => $order->coupon_code,
+                            'discount_amount' => $order->discount_amount,
+                        ]);
+                    }
                     
                     Log::info('ToyyibPay Payment Success', [
                         'order_id' => $order->id,
@@ -201,6 +229,23 @@ class ToyyibPayController extends Controller
             if ($statusId == 1) {
                 $updateData['payment_status'] = 'paid';
                 $updateData['status'] = 'processing';
+                
+                // Record coupon usage if a coupon was applied (only if not already recorded)
+                if ($order->coupon_id && !$order->couponUsage()->exists()) {
+                    CouponUsage::create([
+                        'coupon_id' => $order->coupon_id,
+                        'user_id' => $order->user_id,
+                        'order_id' => $order->id,
+                        'discount_amount' => $order->discount_amount ?? 0,
+                    ]);
+                    
+                    Log::info('Coupon Usage Recorded (Return URL)', [
+                        'order_id' => $order->id,
+                        'coupon_id' => $order->coupon_id,
+                        'coupon_code' => $order->coupon_code,
+                        'discount_amount' => $order->discount_amount,
+                    ]);
+                }
                 
                 // Update invoice number if provided
                 if ($refNo) {

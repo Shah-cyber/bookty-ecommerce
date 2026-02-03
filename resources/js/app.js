@@ -338,70 +338,113 @@ window.RecommendationManager = {
     },
 
     renderBookCard(book) {
+        const finalPrice = book.is_on_sale ? book.final_price : book.price;
+        const discountPercent = book.discount_percent || 0;
+        const stockLeft = book.stock !== undefined ? book.stock : 999; // Default to in-stock if not specified
+        const isBestSeller = (book.total_sold || 0) >= 10;
+        const isOutOfStock = stockLeft === 0;
+        
         return `
-            <div class="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col h-full">
-                <div class="relative overflow-hidden">
-                    <a href="${book.link}" class="block">
-                        <div class="aspect-[2/3] w-full bg-gray-50">
-                            ${book.cover_image ?
-                `<img src="${book.cover_image}" alt="${book.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">` :
-                `<div class="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                                    <svg class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                                    </svg>
-                                </div>`
-            }
-                        </div>
-                    </a>
-                    
-                    <!-- Condition Badge -->
-                    <div class="absolute top-3 left-3 flex flex-col gap-2">
+            <div class="group relative rounded-[1.5rem] overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 h-full flex flex-col aspect-[3/4]">
+                <!-- Full Cover Image Background -->
+                <a href="${book.link}" class="absolute inset-0 z-0">
+                    ${book.cover_image ?
+                        `<img src="${book.cover_image}" alt="${book.title}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ${isOutOfStock ? 'grayscale' : ''}">` :
+                        `<div class="w-full h-full bg-gradient-to-br from-amber-200 via-orange-300 to-amber-400 flex items-center justify-center">
+                            <svg class="h-20 w-20 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
+                        </div>`
+                    }
+                </a>
+                
+                <!-- Top Badges -->
+                <div class="relative z-10 p-4 flex justify-between items-start">
+                    <!-- Left: Condition Badge -->
+                    <div class="flex flex-col gap-2">
                         ${book.condition === 'preloved' ? `
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/90 backdrop-blur-sm text-white shadow-sm">
-                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                                </svg>
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide bg-white/90 backdrop-blur-md text-amber-700 shadow-lg uppercase">
                                 Preloved
                             </span>
-                        ` : `
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-500/90 backdrop-blur-sm text-white shadow-sm">
-                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                                New
-                            </span>
-                        `}
-                        <!-- Genre Badge -->
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-white/90 backdrop-blur-sm text-gray-700 shadow-sm">
-                            ${book.genre || 'Book'}
-                        </span>
-                    </div>
-                    
-                    ${book.score ? `
-                        <div class="absolute top-3 right-3">
-                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 shadow-sm">
+                        ` : ''}
+                        ${book.score ? `
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide bg-white/90 backdrop-blur-md text-gray-700 shadow-lg">
                                 ${Math.round(book.score * 100)}% match
                             </span>
-                        </div>
+                        ` : ''}
+                    </div>
+                    
+                    <!-- Right: Discount Badge -->
+                    ${book.is_on_sale && discountPercent > 0 ? `
+                        <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold bg-white/90 backdrop-blur-md text-gray-900 shadow-lg">
+                            ${discountPercent}% off
+                        </span>
                     ` : ''}
                 </div>
                 
-                <div class="p-5 flex flex-col flex-grow">
-                    <a href="${book.link}" class="block group-hover:text-purple-700 transition-colors duration-200">
-                        <h3 class="font-bold text-gray-900 mb-1 line-clamp-2">${book.title}</h3>
-                    </a>
-                    <p class="text-sm text-gray-600 mb-2">by ${book.author}</p>
+                <!-- Spacer -->
+                <div class="flex-1"></div>
+                
+                <!-- Bottom Content Overlay -->
+                <div class="relative z-10">
+                    <!-- Gradient Overlay -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent -top-20"></div>
                     
-                    <div class="mt-auto pt-3 border-t border-gray-100">
-                        ${book.is_on_sale ?
-                `<div class="flex items-baseline space-x-2">
-                                <span class="text-lg font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">RM ${parseFloat(book.final_price).toFixed(2)}</span>
-                                <span class="text-sm text-gray-500 line-through">RM ${parseFloat(book.price).toFixed(2)}</span>
-                            </div>` :
-                `<span class="text-lg font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">RM ${parseFloat(book.price).toFixed(2)}</span>`
-            }
+                    <!-- Content -->
+                    <div class="relative p-5 pt-8 text-white">
+                        <!-- Dots Indicator (decorative) -->
+                        <div class="flex justify-center gap-1 mb-3">
+                            <span class="w-1.5 h-1.5 rounded-full bg-white/40"></span>
+                            <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
+                            <span class="w-1.5 h-1.5 rounded-full bg-white/40"></span>
+                        </div>
+                        
+                        <!-- Title & Price Row -->
+                        <div class="flex items-start justify-between gap-3 mb-2">
+                            <h3 class="font-serif text-xl font-bold italic leading-tight line-clamp-2 flex-1">
+                                ${book.title}
+                            </h3>
+                            <span class="flex-shrink-0 px-3 py-1.5 bg-white/20 backdrop-blur-md rounded-full text-sm font-bold border border-white/30 whitespace-nowrap">
+                                RM ${parseFloat(finalPrice).toFixed(0)}
+                            </span>
+                        </div>
+                        
+                        <!-- Description/Author -->
+                        <p class="text-white/70 text-sm mb-4 line-clamp-2 leading-relaxed">
+                            by ${book.author}
+                        </p>
+                        
+                        <!-- Tags -->
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            ${isBestSeller ? `
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-semibold bg-white/20 backdrop-blur-sm border border-white/30 text-white uppercase tracking-wide">
+                                    Best Seller
+                                </span>
+                            ` : ''}
+                            ${stockLeft > 0 && stockLeft <= 10 && book.stock !== undefined ? `
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-semibold bg-white/20 backdrop-blur-sm border border-white/30 text-white uppercase tracking-wide">
+                                    ${stockLeft} left
+                                </span>
+                            ` : ''}
+                            ${book.genre ? `
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-semibold bg-white/20 backdrop-blur-sm border border-white/30 text-white uppercase tracking-wide">
+                                    ${book.genre}
+                                </span>
+                            ` : ''}
+                        </div>
+                        
+                        <!-- View Details Button -->
+                        <a href="${book.link}" class="block w-full py-3.5 bg-white text-gray-900 text-center text-sm font-bold rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
+                            View Details
+                        </a>
                     </div>
                 </div>
+                
+                ${book.is_on_sale && discountPercent > 0 ? `
+                    <div class="absolute bottom-24 right-5 z-10">
+                        <span class="text-xs text-white/60 line-through">RM ${parseFloat(book.price).toFixed(0)}</span>
+                    </div>
+                ` : ''}
             </div>
         `;
     },
@@ -627,3 +670,4 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 Alpine.start();
+

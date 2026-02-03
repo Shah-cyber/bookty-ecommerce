@@ -65,8 +65,8 @@ class Coupon extends Model
             return false;
         }
         
-        // Check minimum purchase amount
-        if ($orderAmount < $this->min_purchase_amount) {
+        // Check minimum purchase amount (only if set)
+        if ($this->min_purchase_amount !== null && $orderAmount < $this->min_purchase_amount) {
             return false;
         }
         
@@ -91,17 +91,20 @@ class Coupon extends Model
      */
     public function calculateDiscount($orderAmount)
     {
-        if ($this->free_shipping) {
-            return 0;
+        // For free shipping only coupons, return the discount if any
+        // Otherwise return 0 (shipping discount is handled separately)
+        if ($this->free_shipping && !$this->discount_value) {
+            return 0.0;
         }
+        
         if ($this->discount_type === 'fixed') {
-            return min($this->discount_value, $orderAmount);
+            return (float) min((float) ($this->discount_value ?? 0), (float) $orderAmount);
         }
         
         if ($this->discount_type === 'percentage') {
-            return ($orderAmount * $this->discount_value) / 100;
+            return (float) (((float) $orderAmount * (float) ($this->discount_value ?? 0)) / 100);
         }
         
-        return 0;
+        return 0.0;
     }
 }

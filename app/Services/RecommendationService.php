@@ -101,7 +101,7 @@ class RecommendationService
         // Build user preference profile from multiple sources
         $purchasedBookIds = $this->getPurchasedBookIds($user);
         $wishlistBookIds = $user->wishlistBooks()->pluck('books.id')->all();
-        
+
         // Get interactions (views, clicks, cart) - this helps cold-start users!
         $interactions = UserBookInteraction::where('user_id', $user->id)
             ->whereIn('action', ['view', 'click', 'cart', 'wishlist'])
@@ -154,14 +154,14 @@ class RecommendationService
             }
 
             if ($weight > 0) {
-                if ($book->genre) {
-                    $genreWeights[$book->genre->id] = ($genreWeights[$book->genre->id] ?? 0) + $weight;
-                }
-                foreach ($book->tropes as $trope) {
-                    $tropeWeights[$trope->id] = ($tropeWeights[$trope->id] ?? 0) + ($weight * 0.7);
-                }
-                if (!empty($book->author)) {
-                    $authorWeights[$book->author] = ($authorWeights[$book->author] ?? 0) + ($weight * 0.5);
+            if ($book->genre) {
+                $genreWeights[$book->genre->id] = ($genreWeights[$book->genre->id] ?? 0) + $weight;
+            }
+            foreach ($book->tropes as $trope) {
+                $tropeWeights[$trope->id] = ($tropeWeights[$trope->id] ?? 0) + ($weight * 0.7);
+            }
+            if (!empty($book->author)) {
+                $authorWeights[$book->author] = ($authorWeights[$book->author] ?? 0) + ($weight * 0.5);
                 }
             }
         }

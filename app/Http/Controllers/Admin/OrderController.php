@@ -61,6 +61,11 @@ class OrderController extends Controller
         $statuses = ['pending', 'processing', 'shipped', 'completed', 'cancelled'];
         $paymentStatuses = ['pending', 'paid', 'failed', 'refunded'];
 
+        // If AJAX request, return only the table HTML
+        if ($request->ajax()) {
+            return view('admin.orders.partials.table', compact('orders', 'statuses', 'paymentStatuses'))->render();
+        }
+
         return view('admin.orders.index', compact('orders', 'statuses', 'paymentStatuses'));
     }
 
