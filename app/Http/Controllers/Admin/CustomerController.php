@@ -58,12 +58,6 @@ class CustomerController extends Controller
         }
         
         $customers = $query->withCount('orders')->paginate(6);
-        
-        // If AJAX request, return only the table HTML
-        if ($request->ajax()) {
-            return view('admin.customers.partials.table', compact('customers'))->render();
-        }
-        
         return view('admin.customers.index', compact('customers'));
     }
 

@@ -81,12 +81,6 @@ class Order extends Model
             return true; // No history to verify against
         }
         
-        // If free shipping is applied, prices are intentionally set to 0
-        // So we skip verification for free shipping orders
-        if ($this->is_free_shipping) {
-            return true; // Free shipping orders are always valid
-        }
-        
         return $this->shipping_customer_price == $this->postageRateHistory->customer_price
             && $this->shipping_actual_cost == $this->postageRateHistory->actual_cost;
     }
