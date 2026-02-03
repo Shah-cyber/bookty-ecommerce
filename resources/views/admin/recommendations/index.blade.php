@@ -190,7 +190,7 @@
 
         <!-- Top Recommended Books Table -->
         <div
-            class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+            class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden relative">
             <div
                 class="p-6 border-b border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
@@ -199,99 +199,103 @@
                     </p>
                 </div>
 
-                <div class="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1 text-xs font-medium">
+                <div class="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1 text-xs font-medium relative" id="period-filter-container">
                     <button
-                        class="px-3 py-1.5 bg-white dark:bg-gray-600 shadow-sm rounded-md text-gray-800 dark:text-gray-100">All
-                        Time</button>
+                        data-period="all_time"
+                        class="period-filter-btn px-3 py-1.5 rounded-md text-gray-800 dark:text-gray-100 transition-all duration-300 ease-in-out {{ $period === 'all_time' ? 'bg-white dark:bg-gray-600 shadow-sm transform scale-105' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200' }}">
+                        All Time
+                    </button>
                     <button
-                        class="px-3 py-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">This
-                        Month</button>
+                        data-period="this_month"
+                        class="period-filter-btn px-3 py-1.5 rounded-md text-gray-800 dark:text-gray-100 transition-all duration-300 ease-in-out {{ $period === 'this_month' ? 'bg-white dark:bg-gray-600 shadow-sm transform scale-105' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200' }}">
+                        This Month
+                    </button>
                     <button
-                        class="px-3 py-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">This
-                        Week</button>
+                        data-period="this_week"
+                        class="period-filter-btn px-3 py-1.5 rounded-md text-gray-800 dark:text-gray-100 transition-all duration-300 ease-in-out {{ $period === 'this_week' ? 'bg-white dark:bg-gray-600 shadow-sm transform scale-105' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200' }}">
+                        This Week
+                    </button>
                 </div>
             </div>
 
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm text-left">
-                    <thead
-                        class="bg-gray-50 dark:bg-gray-700/50 text-xs text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wider">
-                        <tr>
-                            <th class="px-6 py-4">Rank</th>
-                            <th class="px-6 py-4">Book Details</th>
-                            <th class="px-6 py-4">Category</th>
-                            <th class="px-6 py-4 text-center">Conversion</th>
-                            <th class="px-6 py-4 text-center">Confidence</th>
-                            <th class="px-6 py-4 text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100 dark:divide-gray-700 text-gray-600 dark:text-gray-300">
-                        @foreach($topRecommended as $index => $book)
-                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                                <td class="px-6 py-4 font-bold text-blue-600 dark:text-blue-400">#{{ $index + 1 }}</td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-4">
-                                        @if($book->cover_image)
-                                            <img src="{{ asset('storage/' . $book->cover_image) }}"
-                                                class="w-10 h-14 object-cover rounded shadow-sm">
-                                        @else
-                                            <div
-                                                class="w-10 h-14 bg-gray-200 dark:bg-gray-600 rounded flex items-center justify-center">
-                                                <i class="fas fa-book text-gray-400 text-xs"></i>
-                                            </div>
-                                        @endif
-                                        <div>
-                                            <div class="font-bold text-gray-800 dark:text-gray-100">{{ $book->title }}</div>
-                                            <div class="text-xs text-gray-500">by {{ $book->author }}</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span
-                                        class="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
-                                        {{ $book->genre->name ?? 'Uncategorized' }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 text-center">
-                                    <div class="flex flex-col items-center">
-                                        <span
-                                            class="font-bold text-gray-800 dark:text-gray-200">{{ $book->order_items_count }}</span>
-                                        <span class="text-[10px] text-gray-400 uppercase">Orders</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center justify-center gap-2">
-                                        @php $confidence = rand(75, 95); @endphp
-                                        <div class="w-16 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                            <div class="h-full bg-green-500 rounded-full" style="width: {{ $confidence }}%">
-                                            </div>
-                                        </div>
-                                        <span class="text-xs font-bold text-green-600">{{ $confidence }}%</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-right">
-                                    <div class="flex items-center justify-end gap-2">
-                                        <a href="{{ route('books.show', $book) }}"
-                                            class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition"
-                                            title="View Details">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <button
-                                            class="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/30 rounded-lg transition"
-                                            title="Analytics">
-                                            <i class="fas fa-chart-bar"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+            <!-- Recommendations Table Container -->
+            <div id="recommendations-table-container" class="transition-opacity duration-300">
+                @include('admin.recommendations.partials.table')
+            </div>
+
+            <!-- Loading Overlay -->
+            <div id="recommendations-loading-overlay" class="hidden absolute inset-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm z-10 rounded-b-lg">
+                <div class="flex items-center justify-center h-full">
+                <div class="flex flex-col items-center gap-3">
+                    <svg class="animate-spin h-8 w-8 text-blue-600 dark:text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span class="text-sm text-gray-700 dark:text-gray-300 font-medium">Loading recommendations...</span>
+                </div>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- CSS Overrides for ApexCharts Tooltip -->
+    <style>
+        /* Period Filter Animations */
+        .period-filter-btn {
+            position: relative;
+            z-index: 1;
+        }
+
+        .period-filter-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .period-filter-btn:active {
+            transform: scale(0.98);
+        }
+
+        #period-filter-container {
+            position: relative;
+        }
+
+        /* Smooth table transitions */
+        #recommendations-table-container {
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        #recommendations-table-container table tbody tr {
+            animation: fadeInRow 0.3s ease-in-out;
+        }
+
+        @keyframes fadeInRow {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Loading overlay animation */
+        #recommendations-loading-overlay {
+            transition: opacity 0.2s ease-in-out;
+        }
+
+        #recommendations-loading-overlay:not(.hidden) {
+            animation: fadeIn 0.2s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
     <style>
         .apexcharts-tooltip {
             background-color: #ffffff !important;
@@ -334,15 +338,29 @@
             // Chart data from backend
             const chartData = {
                 effectiveness: {
-                    contentBased: {{ round($algorithmInsights['content_based_effectiveness']['genre_match_rate'] * 100) }},
-                    collaborative: {{ round($algorithmInsights['collaborative_effectiveness']['user_similarity_accuracy'] * 100) }},
-                    hybrid: {{ round(($algorithmInsights['content_based_effectiveness']['genre_match_rate'] + $algorithmInsights['collaborative_effectiveness']['user_similarity_accuracy']) / 2 * 100) }}
-                                        },
+                    contentBased: {
+                        value: {{ round($algorithmInsights['content_based_effectiveness']['genre_match_rate'] * 100) }},
+                        genreMatch: {{ round($algorithmInsights['content_based_effectiveness']['genre_match_rate'] * 100) }},
+                        tropeMatch: {{ round($algorithmInsights['content_based_effectiveness']['trope_match_rate'] * 100) }},
+                        authorMatch: {{ round($algorithmInsights['content_based_effectiveness']['author_match_rate'] * 100) }}
+                    },
+                    collaborative: {
+                        value: {{ round($algorithmInsights['collaborative_effectiveness']['user_similarity_accuracy'] * 100) }},
+                        userSimilarity: {{ round($algorithmInsights['collaborative_effectiveness']['user_similarity_accuracy'] * 100) }},
+                        coPurchase: {{ round($algorithmInsights['collaborative_effectiveness']['co_purchase_accuracy'] * 100) }},
+                        coverage: {{ round($algorithmInsights['collaborative_effectiveness']['collaborative_coverage'] * 100) }}
+                    },
+                    hybrid: {
+                        value: {{ round(($algorithmInsights['content_based_effectiveness']['genre_match_rate'] + $algorithmInsights['collaborative_effectiveness']['user_similarity_accuracy']) / 2 * 100) }},
+                        contentWeight: 60,
+                        collaborativeWeight: 40
+                    }
+                },
                 accuracy: {
                     precision: {{ round($accuracyMetrics['precision'] * 100) }},
                     recall: {{ round($accuracyMetrics['recall'] * 100) }},
                     f1Score: {{ round($accuracyMetrics['f1_score'] * 100) }}
-                                        },
+                },
                 trends: {
                     precision: [{{ round($accuracyMetrics['precision'] * 100) - 3 }}, {{ round($accuracyMetrics['precision'] * 100) - 1 }}, {{ round($accuracyMetrics['precision'] * 100) }}, {{ round($accuracyMetrics['precision'] * 100) + 1 }}],
                     recall: [{{ round($accuracyMetrics['recall'] * 100) - 2 }}, {{ round($accuracyMetrics['recall'] * 100) }}, {{ round($accuracyMetrics['recall'] * 100) + 1 }}, {{ round($accuracyMetrics['recall'] * 100) + 2 }}],
@@ -362,7 +380,11 @@
                     },
                     series: [{
                         name: 'Effectiveness',
-                        data: [chartData.effectiveness.contentBased, chartData.effectiveness.collaborative, chartData.effectiveness.hybrid]
+                        data: [
+                            chartData.effectiveness.contentBased.value,
+                            chartData.effectiveness.collaborative.value,
+                            chartData.effectiveness.hybrid.value
+                        ]
                     }],
                     chart: {
                         type: 'bar',
@@ -420,9 +442,63 @@
                             fontSize: '12px',
                             fontFamily: 'Inter, sans-serif'
                         },
-                        y: {
-                            formatter: function (val) { return val + "%" }
-                        }
+                        custom: (function(isDarkMode) {
+                            return function({series, seriesIndex, dataPointIndex, w}) {
+                                const algorithmNames = ['Content-Based', 'Collaborative', 'Hybrid'];
+                                const algorithmName = algorithmNames[dataPointIndex];
+                                const value = series[seriesIndex][dataPointIndex];
+                                
+                                let details = '';
+                                if (dataPointIndex === 0) {
+                                    // Content-Based details
+                                    details = `
+                                        <div style="padding: 4px 0; border-top: 1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}; margin-top: 8px;">
+                                            <div style="font-size: 11px; color: ${isDarkMode ? '#9ca3af' : '#6b7280'}; margin-top: 6px;">
+                                                <div>Genre Match: ${chartData.effectiveness.contentBased.genreMatch}%</div>
+                                                <div>Trope Match: ${chartData.effectiveness.contentBased.tropeMatch}%</div>
+                                                <div>Author Match: ${chartData.effectiveness.contentBased.authorMatch}%</div>
+                                            </div>
+                                        </div>
+                                    `;
+                                } else if (dataPointIndex === 1) {
+                                    // Collaborative details
+                                    details = `
+                                        <div style="padding: 4px 0; border-top: 1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}; margin-top: 8px;">
+                                            <div style="font-size: 11px; color: ${isDarkMode ? '#9ca3af' : '#6b7280'}; margin-top: 6px;">
+                                                <div>User Similarity: ${chartData.effectiveness.collaborative.userSimilarity}%</div>
+                                                <div>Co-Purchase Accuracy: ${chartData.effectiveness.collaborative.coPurchase}%</div>
+                                                <div>Coverage: ${chartData.effectiveness.collaborative.coverage}%</div>
+                                            </div>
+                                        </div>
+                                    `;
+                                } else if (dataPointIndex === 2) {
+                                    // Hybrid details
+                                    details = `
+                                        <div style="padding: 4px 0; border-top: 1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}; margin-top: 8px;">
+                                            <div style="font-size: 11px; color: ${isDarkMode ? '#9ca3af' : '#6b7280'}; margin-top: 6px;">
+                                                <div>Content-Based Weight: ${chartData.effectiveness.hybrid.contentWeight}%</div>
+                                                <div>Collaborative Weight: ${chartData.effectiveness.hybrid.collaborativeWeight}%</div>
+                                            </div>
+                                        </div>
+                                    `;
+                                }
+                                
+                                return `
+                                    <div style="padding: 8px 12px; background: ${isDarkMode ? '#1f2937' : '#ffffff'}; border: 1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}; border-radius: 6px;">
+                                        <div style="font-weight: 600; font-size: 13px; color: ${isDarkMode ? '#f3f4f6' : '#111827'}; margin-bottom: 4px;">
+                                            ${algorithmName}
+                                        </div>
+                                        <div style="font-size: 18px; font-weight: 700; color: ${isDarkMode ? '#60a5fa' : '#3b82f6'};">
+                                            ${value}%
+                                        </div>
+                                        <div style="font-size: 11px; color: ${isDarkMode ? '#9ca3af' : '#6b7280'}; margin-top: 4px;">
+                                            Effectiveness Score
+                                        </div>
+                                        ${details}
+                                    </div>
+                                `;
+                            };
+                        })(isDark)
                     }
                 };
 
@@ -493,7 +569,35 @@
                             fontSize: '12px',
                             fontFamily: 'Inter, sans-serif'
                         },
-                        y: { formatter: function (val) { return val + "%" } }
+                        custom: (function(isDarkMode) {
+                            return function({series, seriesIndex, dataPointIndex, w}) {
+                                const metricNames = ['Precision', 'Recall', 'F1 Score'];
+                                const metricName = metricNames[seriesIndex];
+                                const weekNames = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+                                const weekName = weekNames[dataPointIndex];
+                                const value = series[seriesIndex][dataPointIndex];
+                                
+                                const colors = [
+                                    isDarkMode ? '#60a5fa' : '#3b82f6',
+                                    isDarkMode ? '#34d399' : '#10b981',
+                                    isDarkMode ? '#f87171' : '#ef4444'
+                                ];
+                                
+                                return `
+                                    <div style="padding: 8px 12px; background: ${isDarkMode ? '#1f2937' : '#ffffff'}; border: 1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}; border-radius: 6px;">
+                                        <div style="font-weight: 600; font-size: 13px; color: ${isDarkMode ? '#f3f4f6' : '#111827'}; margin-bottom: 4px;">
+                                            ${metricName}
+                                        </div>
+                                        <div style="font-size: 11px; color: ${isDarkMode ? '#9ca3af' : '#6b7280'}; margin-bottom: 4px;">
+                                            ${weekName}
+                                        </div>
+                                        <div style="font-size: 18px; font-weight: 700; color: ${colors[seriesIndex]};">
+                                            ${value}%
+                                        </div>
+                                    </div>
+                                `;
+                            };
+                        })(isDark)
                     },
                     legend: {
                         position: 'top',
@@ -570,6 +674,89 @@
                 observer.observe(document.documentElement, {
                     attributes: true,
                     attributeFilter: ['class']
+                });
+            });
+
+            // Period Filter Functionality
+            document.addEventListener('DOMContentLoaded', function() {
+                const filterButtons = document.querySelectorAll('.period-filter-btn');
+                const tableContainer = document.getElementById('recommendations-table-container');
+                const loadingOverlay = document.getElementById('recommendations-loading-overlay');
+                const currentPeriod = '{{ $period }}';
+
+                // Set initial active state
+                filterButtons.forEach(btn => {
+                    const period = btn.getAttribute('data-period');
+                    if (period === currentPeriod) {
+                        btn.classList.add('bg-white', 'dark:bg-gray-600', 'shadow-sm', 'transform', 'scale-105');
+                        btn.classList.remove('text-gray-500', 'dark:text-gray-400');
+                    }
+                });
+
+                filterButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const period = this.getAttribute('data-period');
+                        
+                        // Don't reload if clicking the same period
+                        if (period === currentPeriod && this.classList.contains('bg-white')) {
+                            return;
+                        }
+
+                        // Show loading overlay
+                        loadingOverlay.classList.remove('hidden');
+                        tableContainer.style.opacity = '0.5';
+
+                        // Update active button with animation
+                        filterButtons.forEach(btn => {
+                            btn.classList.remove('bg-white', 'dark:bg-gray-600', 'shadow-sm', 'transform', 'scale-105');
+                            btn.classList.add('text-gray-500', 'dark:text-gray-400');
+                        });
+
+                        // Animate active button
+                        this.classList.remove('text-gray-500', 'dark:text-gray-400');
+                        this.classList.add('bg-white', 'dark:bg-gray-600', 'shadow-sm', 'transform', 'scale-105');
+
+                        // Fetch new data via AJAX
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('period', period);
+                        
+                        fetch(url.toString(), {
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'text/html'
+                            }
+                        })
+                        .then(response => response.text())
+                        .then(html => {
+                            // Fade out
+                            tableContainer.style.opacity = '0';
+                            
+                            setTimeout(() => {
+                                // Update table content
+                                tableContainer.innerHTML = html;
+                                
+                                // Fade in
+                                setTimeout(() => {
+                                    tableContainer.style.opacity = '1';
+                                    loadingOverlay.classList.add('hidden');
+                                    
+                                    // Update URL without reload
+                                    window.history.pushState({}, '', url.toString());
+                                }, 50);
+                            }, 150);
+                        })
+                        .catch(error => {
+                            console.error('Error loading recommendations:', error);
+                            loadingOverlay.classList.add('hidden');
+                            tableContainer.style.opacity = '1';
+                            alert('Error loading recommendations. Please try again.');
+                        });
+                    });
+                });
+
+                // Handle browser back/forward buttons
+                window.addEventListener('popstate', function() {
+                    location.reload();
                 });
             });
         </script>

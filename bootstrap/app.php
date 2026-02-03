@@ -12,7 +12,12 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'role' => \App\Http\Middleware\CheckRole::class,
+            // Spatie's built-in permission middlewares
+            'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+            'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+            
+            // Custom middlewares
             'ensure.cart' => \App\Http\Middleware\EnsureUserHasCart::class,
         ]);
         

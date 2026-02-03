@@ -197,17 +197,25 @@ class ReportsController extends Controller
         // Gross profit margin per genre
         $profitMarginByGenre = $this->getProfitMarginByGenre($startDate, $endDate);
         
+        // Gross profit margin per trope
+        $profitMarginByTrope = $this->getProfitMarginByTrope($startDate, $endDate);
+        
+        // Postage rate profitability
+        $postageProfitability = $this->getPostageProfitability($startDate, $endDate);
+        
         // Monthly profit vs expenses
         $monthlyProfitExpenses = $this->getMonthlyProfitExpenses($startDate, $endDate);
         
-        // Refund/return loss analysis
-        $refundLossAnalysis = $this->getRefundLossAnalysis($startDate, $endDate);
+        // Overall summary
+        $overallSummary = $this->getOverallProfitSummary($startDate, $endDate);
 
         return view('admin.reports.profitability', compact(
             'profitMarginByBook',
             'profitMarginByGenre',
+            'profitMarginByTrope',
+            'postageProfitability',
             'monthlyProfitExpenses',
-            'refundLossAnalysis',
+            'overallSummary',
             'startDate',
             'endDate'
         ));
@@ -553,6 +561,113 @@ class ReportsController extends Controller
             ->groupBy('month')
             ->orderBy('month')
             ->get();
+    }
+
+    private function getProfitMarginByTrope($startDate, $endDate)
+    {
+        return DB::table('tropes')
+            ->join('book_trope', 'tropes.id', '=', 'book_trope.trope_id')
+            ->join('books', 'book_trope.book_id', '=', 'books.id')
+            ->join('order_items', 'books.id', '=', 'order_items.book_id')
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->where('orders.status', 'completed')
+            ->whereBetween('orders.created_at', [$startDate, $endDate])
+            ->whereNotNull('order_items.cost_price')
+            ->where('order_items.cost_price', '>', 0)
+            ->select('tropes.id', 'tropes.name')
+            ->selectRaw('SUM(order_items.total_selling) as total_revenue')
+            ->selectRaw('SUM(order_items.total_cost) as total_cost')
+            ->selectRaw('SUM(order_items.total_selling - order_items.total_cost) as total_profit')
+            ->selectRaw('ROUND((SUM(order_items.total_selling - order_items.total_cost) / SUM(order_items.total_selling)) * 100, 2) as profit_margin')
+            ->selectRaw('COUNT(DISTINCT orders.id) as order_count')
+            ->groupBy('tropes.id', 'tropes.name')
+            ->orderBy('total_profit', 'desc')
+            ->limit(10)
+            ->get();
+    }
+
+    private function getPostageProfitability($startDate, $endDate)
+    {
+        // Calculate shipping profit/loss by region
+        $shippingByRegion = DB::table('orders')
+            ->where('status', 'completed')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->whereNotNull('shipping_region')
+            ->select('shipping_region')
+            ->selectRaw('COUNT(*) as order_count')
+            ->selectRaw('SUM(shipping_customer_price) as customer_paid')
+            ->selectRaw('SUM(shipping_actual_cost) as actual_cost')
+            ->selectRaw('SUM(shipping_customer_price - shipping_actual_cost) as profit_loss')
+            ->selectRaw('ROUND(AVG(shipping_customer_price), 2) as avg_customer_price')
+            ->selectRaw('ROUND(AVG(shipping_actual_cost), 2) as avg_actual_cost')
+            ->groupBy('shipping_region')
+            ->get();
+
+        // Calculate free shipping impact
+        $freeShippingImpact = DB::table('orders')
+            ->where('status', 'completed')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->where('is_free_shipping', true)
+            ->selectRaw('COUNT(*) as free_shipping_count')
+            ->selectRaw('SUM(shipping_actual_cost) as lost_revenue')
+            ->first();
+
+        // Total shipping metrics
+        $totalShippingMetrics = DB::table('orders')
+            ->where('status', 'completed')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->selectRaw('SUM(shipping_customer_price) as total_customer_paid')
+            ->selectRaw('SUM(shipping_actual_cost) as total_actual_cost')
+            ->selectRaw('SUM(shipping_customer_price - shipping_actual_cost) as total_profit_loss')
+            ->first();
+
+        return [
+            'by_region' => $shippingByRegion,
+            'free_shipping_impact' => $freeShippingImpact,
+            'total_metrics' => $totalShippingMetrics,
+        ];
+    }
+
+    private function getOverallProfitSummary($startDate, $endDate)
+    {
+        // Total sales and profit from books
+        $bookMetrics = DB::table('orders')
+            ->join('order_items', 'orders.id', '=', 'order_items.order_id')
+            ->where('orders.status', 'completed')
+            ->whereBetween('orders.created_at', [$startDate, $endDate])
+            ->whereNotNull('order_items.cost_price')
+            ->where('order_items.cost_price', '>', 0)
+            ->selectRaw('SUM(order_items.total_selling) as total_revenue')
+            ->selectRaw('SUM(order_items.total_cost) as total_cost')
+            ->selectRaw('SUM(order_items.total_selling - order_items.total_cost) as total_profit')
+            ->selectRaw('COUNT(DISTINCT orders.id) as order_count')
+            ->first();
+
+        // Shipping profit/loss
+        $shippingMetrics = DB::table('orders')
+            ->where('status', 'completed')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->selectRaw('SUM(shipping_customer_price) as shipping_revenue')
+            ->selectRaw('SUM(shipping_actual_cost) as shipping_cost')
+            ->selectRaw('SUM(shipping_customer_price - shipping_actual_cost) as shipping_profit')
+            ->first();
+
+        $totalRevenue = ($bookMetrics->total_revenue ?? 0) + ($shippingMetrics->shipping_revenue ?? 0);
+        $totalCost = ($bookMetrics->total_cost ?? 0) + ($shippingMetrics->shipping_cost ?? 0);
+        $totalProfit = $totalRevenue - $totalCost;
+        $profitMargin = $totalRevenue > 0 ? round(($totalProfit / $totalRevenue) * 100, 2) : 0;
+
+        return [
+            'total_revenue' => $totalRevenue,
+            'total_cost' => $totalCost,
+            'total_profit' => $totalProfit,
+            'profit_margin' => $profitMargin,
+            'book_revenue' => $bookMetrics->total_revenue ?? 0,
+            'book_profit' => $bookMetrics->total_profit ?? 0,
+            'shipping_revenue' => $shippingMetrics->shipping_revenue ?? 0,
+            'shipping_profit' => $shippingMetrics->shipping_profit ?? 0,
+            'order_count' => $bookMetrics->order_count ?? 0,
+        ];
     }
 
     private function getRefundLossAnalysis($startDate, $endDate)

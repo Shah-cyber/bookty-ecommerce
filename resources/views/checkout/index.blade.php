@@ -236,6 +236,9 @@
                     return;
                 }
                 
+                // Get current subtotal
+                const subtotal = parseAmount(subtotalElement.innerText);
+                
                 // Show loading state
                 applyCouponBtn.disabled = true;
                 applyCouponBtn.innerText = 'Applying...';
@@ -264,16 +267,21 @@
                         // Show success message
                         showMessage(data.message, 'success');
                         
-                        // Update discount amount
-                        discountRow.classList.remove('hidden');
-                        discountAmount.innerText = `-RM ${data.discount_amount.toFixed(2)}`;
+                        // Convert discount amount to number
+                        const discountValue = parseFloat(data.discount_amount) || 0;
+                        
+                        // Update discount amount (only show if there's a discount)
+                        if (discountValue > 0) {
+                            discountRow.classList.remove('hidden');
+                            discountAmount.innerText = `-RM ${discountValue.toFixed(2)}`;
+                        }
                         
                         // Update total
                         updateTotal();
                         
                         // Store coupon code and discount amount in hidden inputs
                         appliedCouponInput.value = couponCode;
-                        appliedDiscountInput.value = data.discount_amount;
+                        appliedDiscountInput.value = discountValue.toFixed(2);
                         
                         // Disable coupon input and button
                         couponCodeInput.disabled = true;
@@ -281,6 +289,7 @@
                         applyCouponBtn.disabled = true;
 
                         // Re-fetch postage with potential free shipping from coupon
+                        // This will update the shipping amount if the coupon provides free shipping
                         try {
                             const stateEl = document.getElementById('shipping_state');
                             if (stateEl && stateEl.value) {

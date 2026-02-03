@@ -57,7 +57,7 @@ class CouponController extends Controller
             $coupon->starts_at = $request->starts_at;
             $coupon->expires_at = $request->expires_at;
             $coupon->is_active = true;
-            $coupon->free_shipping = $request->has('free_shipping') ? true : false;
+            $coupon->free_shipping = $request->boolean('free_shipping');
             $coupon->save();
             
             return redirect()->route('admin.coupons.index')
@@ -115,8 +115,8 @@ class CouponController extends Controller
             $coupon->max_uses_total = $request->max_uses_total;
             $coupon->starts_at = $request->starts_at;
             $coupon->expires_at = $request->expires_at;
-            $coupon->is_active = $request->has('is_active') ? true : false;
-            $coupon->free_shipping = $request->has('free_shipping') ? true : false;
+            $coupon->is_active = $request->boolean('is_active');
+            $coupon->free_shipping = $request->boolean('free_shipping');
             $coupon->save();
             
             return redirect()->route('admin.coupons.index')

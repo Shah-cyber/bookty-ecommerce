@@ -1,0 +1,105 @@
+' Hybrid Recommendation System - Sequence Diagram
+' Mermaid version: diagrams/hybrid-recommendation-sequence.mmd
+' Render: VS Code PlantUML extension (Alt+D), or paste at https://www.plantuml.com/plantuml/uml/
+' Export: PNG, SVG for FYP report
+@startuml Hybrid Recommendation Sequence
+title Hybrid Recommendation System - Sequence Diagram
+
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "User" as User
+participant "Controller\n(HomeController /\nRecommendationController)" as Controller
+participant "RecommendationService" as RecSvc
+participant "Cache" as Cache
+participant "OrderItem\n+ Order" as OrderItem
+participant "UserBookInteraction" as UBI
+participant "User\n(wishlistBooks)" as UserModel
+participant "Book" as Book
+
+== Request Recommendations ==
+User -> Controller: GET /api/recommendations/me?limit=12
+activate Controller
+Controller -> RecSvc: recommendForUser(user, limit)
+activate RecSvc
+
+== Cache Check ==
+RecSvc -> Cache: get(reco:user:{id}:v1:{limit})
+
+alt Cache Hit
+    Cache --> RecSvc: cached Collection<Book>
+else Cache Miss
+    Cache --> RecSvc: null
+    RecSvc -> RecSvc: generateRecommendations(user, limit)
+    
+    == Content-Based Filtering ==
+    RecSvc -> RecSvc: contentBasedScores(user)
+    activate RecSvc #LightBlue
+    
+    RecSvc -> OrderItem: getPurchasedBookIds(user)\n[join orders, status=completed]
+    OrderItem --> RecSvc: purchasedBookIds[]
+    
+    RecSvc -> UserModel: wishlistBooks()
+    UserModel --> RecSvc: wishlistBookIds[]
+    
+    RecSvc -> UBI: where(user_id, action in [view,click,cart,wishlist])
+    UBI --> RecSvc: interactions (book_id => weight×count)
+    
+    RecSvc -> Book: whereIn(id, interestIds)\nwith genre, tropes
+    Book --> RecSvc: baseBooks
+    
+    note right of RecSvc
+        Build genre/trope/author weights
+        from purchased (5.0), wishlist (3.0),
+        interactions (capped 2.0)
+    end note
+    
+    RecSvc -> Book: whereNotIn(purchased), stock>0
+    Book --> RecSvc: candidates
+    
+    RecSvc -> RecSvc: score each candidate\n(genre + trope + author + popularity)
+    RecSvc -> RecSvc: normalizeVector(scores)
+    RecSvc --> RecSvc: contentScores[book_id => 0..1]
+    deactivate RecSvc
+    
+    == Collaborative Filtering ==
+    RecSvc -> RecSvc: collaborativeScores(user)
+    activate RecSvc #LightGreen
+    
+    RecSvc -> OrderItem: getPurchasedBookIds(user)
+    OrderItem --> RecSvc: purchasedBookIds[]
+    
+    RecSvc -> OrderItem: find peer users\n(users who bought same books)
+    OrderItem --> RecSvc: peerUserIds[]
+    
+    RecSvc -> OrderItem: books purchased by peers\n(not in user's purchased)\ngroup by book_id, count, limit 200
+    OrderItem --> RecSvc: rows (book_id, cnt)
+    
+    RecSvc -> RecSvc: normalizeVector(scores)
+    RecSvc --> RecSvc: collabScores[book_id => 0..1]
+    deactivate RecSvc
+    
+    == Hybrid Fusion ==
+    alt Cold Start (both contentScores and collabScores empty)
+        RecSvc -> RecSvc: fallbackRecommendations(limit)
+        RecSvc -> Book: where(stock>0)\norderBy(reviews_count, created_at)\ntake(limit)
+        Book --> RecSvc: popular books
+    else Has Scores
+        note right of RecSvc
+            finalScore = 0.6 × contentScore
+                       + 0.4 × collabScore
+        end note
+        RecSvc -> Book: whereIn(id, scoredIds)\nwith genre, tropes
+        Book --> RecSvc: books
+        RecSvc -> RecSvc: sortByDesc(score), take(limit)
+    end
+    
+    RecSvc -> Cache: put(result, 30 min)
+end
+
+RecSvc --> Controller: Collection<Book>
+deactivate RecSvc
+Controller --> User: JSON { data: books[] }
+deactivate Controller
+
+@enduml
