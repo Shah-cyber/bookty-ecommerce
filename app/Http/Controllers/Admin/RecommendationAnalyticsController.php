@@ -21,11 +21,8 @@ class RecommendationAnalyticsController extends Controller
     /**
      * Display the recommendation analytics dashboard
      */
-    public function index(Request $request)
+    public function index()
     {
-        // Get time period filter (all_time, this_month, this_week)
-        $period = $request->get('period', 'all_time');
-        
         // Get basic statistics
         $stats = $this->getBasicStats();
         
@@ -38,16 +35,11 @@ class RecommendationAnalyticsController extends Controller
         // Get algorithm insights
         $algorithmInsights = $this->getAlgorithmInsights();
         
-        // Get top recommended books with time period filter
-        $topRecommended = $this->getTopRecommendedBooks($period);
+        // Get top recommended books
+        $topRecommended = $this->getTopRecommendedBooks();
         
         // Get recommendation accuracy metrics
         $accuracyMetrics = $this->getAccuracyMetrics();
-
-        // If AJAX request, return only the table HTML
-        if ($request->ajax()) {
-            return view('admin.recommendations.partials.table', compact('topRecommended'))->render();
-        }
 
         return view('admin.recommendations.index', compact(
             'stats',
@@ -55,8 +47,7 @@ class RecommendationAnalyticsController extends Controller
             'userPatterns',
             'algorithmInsights',
             'topRecommended',
-            'accuracyMetrics',
-            'period'
+            'accuracyMetrics'
         ));
     }
 
@@ -179,51 +170,16 @@ class RecommendationAnalyticsController extends Controller
     /**
      * Get top recommended books
      */
-    private function getTopRecommendedBooks($period = 'all_time')
+    private function getTopRecommendedBooks()
     {
-        $query = Book::with(['genre', 'tropes'])
-            ->whereHas('orderItems', function($q) use ($period) {
-                $q->whereHas('order', function($orderQuery) use ($period) {
-                    $orderQuery->where('status', 'completed');
-                    
-                    // Apply time period filter
-                    switch ($period) {
-                        case 'this_week':
-                            $orderQuery->where('created_at', '>=', now()->startOfWeek());
-                            break;
-                        case 'this_month':
-                            $orderQuery->where('created_at', '>=', now()->startOfMonth());
-                            break;
-                        case 'all_time':
-                        default:
-                            // No date filter for all time
-                            break;
-                    }
-                });
-            })
-            ->withCount(['orderItems' => function($q) use ($period) {
-                $q->whereHas('order', function($orderQuery) use ($period) {
-                    $orderQuery->where('status', 'completed');
-                    
-                    // Apply time period filter
-                    switch ($period) {
-                        case 'this_week':
-                            $orderQuery->where('created_at', '>=', now()->startOfWeek());
-                            break;
-                        case 'this_month':
-                            $orderQuery->where('created_at', '>=', now()->startOfMonth());
-                            break;
-                        case 'all_time':
-                        default:
-                            // No date filter for all time
-                            break;
-                    }
-                });
-            }])
+        // This would ideally track which books are most frequently recommended
+        // For now, we'll use books that appear in many orders as a proxy
+        return Book::with(['genre', 'tropes'])
+            ->whereHas('orderItems')
+            ->withCount('orderItems')
             ->orderBy('order_items_count', 'desc')
-            ->limit(10);
-        
-        return $query->get();
+            ->limit(10)
+            ->get();
     }
 
     /**

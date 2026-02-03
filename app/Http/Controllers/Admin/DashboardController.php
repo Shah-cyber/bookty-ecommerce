@@ -127,30 +127,6 @@ class DashboardController extends Controller
         $topTitle = $books->first()->title ?? null;
         $totalTitles = $books->count();
 
-        // Calculate comparison with previous equivalent period
-        $periodDays = $start->diffInDays($end);
-        $prevStart = (clone $start)->subDays($periodDays);
-        $prevEnd = (clone $start);
-        
-        $prevTotalSold = Book::whereHas('orderItems', function($query) use ($prevStart, $prevEnd) {
-                $query->whereHas('order', function($q) use ($prevStart, $prevEnd) {
-                    $q->where('status', 'completed')
-                      ->whereBetween('created_at', [$prevStart, $prevEnd]);
-                });
-            })
-            ->withCount(['orderItems as total_sold' => function($query) use ($prevStart, $prevEnd) {
-                $query->whereHas('order', function($q) use ($prevStart, $prevEnd) {
-                    $q->where('status', 'completed')
-                      ->whereBetween('created_at', [$prevStart, $prevEnd]);
-                });
-            }])
-            ->get()
-            ->sum('total_sold');
-        
-        $changePercent = $prevTotalSold > 0 
-            ? round((($totalSold - $prevTotalSold) / $prevTotalSold) * 100, 1) 
-            : ($totalSold > 0 ? 100 : 0);
-
         return response()->json([
             'titles' => $titles,
             'quantities' => $quantities,
@@ -159,8 +135,6 @@ class DashboardController extends Controller
                 'total_sold' => $totalSold,
                 'top_title' => $topTitle,
                 'total_titles' => $totalTitles,
-                'change_percent' => $changePercent,
-                'prev_total_sold' => $prevTotalSold,
             ],
         ]);
     }
