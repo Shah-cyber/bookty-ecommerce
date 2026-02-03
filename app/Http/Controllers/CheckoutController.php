@@ -82,18 +82,9 @@ class CheckoutController extends Controller
         // Check for free shipping via promotions or coupons
         $isFreeShipping = false;
         $appliedCouponCode = $request->input('coupon_code');
-        $appliedCoupon = null;
-        $couponDiscount = 0;
-        
         if ($appliedCouponCode) {
             $coupon = \App\Models\Coupon::where('code', $appliedCouponCode)->first();
-            if ($coupon && $coupon->isValidFor(Auth::user(), $totalAmount)) {
-                $appliedCoupon = $coupon;
-                
-                // Calculate coupon discount
-                $couponDiscount = $coupon->calculateDiscount($totalAmount);
-                
-                // Check for free shipping
+            if ($coupon && $coupon->is_active && now()->between($coupon->starts_at, $coupon->expires_at)) {
                 if ($coupon->free_shipping) {
                     $isFreeShipping = true;
                 }
@@ -115,10 +106,6 @@ class CheckoutController extends Controller
             $shippingCustomerPrice = 0;
         }
 
-        // Apply coupon discount to subtotal (before shipping)
-        $subtotalBeforeDiscount = $totalAmount;
-        $totalAmount -= $couponDiscount;
-        
         // Add shipping to total
         $totalAmount += $shippingCustomerPrice;
         
@@ -151,11 +138,6 @@ class CheckoutController extends Controller
                 'shipping_postal_code' => $request->shipping_postal_code,
                 'shipping_phone' => $request->shipping_phone,
                 'is_free_shipping' => $isFreeShipping,
-                
-                // Coupon information (usage recorded after successful payment)
-                'coupon_id' => $appliedCoupon?->id,
-                'coupon_code' => $appliedCoupon?->code,
-                'discount_amount' => $couponDiscount,
             ]);
             
             // 3. Create order items and update stock

@@ -71,7 +71,7 @@ class CouponController extends Controller
                 ]);
             }
             
-            if ($coupon->min_purchase_amount !== null && $amount < $coupon->min_purchase_amount) {
+            if ($amount < $coupon->min_purchase_amount) {
                 return response()->json([
                     'valid' => false,
                     'message' => "This coupon requires a minimum purchase of RM {$coupon->min_purchase_amount}."
@@ -108,13 +108,11 @@ class CouponController extends Controller
         // Return success response
         return response()->json([
             'valid' => true,
-            'message' => $coupon->free_shipping ? 'Coupon applied! Free shipping activated.' : 'Coupon applied successfully!',
-            'discount_amount' => (float) $discountAmount,
-            'free_shipping' => (bool) $coupon->free_shipping,
+            'message' => 'Coupon applied successfully!',
+            'discount_amount' => $discountAmount,
             'coupon' => [
                 'code' => $coupon->code,
-                'id' => $coupon->id,
-                'description' => $coupon->description,
+                'id' => $coupon->id
             ]
         ]);
     }
