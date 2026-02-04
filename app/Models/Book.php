@@ -153,31 +153,38 @@ class Book extends Model
     /**
      * Get the final price of the book after applying any discounts.
      * 
+     * If both a flash sale and a regular book discount are active,
+     * we apply whichever yields the lowest final price (they do not stack).
+     *
      * @return float
      */
     public function getFinalPriceAttribute(): float
     {
-        // Check for flash sale first (they have priority)
-        if ($this->active_flash_sale) {
+        $basePrice = $this->price;
+        $finalPrices = [$basePrice];
+
+        // Flash sale price (if any)
+        $flashSale = $this->active_flash_sale;
+        if ($flashSale) {
             $flashSaleItem = $this->flashSaleItems()
-                ->where('flash_sale_id', $this->active_flash_sale->id)
+                ->where('flash_sale_id', $flashSale->id)
                 ->first();
-                
+
             if ($flashSaleItem && $flashSaleItem->special_price) {
-                return $flashSaleItem->special_price;
+                $finalPrices[] = $flashSaleItem->special_price;
+            } else {
+                $finalPrices[] = $flashSale->getDiscountedPrice($basePrice);
             }
-            
-            return $this->active_flash_sale->getDiscountedPrice($this->price);
         }
         
-        // Then check for regular discount
+        // Regular book discount price (if any)
         $discount = $this->discount;
         if ($discount) {
-            return $discount->getDiscountedPrice($this->price);
+            $finalPrices[] = $discount->getDiscountedPrice($basePrice);
         }
         
-        // No discount applies
-        return $this->price;
+        // Return the best (lowest) price among all candidates
+        return min($finalPrices);
     }
     
     /**

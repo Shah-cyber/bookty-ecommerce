@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use App\Models\Genre;
 use App\Models\FlashSale;
+use App\Models\BookDiscount;
+use App\Models\Coupon;
 use App\Models\Order;
 use App\Services\RecommendationService;
 use Illuminate\Http\Request;
@@ -37,15 +39,30 @@ class HomeController extends Controller
             ->take(8)
             ->get();
 
-        // Get active flash sales
+        // Get active flash sale (single, soonest ending) for homepage highlight
         $activeFlashSale = FlashSale::with([
-            'books' => function ($query) {
-                $query->with(['genre', 'reviews']);
-            }
-        ])
+                'books' => function ($query) {
+                    $query->with(['genre', 'reviews']);
+                }
+            ])
             ->active()
             ->orderBy('ends_at', 'asc')
             ->first();
+
+        // Get active book discounts (for promotion ads)
+        $activeBookDiscounts = BookDiscount::with(['book' => function ($q) {
+                $q->with(['genre', 'reviews']);
+            }])
+            ->active()
+            ->orderBy('ends_at', 'asc')
+            ->take(8)
+            ->get();
+
+        // Get active coupons (for promotion ads)
+        $activeCoupons = Coupon::active()
+            ->orderBy('expires_at', 'asc')
+            ->take(3)
+            ->get();
 
         // Get personalized recommendations for authenticated users
         $recommendations = null;
@@ -93,6 +110,8 @@ class HomeController extends Controller
             'heroBooks',
             'genres',
             'activeFlashSale',
+            'activeBookDiscounts',
+            'activeCoupons',
             'recommendations',
             'testimonials',
             'totalCustomers',

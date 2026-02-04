@@ -46,6 +46,19 @@ export default {
                     },
                     black: '#1A1A1A',
                     cream: '#F9F3F0',
+                },
+                primary: {
+                    50: '#FFF5F8',
+                    100: '#FFEBF2',
+                    200: '#FFD6E3',
+                    300: '#FFB2C5', // User requested color
+                    400: '#FF8FB3',
+                    500: '#FF6699',
+                    600: '#E63D75',
+                    700: '#CC1F5E',
+                    800: '#A61448',
+                    900: '#800A33',
+                    950: '#4D031B'
                 }
             },
         },

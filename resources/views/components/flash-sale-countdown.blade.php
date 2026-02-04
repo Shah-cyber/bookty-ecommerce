@@ -1,22 +1,31 @@
 
-<div {{ $attributes->merge(['class' => 'bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg p-4 shadow-lg']) }}>
+<div {{ $attributes->merge(['class' => 'bg-gradient-to-r from-primary-600 via-primary-700 to-bookty-purple-800 text-white rounded-lg p-4 shadow-lg']) }}>
     <div class="flex items-center justify-between">
         <h3 class="text-lg font-bold">{{ $title }}</h3>
-        <div class="countdown-timer flex items-center space-x-1" data-end-time="{{ $endTime }}">
-            <div class="bg-white text-red-600 rounded px-2 py-1 font-mono font-bold text-center min-w-[2.5rem]">
-                <span class="days">00</span>
+        <div class="countdown-timer flex items-center space-x-3" data-end-time="{{ $endTime }}">
+            <div class="flex flex-col items-center">
+                <div class="bg-white text-primary-600 rounded px-2 py-1 font-mono font-bold text-center min-w-[2.8rem]">
+                    <span class="days">00</span>
+                </div>
+                <span class="mt-1 text-[10px] uppercase tracking-wide text-white/80">Days</span>
             </div>
-            <span class="text-white font-bold">:</span>
-            <div class="bg-white text-red-600 rounded px-2 py-1 font-mono font-bold text-center min-w-[2.5rem]">
-                <span class="hours">00</span>
+            <div class="flex flex-col items-center">
+                <div class="bg-white text-primary-600 rounded px-2 py-1 font-mono font-bold text-center min-w-[2.8rem]">
+                    <span class="hours">00</span>
+                </div>
+                <span class="mt-1 text-[10px] uppercase tracking-wide text-white/80">Hours</span>
             </div>
-            <span class="text-white font-bold">:</span>
-            <div class="bg-white text-red-600 rounded px-2 py-1 font-mono font-bold text-center min-w-[2.5rem]">
-                <span class="minutes">00</span>
+            <div class="flex flex-col items-center">
+                <div class="bg-white text-primary-600 rounded px-2 py-1 font-mono font-bold text-center min-w-[2.8rem]">
+                    <span class="minutes">00</span>
+                </div>
+                <span class="mt-1 text-[10px] uppercase tracking-wide text-white/80">Minutes</span>
             </div>
-            <span class="text-white font-bold">:</span>
-            <div class="bg-white text-red-600 rounded px-2 py-1 font-mono font-bold text-center min-w-[2.5rem]">
-                <span class="seconds">00</span>
+            <div class="flex flex-col items-center">
+                <div class="bg-white text-primary-600 rounded px-2 py-1 font-mono font-bold text-center min-w-[2.8rem]">
+                    <span class="seconds">00</span>
+                </div>
+                <span class="mt-1 text-[10px] uppercase tracking-wide text-white/80">Seconds</span>
             </div>
         </div>
     </div>

@@ -240,6 +240,9 @@
                 applyCouponBtn.disabled = true;
                 applyCouponBtn.innerText = 'Applying...';
                 
+                // Current subtotal (after per-book discounts)
+                const subtotal = parseAmount(subtotalElement.innerText);
+
                 // Get CSRF token
                 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
                 

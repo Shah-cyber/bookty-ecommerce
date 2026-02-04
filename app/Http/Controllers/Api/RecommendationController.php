@@ -56,6 +56,7 @@ class RecommendationController extends Controller
             'cover_image' => $book->cover_image ? asset('storage/'.$book->cover_image) : null,
             'condition' => $book->condition ?? 'new',
             'score' => $book->score ?? null,
+            'stock' => $book->stock,
             'link' => route('books.show', $book, absolute: false),
         ];
     }

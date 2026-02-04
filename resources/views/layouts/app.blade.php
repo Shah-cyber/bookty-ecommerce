@@ -24,7 +24,15 @@
         </style>
     </head>
     <body class="font-sans antialiased" data-layout="customer">
-        <div class="min-h-screen bg-gray-100">
+        <div class="min-h-screen bg-slate-50 relative overflow-hidden">
+            <!-- Liquid Background Blobs -->
+            <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+                <div class="absolute -top-40 -left-40 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float"></div>
+                <div class="absolute top-0 right-0 w-96 h-96 bg-yellow-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float animation-delay-2000"></div>
+                <div class="absolute -bottom-40 left-20 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float animation-delay-4000"></div>
+            </div>
+
+            <div class="relative z-10">
             @include('layouts.navigation')
 
             <!-- Page Heading -->
@@ -40,6 +48,7 @@
             <main>
                 @yield('content')
             </main>
+            </div>
         </div>
         
         <!-- Authentication Modal -->

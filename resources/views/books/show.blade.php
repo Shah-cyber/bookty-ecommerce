@@ -3,85 +3,175 @@
 @section('content')
     <div class="container mx-auto px-4 py-8">
         <div class="mb-6">
-            <a href="{{ route('books.index') }}" class="text-purple-600 hover:text-purple-900">
-                &larr; Back to Books
+            <a href="{{ route('books.index') }}" class="inline-flex items-center text-sm font-medium text-primary-700 hover:text-primary-900">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+                Back to Books
             </a>
         </div>
 
         {{-- Flash messages are now handled by JavaScript toast notifications --}}
 
-        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-            <div class="lg:flex">
-                <!-- Book Cover -->
-                <div class="lg:w-1/4 p-6">
-                    <div class="sticky top-6">
-                        @if($book->cover_image)
-                            <img src="{{ asset('storage/' . $book->cover_image) }}" alt="{{ $book->title }}" class="w-full h-auto object-cover rounded-lg shadow-md">
-                        @else
-                            <div class="w-full h-96 bg-gray-200 rounded-lg shadow-md flex items-center justify-center">
-                                <svg class="h-24 w-24 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                            </div>
-                        @endif
+        <div class="relative rounded-[2rem] bg-gradient-to-br from-gray-50 via-primary-50 to-white shadow-xl overflow-hidden">
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(255,255,255,0.9),_transparent_55%),_radial-gradient(circle_at_bottom_right,_rgba(15,23,42,0.12),_transparent_55%)] pointer-events-none"></div>
 
-                        <div class="mt-6">
-                            <div class="flex items-center mb-4">
-                                @if($book->is_on_sale)
-                                    <div class="flex items-center">
-                                        <span class="text-2xl font-bold text-purple-600">RM {{ number_format($book->final_price, 2) }}</span>
-                                        <span class="ml-3 text-lg text-gray-500 line-through">RM {{ number_format($book->price, 2) }}</span>
-                                        <span class="ml-3 text-sm bg-red-100 text-red-800 px-2 py-1 rounded-md">-{{ $book->discount_percent }}%</span>
-                                    </div>
-                                @else
-                                    <span class="text-2xl font-bold text-purple-600">RM {{ number_format($book->price, 2) }}</span>
-                                @endif
-                                <span class="ml-2 text-sm {{ $book->stock > 0 ? 'text-green-600' : 'text-red-600' }}">
-                                    {{ $book->stock > 0 ? 'In Stock' : 'Out of Stock' }}
+            <div class="relative z-10 lg:flex">
+                <!-- Book Cover -->
+                <div class="lg:w-1/3 p-6">
+                    <div class="sticky top-6">
+                        <div class="relative rounded-[1.75rem] overflow-hidden shadow-xl">
+                            @if($book->cover_image)
+                                <img
+                                    src="{{ asset('storage/' . $book->cover_image) }}"
+                                    alt="{{ $book->title }}"
+                                    class="w-full h-auto object-cover transform transition-transform duration-700 ease-out hover:scale-105"
+                                >
+                            @else
+                                <div class="w-full h-96 bg-gray-200 flex items-center justify-center">
+                                    <svg class="h-24 w-24 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
+                            @endif
+
+                            <!-- Top badges on cover -->
+                            <div class="absolute top-4 left-4 right-4 flex justify-between items-start">
+                                <div class="flex flex-col gap-2">
+                                    @if($book->is_on_sale)
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold bg-white/85 text-gray-900 shadow-md">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+                                            {{ $book->discount_percent }}% OFF
+                                        </span>
+                                    @endif
+                                    <span class="inline-flex items-center px-3 py-1.5 rounded-full text-[11px] font-semibold shadow-md
+                                                 {{ ($book->condition ?? 'new') === 'preloved'
+                                                        ? 'bg-amber-100/90 text-amber-900'
+                                                        : 'bg-emerald-100/90 text-emerald-900' }}">
+                                        {{ $book->condition_label ?? 'New' }}
+                                    </span>
+                                </div>
+
+                                <div class="pointer-events-auto">
+                                    @auth
+                                        <button
+                                            id="wishlist-button"
+                                            class="wishlist-btn p-2.5 rounded-full bg-white/15 hover:bg-white/25 border border-white/40 text-white hover:text-red-500 backdrop-blur-md shadow-md transition-all duration-300"
+                                            data-book-id="{{ $book->id }}"
+                                            data-in-wishlist="{{ Auth::user()->hasBookInWishlist($book->id) ? 'true' : 'false' }}"
+                                            aria-label="{{ Auth::user()->hasBookInWishlist($book->id) ? 'Remove from wishlist' : 'Add to wishlist' }}"
+                                        >
+                                            <svg
+                                                class="w-5 h-5 {{ Auth::user()->hasBookInWishlist($book->id) ? 'fill-current text-red-500' : 'fill-none' }}"
+                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                            </svg>
+                                        </button>
+                                    @else
+                                        <a
+                                            href="{{ route('login') }}"
+                                            class="p-2.5 rounded-full bg-white/15 hover:bg-white/25 border border-white/40 text-white hover:text-red-500 backdrop-blur-md shadow-md transition-all duration-300"
+                                            aria-label="Sign in to save"
+                                        >
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                            </svg>
+                                        </a>
+                                    @endauth
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    @if($book->is_on_sale)
+                                        <div class="flex items-baseline gap-2">
+                                            <span class="text-3xl font-bold text-primary-700">
+                                                RM {{ number_format($book->final_price, 2) }}
+                                            </span>
+                                            <span class="text-lg text-gray-400 line-through">
+                                                RM {{ number_format($book->price, 2) }}
+                                            </span>
+                                            <span class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-700">
+                                                -{{ $book->discount_percent }}%
+                                            </span>
+                                        </div>
+                                    @else
+                                        <span class="text-3xl font-bold text-primary-700">
+                                            RM {{ number_format($book->price, 2) }}
+                                        </span>
+                                    @endif
+                                    <p class="mt-1 text-xs text-gray-500">
+                                        {{ $book->stock > 0 ? 'Available and ready to ship' : 'Currently out of stock' }}
+                                    </p>
+                                </div>
+                                <span class="ml-4 inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
+                                             {{ $book->stock > 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700' }}">
+                                    <span class="w-2 h-2 rounded-full mr-1 {{ $book->stock > 0 ? 'bg-emerald-500' : 'bg-red-500' }}"></span>
+                                    {{ $book->stock > 0 ? 'In stock' : 'Out of stock' }}
                                 </span>
                             </div>
 
-                            <div class="flex flex-col space-y-4">
+                            <div class="flex flex-col space-y-3">
                                 @if($book->stock > 0)
-                                    <button 
-                                        type="button" 
-                                        class="ajax-add-to-cart w-full px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                                    <button
+                                        type="button"
+                                        class="btn-liquid w-full ajax-add-to-cart"
                                         data-book-id="{{ $book->id }}"
                                     >
-                                        Add to Cart
+                                        <span>Add to Cart</span>
+                                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                                        </svg>
                                     </button>
                                 @else
-                                    <button type="button" class="w-full px-4 py-2 bg-purple-600 text-white rounded-md opacity-50 cursor-not-allowed" disabled>
+                                    <button
+                                        type="button"
+                                        class="w-full py-3 rounded-full bg-gray-200/80 text-gray-500 text-sm font-semibold cursor-not-allowed border border-gray-200"
+                                        disabled
+                                    >
                                         Out of Stock
                                     </button>
                                 @endif
-                                
+
                                 @auth
-                                    <button 
-                                        type="button" 
-                                        id="wishlist-button"
-                                        class="wishlist-btn w-full px-4 py-2 {{ Auth::user()->hasBookInWishlist($book->id) ? 'bg-pink-100 text-pink-700 border border-pink-300 hover:bg-pink-200' : 'bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200' }} rounded-md flex items-center justify-center gap-2"
+                                    <button
+                                        type="button"
+                                        id="wishlist-button-secondary"
+                                        class="wishlist-btn w-full px-4 py-2 rounded-full border text-sm font-medium flex items-center justify-center gap-2
+                                               {{ Auth::user()->hasBookInWishlist($book->id)
+                                                    ? 'bg-primary-50 text-primary-700 border-primary-200 hover:bg-primary-100'
+                                                    : 'bg-white/60 text-gray-800 border-gray-200 hover:bg-gray-50' }}"
                                         data-book-id="{{ $book->id }}"
                                         data-in-wishlist="{{ Auth::user()->hasBookInWishlist($book->id) ? 'true' : 'false' }}"
                                     >
                                         @if(Auth::user()->hasBookInWishlist($book->id))
-                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
                                             </svg>
                                             <span>Remove from Wishlist</span>
                                         @else
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                                             </svg>
                                             <span>Add to Wishlist</span>
                                         @endif
                                     </button>
                                 @else
-                                    <a href="{{ route('login') }}" class="w-full px-4 py-2 bg-gray-100 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-200 flex items-center justify-center gap-2 text-center">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                    <a
+                                        href="{{ route('login') }}"
+                                        class="w-full px-4 py-2 rounded-full bg-white/70 text-gray-800 border border-gray-200 hover:bg-gray-50 flex items-center justify-center gap-2 text-sm"
+                                    >
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                                         </svg>
-                                        Sign in to Save
+                                        Sign in to save this book
                                     </a>
                                 @endauth
                             </div>
@@ -111,7 +201,7 @@
                                 New
                             </span>
                         @endif
-                        <span class="px-3 py-1 text-sm font-medium rounded-full bg-purple-100 text-purple-800 hover:bg-purple-200 transition-colors">
+                        <span class="px-3 py-1 text-sm font-medium rounded-full bg-primary-100 text-primary-800 hover:bg-primary-200 transition-colors">
                             {{ $book->genre->name }}
                         </span>
                         @foreach($book->tropes as $trope)
@@ -128,7 +218,7 @@
                                 <p>{{ $book->synopsis }}</p>
                             </div>
                             <div id="synopsis-fade" class="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-white to-transparent pointer-events-none"></div>
-                            <button id="toggle-synopsis" class="text-purple-600 hover:text-purple-800 font-semibold mt-2 text-sm">Read More</button>
+                            <button id="toggle-synopsis" class="text-primary-600 hover:text-primary-800 font-semibold mt-2 text-sm">Read More</button>
                         </div>
                     </div>
 
@@ -181,7 +271,7 @@
                 <div class="lg:w-1/4 p-6 border-t lg:border-t-0 lg:border-l border-gray-200 bg-gray-50">
                     <div class="sticky top-6">
                         <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center">
-                            <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 mr-2 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                             </svg>
                             Similar Books
@@ -191,7 +281,7 @@
                             <!-- Loading state -->
                             <div class="text-center py-8">
                                 <div class="inline-flex items-center px-3 py-2 bg-white rounded-lg shadow-sm">
-                                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-purple-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                     </svg>
@@ -202,7 +292,7 @@
                         
                         <!-- View More Button -->
                         <div class="mt-6">
-                            <a href="{{ route('books.index') }}" class="block w-full text-center px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors duration-200">
+                            <a href="{{ route('books.index') }}" class="block w-full text-center px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors duration-200">
                                 View All Books
                             </a>
                         </div>
@@ -340,7 +430,7 @@
                                 <div class="py-6">
                                     <div class="flex items-center gap-4">
                                         <div class="shrink-0">
-                                            <div class="w-11 h-11 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold border-2 border-gray-400">
+                                            <div class="w-11 h-11 rounded-full bg-gradient-to-br from-primary-500 to-primary-400 flex items-center justify-center text-white font-semibold border-2 border-gray-400">
                                                 {{ strtoupper(substr($review->user->name, 0, 1)) }}
                                             </div>
                                         </div>
@@ -539,20 +629,20 @@
                                 
                                 <div class="mb-4">
                                     <label for="comment" class="block text-sm font-medium text-gray-700 mb-1">Your Review</label>
-                                    <textarea name="comment" id="comment" rows="4" class="w-full border-gray-300 rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50" placeholder="Share your experience with this book...">{{ old('comment') }}</textarea>
+                                    <textarea name="comment" id="comment" rows="4" class="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring focus:ring-primary-200 focus:ring-opacity-50" placeholder="Share your experience with this book...">{{ old('comment') }}</textarea>
                                 </div>
                                 
                                 <!-- Image Upload Section -->
                                 <div class="mb-4">
                                     <label for="images" class="block text-sm font-medium text-gray-700 mb-2">Add Photos (Optional)</label>
-                                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-purple-400 transition-colors duration-200" id="image-upload-area">
+                                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary-400 transition-colors duration-200" id="image-upload-area">
                                         <input type="file" id="images" name="images[]" multiple accept="image/*" class="hidden" onchange="handleImageUpload(event)">
                                         <div class="space-y-2">
                                             <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                                                 <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                             </svg>
                                             <div class="text-sm text-gray-600">
-                                                <label for="images" class="relative cursor-pointer bg-white rounded-md font-medium text-purple-600 hover:text-purple-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-purple-500">
+                                                <label for="images" class="relative cursor-pointer bg-white rounded-md font-medium text-primary-600 hover:text-primary-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-500">
                                                     <span>Upload photos</span>
                                                     <input type="file" id="images" name="images[]" multiple accept="image/*" class="sr-only" onchange="handleImageUpload(event)">
                                                 </label>
@@ -589,53 +679,7 @@
                 <h2 class="text-2xl font-serif font-bold text-gray-900 mb-6">You May Also Like</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     @foreach($relatedBooks as $relatedBook)
-                        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                            <a href="{{ route('books.show', $relatedBook) }}">
-                                <div class="h-64 overflow-hidden">
-                                    @if($relatedBook->cover_image)
-                                        <img src="{{ asset('storage/' . $relatedBook->cover_image) }}" alt="{{ $relatedBook->title }}" class="w-full h-full object-cover">
-                                    @else
-                                        <div class="w-full h-full bg-gray-200 flex items-center justify-center">
-                                            <svg class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                            </svg>
-                                        </div>
-                                    @endif
-                                </div>
-                            </a>
-                            <div class="p-4">
-                                <a href="{{ route('books.show', $relatedBook) }}">
-                                    <h3 class="text-lg font-semibold text-gray-900 mb-1">{{ $relatedBook->title }}</h3>
-                                </a>
-                                <p class="text-sm text-gray-600 mb-2">{{ $relatedBook->author }}</p>
-                                <div class="flex justify-between items-center">
-                                    @if($relatedBook->is_on_sale)
-                                        <div class="flex items-center">
-                                            <span class="text-purple-600 font-semibold">RM {{ number_format($relatedBook->final_price, 2) }}</span>
-                                            <span class="ml-2 text-xs text-gray-500 line-through">RM {{ number_format($relatedBook->price, 2) }}</span>
-                                            <span class="ml-1 text-xs bg-red-100 text-red-800 px-1 py-0.5 rounded">-{{ $relatedBook->discount_percent }}%</span>
-                                        </div>
-                                    @else
-                                        <span class="text-purple-600 font-semibold">RM {{ number_format($relatedBook->price, 2) }}</span>
-                                    @endif
-                                    <span class="text-xs text-gray-500 px-2 py-1 bg-gray-100 rounded-full">{{ $relatedBook->genre->name }}</span>
-                                </div>
-                                <div class="flex items-center mt-2">
-                                    @php
-                                        $avgRating = $relatedBook->average_rating;
-                                        $reviewsCount = $relatedBook->reviews_count;
-                                    @endphp
-                                    <div class="flex">
-                                        @for ($i = 1; $i <= 5; $i++)
-                                            <svg class="w-3 h-3 {{ $i <= ($avgRating ?: 0) ? 'text-yellow-400' : 'text-gray-300' }}" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                            </svg>
-                                        @endfor
-                                    </div>
-                                    <span class="text-xs text-gray-500 ml-1">{{ $avgRating ? number_format($avgRating, 1) : 'No' }} ({{ $reviewsCount }})</span>
-                                </div>
-                            </div>
-                        </div>
+                        <x-book-card :book="$relatedBook" />
                     @endforeach
                 </div>
             </div>
@@ -651,7 +695,7 @@
                     @csrf
                     <div class="mb-4">
                         <label for="reason" class="block text-sm font-medium text-gray-700 mb-2">Reason for reporting</label>
-                        <select id="reason" name="reason" class="w-full border-gray-300 rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50" required>
+                        <select id="reason" name="reason" class="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring focus:ring-primary-200 focus:ring-opacity-50" required>
                             <option value="">Select a reason</option>
                             <option value="spam">Spam</option>
                             <option value="inappropriate">Inappropriate content</option>
@@ -662,7 +706,7 @@
                     </div>
                     <div class="mb-4">
                         <label for="description" class="block text-sm font-medium text-gray-700 mb-2">Additional details (optional)</label>
-                        <textarea id="description" name="description" rows="3" class="w-full border-gray-300 rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50" placeholder="Please provide more details about why you're reporting this review..."></textarea>
+                        <textarea id="description" name="description" rows="3" class="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring focus:ring-primary-200 focus:ring-opacity-50" placeholder="Please provide more details about why you're reporting this review..."></textarea>
                     </div>
                     <div class="flex justify-end space-x-3">
                         <button type="button" id="cancelReport" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200">

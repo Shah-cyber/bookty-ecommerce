@@ -91,17 +91,20 @@ class Coupon extends Model
      */
     public function calculateDiscount($orderAmount)
     {
-        if ($this->free_shipping) {
-            return 0;
-        }
+        // Normalize to float to avoid string issues from database decimals
+        $amount = (float) $orderAmount;
+        $value = (float) $this->discount_value;
+
+        // Free shipping is handled separately; it should not disable
+        // the monetary discount. A coupon can provide both.
         if ($this->discount_type === 'fixed') {
-            return min($this->discount_value, $orderAmount);
+            return min($value, $amount);
         }
-        
+
         if ($this->discount_type === 'percentage') {
-            return ($orderAmount * $this->discount_value) / 100;
+            return ($amount * $value) / 100;
         }
-        
+
         return 0;
     }
 }
