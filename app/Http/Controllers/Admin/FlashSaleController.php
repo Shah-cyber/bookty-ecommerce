@@ -95,7 +95,8 @@ class FlashSaleController extends Controller
             $flashSale->ends_at = date('Y-m-d H:i:s', strtotime($request->ends_at));
             $flashSale->discount_type = $request->discount_type;
             $flashSale->discount_value = $request->discount_value;
-            $flashSale->free_shipping = $request->has('free_shipping') ? true : false;
+            // Use boolean() so hidden "0" + optional "1" checkbox work correctly
+            $flashSale->free_shipping = $request->boolean('free_shipping');
             $flashSale->is_active = true;
             $flashSale->save();
             
@@ -217,10 +218,10 @@ class FlashSaleController extends Controller
             $flashSale->ends_at = date('Y-m-d H:i:s', strtotime($request->ends_at));
             $flashSale->discount_type = $request->discount_type;
             $flashSale->discount_value = $request->discount_value;
-            // Handle free shipping toggle
-            $flashSale->free_shipping = $request->has('free_shipping') ? true : false;
-            // Handle is_active field explicitly
-            $flashSale->is_active = $request->has('is_active') ? true : false;
+            // Handle free shipping toggle using boolean() to respect hidden 0 + checkbox 1 pattern
+            $flashSale->free_shipping = $request->boolean('free_shipping');
+            // Handle is_active field explicitly with boolean()
+            $flashSale->is_active = $request->boolean('is_active');
             $flashSale->save();
             
             // Remove existing items

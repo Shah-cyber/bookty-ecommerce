@@ -4,7 +4,7 @@
     <div class="container mx-auto px-4 py-12">
         <!-- Shop Hero Section -->
         <div class="mb-12 text-center">
-            <h1 class="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-gray-900 via-purple-800 to-indigo-800 bg-clip-text text-transparent">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-gray-900 via-primary-800 to-primary-900 bg-clip-text text-transparent">
                 Discover Your Next Adventure
             </h1>
             <p class="text-lg text-gray-600 max-w-2xl mx-auto">
@@ -30,128 +30,107 @@
         <div class="flex flex-col lg:flex-row gap-8">
             <!-- Filters Sidebar -->
             <div id="filters-sidebar" 
-                 class="w-full lg:w-72 flex-shrink-0 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-120px)] hidden lg:block">
+                 class="w-full lg:w-80 flex-shrink-0 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-120px)] hidden lg:block overflow-y-auto scrollbar-hide pb-10">
 
-              <div class="bg-white/90 backdrop-blur-lg rounded-2xl shadow-md border border-gray-100 overflow-hidden">
+              <div class="bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100/50">
                 <!-- Filters Header -->
-                <div class="bg-gradient-to-r from-purple-100/80 to-indigo-100/80 px-6 py-4 border-b border-gray-200">
-                  <div class="flex items-center justify-between">
-                    <h2 class="text-lg font-bold text-gray-900">Refine Results</h2>
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900">Filters</h2>
                     <a href="{{ route('books.index') }}" 
-                       class="text-sm text-purple-600 hover:text-purple-800 font-medium transition">
-                      Reset All
+                       class="text-xs font-bold text-gray-400 hover:text-red-500 uppercase tracking-wider transition">
+                      Reset
                     </a>
-                  </div>
                 </div>
 
-                <form action="{{ route('books.index') }}" method="GET" class="p-6 space-y-6">
-                  <!-- Author Filter -->
+                <form action="{{ route('books.index') }}" method="GET" class="space-y-8">
+                  
+                  <!-- Price Filter -->
                   <div class="filter-section">
-                    <button type="button" data-collapse-toggle="author-filters"
-                      class="flex items-center justify-between w-full text-sm font-bold text-gray-900 group">
-                      Authors
-                      <svg class="w-4 h-4 ml-2 text-gray-500 group-hover:text-purple-600 transition-transform"
-                           data-collapse-icon fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M19 9l-7 7-7-7"/>
-                      </svg>
-                    </button>
-                    <div id="author-filters" class="space-y-2 mt-3 max-h-48 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-purple-200 scrollbar-track-gray-100 hidden">
-                      @foreach($authors as $author)
-                        <label for="author-{{ Str::slug($author) }}" 
-                               class="flex items-center px-2 py-1.5 rounded-md cursor-pointer hover:bg-purple-50 transition">
-                          <input id="author-{{ \Illuminate\Support\Str::slug($author) }}" name="author" type="radio" value="{{ $author }}"
-                                 {{ request('author') == $author ? 'checked' : '' }}
-                                 class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
-                          <span class="ml-2 text-sm text-gray-700">{{ $author }}</span>
-                        </label>
-                      @endforeach
+                    <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Price Range</h3>
+                    <div class="flex items-center gap-3">
+                        <div class="relative flex-1">
+                          <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 text-xs font-bold">RM</span>
+                          <input type="number" name="price_min" id="price_min" placeholder="Min"
+                                 value="{{ request('price_min') }}" min="0"
+                                 class="w-full pl-9 pr-3 py-2.5 bg-gray-50 border-none rounded-xl text-sm font-bold text-gray-900 focus:ring-2 focus:ring-gray-900 placeholder-gray-400">
+                        </div>
+                        <span class="text-gray-300 font-bold">-</span>
+                        <div class="relative flex-1">
+                          <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 text-xs font-bold">RM</span>
+                          <input type="number" name="price_max" id="price_max" placeholder="Max"
+                                 value="{{ request('price_max') }}" min="0"
+                                 class="w-full pl-9 pr-3 py-2.5 bg-gray-50 border-none rounded-xl text-sm font-bold text-gray-900 focus:ring-2 focus:ring-gray-900 placeholder-gray-400">
+                        </div>
                     </div>
                   </div>
+
                   <!-- Genre Filter -->
-                  <div class="filter-section">
-                    <button type="button" data-collapse-toggle="genre-filters"
-                      class="flex items-center justify-between w-full text-sm font-bold text-gray-900 group">
-                      Genre
-                      <svg class="w-4 h-4 ml-2 text-gray-500 group-hover:text-purple-600 transition-transform"
-                           data-collapse-icon fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M19 9l-7 7-7-7"/>
-                      </svg>
-                    </button>
-                    <div id="genre-filters" class="space-y-2 mt-3 max-h-48 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-purple-200 scrollbar-track-gray-100 hidden">
+                  <div class="filter-section border-t border-gray-100 pt-8">
+                    <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Genres</h3>
+                    <div class="flex flex-wrap gap-2">
                       @foreach($genres as $genre)
-                        <label for="genre-{{ $genre->id }}" 
-                               class="flex items-center px-2 py-1.5 rounded-md cursor-pointer hover:bg-purple-50 transition">
+                        <label for="genre-{{ $genre->id }}" class="cursor-pointer">
                           <input id="genre-{{ $genre->id }}" name="genre" type="radio" value="{{ $genre->id }}"
                                  {{ request('genre') == $genre->id ? 'checked' : '' }}
-                                 class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
-                          <span class="ml-2 text-sm text-gray-700">{{ $genre->name }}</span>
+                                 class="peer sr-only">
+                          <span class="inline-block px-4 py-2 rounded-xl bg-gray-50 text-gray-600 text-sm font-bold border border-transparent hover:bg-gray-100 peer-checked:bg-gray-900 peer-checked:text-white peer-checked:shadow-lg transition-all duration-200">
+                            {{ $genre->name }}
+                          </span>
                         </label>
                       @endforeach
                     </div>
                   </div>
 
                   <!-- Trope Filter -->
-                  <div class="filter-section border-t border-gray-200 pt-5">
+                  <div class="filter-section border-t border-gray-100 pt-8">
                     <button type="button" data-collapse-toggle="trope-filters"
-                      class="flex items-center justify-between w-full text-sm font-bold text-gray-900 group">
+                      class="flex items-center justify-between w-full text-sm font-bold text-gray-900 uppercase tracking-wider group">
                       Tropes
-                      <svg class="w-4 h-4 ml-2 text-gray-500 group-hover:text-purple-600 transition-transform"
+                      <svg class="w-4 h-4 text-gray-400 group-hover:text-gray-900 transition-transform"
                            data-collapse-icon fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M19 9l-7 7-7-7"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                       </svg>
                     </button>
-                    <div id="trope-filters" class="space-y-2 mt-3 max-h-48 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-purple-200 scrollbar-track-gray-100 hidden">
+                    <div id="trope-filters" class="mt-4 hidden space-y-1">
                       @foreach($tropes as $trope)
-                        <label for="trope-{{ $trope->id }}" 
-                               class="flex items-center px-2 py-1.5 rounded-md cursor-pointer hover:bg-purple-50 transition">
-                          <input id="trope-{{ $trope->id }}" name="trope" type="radio" value="{{ $trope->id }}"
+                        <label class="flex items-center group cursor-pointer p-2 rounded-lg hover:bg-gray-50 transition">
+                          <input type="radio" name="trope" value="{{ $trope->id }}" 
                                  {{ request('trope') == $trope->id ? 'checked' : '' }}
-                                 class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
-                          <span class="ml-2 text-sm text-gray-700">{{ $trope->name }}</span>
+                                 class="w-4 h-4 text-gray-900 border-gray-300 focus:ring-gray-900 rounded-full cursor-pointer">
+                          <span class="ml-3 text-sm font-medium text-gray-600 group-hover:text-gray-900">{{ $trope->name }}</span>
                         </label>
                       @endforeach
                     </div>
                   </div>
 
-                  <!-- Price Filter -->
-                  <div class="filter-section border-t border-gray-200 pt-5">
-                    <button type="button" data-collapse-toggle="price-filters"
-                      class="flex items-center justify-between w-full text-sm font-bold text-gray-900 group">
-                      Price Range
-                      <svg class="w-4 h-4 ml-2 text-gray-500 group-hover:text-purple-600 transition-transform"
+                  <!-- Author Filter -->
+                  <div class="filter-section border-t border-gray-100 pt-8">
+                     <button type="button" data-collapse-toggle="author-filters"
+                      class="flex items-center justify-between w-full text-sm font-bold text-gray-900 uppercase tracking-wider group">
+                      Authors
+                      <svg class="w-4 h-4 text-gray-400 group-hover:text-gray-900 transition-transform"
                            data-collapse-icon fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M19 9l-7 7-7-7"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                       </svg>
                     </button>
-                    <div id="price-filters" class="mt-3 hidden">
-                      <div class="flex items-center space-x-4">
-                        <div class="relative flex-1">
-                          <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">RM</span>
-                          <input type="number" name="price_min" id="price_min" placeholder="Min"
-                                 value="{{ request('price_min') }}" min="0"
-                                 class="w-full pl-10 pr-3 py-2 border-gray-300 rounded-lg focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50">
-                        </div>
-                        <div class="relative flex-1">
-                          <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">RM</span>
-                          <input type="number" name="price_max" id="price_max" placeholder="Max"
-                                 value="{{ request('price_max') }}" min="0"
-                                 class="w-full pl-10 pr-3 py-2 border-gray-300 rounded-lg focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50">
-                        </div>
-                      </div>
+                    <div id="author-filters" class="mt-4 hidden space-y-1">
+                      @foreach($authors as $author)
+                        <label class="flex items-center group cursor-pointer p-2 rounded-lg hover:bg-gray-50 transition">
+                          <input type="radio" name="author" value="{{ $author }}" 
+                                 {{ request('author') == $author ? 'checked' : '' }}
+                                 class="w-4 h-4 text-gray-900 border-gray-300 focus:ring-gray-900 rounded-full cursor-pointer">
+                          <span class="ml-3 text-sm font-medium text-gray-600 group-hover:text-gray-900">{{ $author }}</span>
+                        </label>
+                      @endforeach
                     </div>
                   </div>
 
                   <!-- Apply Filters Button -->
-                  <div class="pt-5 border-t border-gray-200">
+                  <div class="pt-4">
                     <button type="submit" 
-                      class="w-full py-3 px-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-medium rounded-lg shadow-md transition duration-300 flex items-center justify-center">
+                      class="w-full py-4 bg-gray-900 text-white font-bold rounded-2xl shadow-xl hover:bg-black hover:shadow-2xl hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center">
                       <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
                       </svg>
                       Apply Filters
                     </button>
@@ -163,8 +142,8 @@
             <!-- Books Content Area -->
             <div class="flex-1">
                 <!-- Results Header -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div class="mb-8">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white rounded-[2rem] p-6 shadow-lg border border-gray-100/50">
                         <div>
                             <h2 class="text-2xl font-bold text-gray-900 mb-1">
                         @if(request('genre') && $genres->where('id', request('genre'))->first())
@@ -177,7 +156,7 @@
                             All Books
                         @endif
                             </h2>
-                            <p class="text-gray-500">Showing {{ $books->count() }} of {{ $books->total() }} books</p>
+                            <p class="text-gray-500 font-medium">Showing {{ $books->count() }} of {{ $books->total() }} books</p>
                         </div>
                         
                         <!-- Desktop Sort Dropdown -->
@@ -201,7 +180,7 @@
 
                                 <!-- Sort Dropdown Button -->
                                 <button id="sortDropdownButton" type="button"
-                                    class="flex items-center justify-between w-48 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                    class="flex items-center justify-between w-52 px-6 py-3 text-sm font-bold text-gray-900 bg-white border border-gray-100 rounded-full shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
                                     <span>
                                         @switch(request('sort'))
                                             @case('price_asc') Price: Low to High @break
@@ -211,41 +190,41 @@
                                             @default Newest Arrivals
                                         @endswitch
                                     </span>
-                                    <svg class="w-4 h-4 ml-2 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <svg class="w-4 h-4 ml-2 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </button>
 
                                 <!-- Dropdown Menu -->
-                                <div id="sortDropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-48 absolute right-0 mt-2">
+                                <div id="sortDropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-2xl shadow-xl border border-gray-100 w-52 absolute right-0 mt-3 overflow-hidden">
                                     <ul class="py-2 text-sm text-gray-700" aria-labelledby="sortDropdownButton">
                                         <li>
                                             <button type="submit" name="sort" value="newest"
-                                                class="w-full text-left px-4 py-2 hover:bg-gray-100 {{ request('sort') == 'newest' ? 'font-semibold text-blue-600' : '' }}">
+                                                class="w-full text-left px-5 py-3 hover:bg-gray-50 font-medium {{ request('sort') == 'newest' ? 'font-bold text-gray-900 bg-gray-50' : '' }}">
                                                 Newest Arrivals
                                             </button>
                                         </li>
                                         <li>
                                             <button type="submit" name="sort" value="price_asc"
-                                                class="w-full text-left px-4 py-2 hover:bg-gray-100 {{ request('sort') == 'price_asc' ? 'font-semibold text-blue-600' : '' }}">
+                                                class="w-full text-left px-5 py-3 hover:bg-gray-50 font-medium {{ request('sort') == 'price_asc' ? 'font-bold text-gray-900 bg-gray-50' : '' }}">
                                                 Price: Low to High
                                             </button>
                                         </li>
                                         <li>
                                             <button type="submit" name="sort" value="price_desc"
-                                                class="w-full text-left px-4 py-2 hover:bg-gray-100 {{ request('sort') == 'price_desc' ? 'font-semibold text-blue-600' : '' }}">
+                                                class="w-full text-left px-5 py-3 hover:bg-gray-50 font-medium {{ request('sort') == 'price_desc' ? 'font-bold text-gray-900 bg-gray-50' : '' }}">
                                                 Price: High to Low
                                             </button>
                                         </li>
                                         <li>
                                             <button type="submit" name="sort" value="title_asc"
-                                                class="w-full text-left px-4 py-2 hover:bg-gray-100 {{ request('sort') == 'title_asc' ? 'font-semibold text-blue-600' : '' }}">
+                                                class="w-full text-left px-5 py-3 hover:bg-gray-50 font-medium {{ request('sort') == 'title_asc' ? 'font-bold text-gray-900 bg-gray-50' : '' }}">
                                                 Title: A to Z
                                             </button>
                                         </li>
                                         <li>
                                             <button type="submit" name="sort" value="title_desc"
-                                                class="w-full text-left px-4 py-2 hover:bg-gray-100 {{ request('sort') == 'title_desc' ? 'font-semibold text-blue-600' : '' }}">
+                                                class="w-full text-left px-5 py-3 hover:bg-gray-50 font-medium {{ request('sort') == 'title_desc' ? 'font-bold text-gray-900 bg-gray-50' : '' }}">
                                                 Title: Z to A
                                             </button>
                                         </li>
@@ -257,11 +236,11 @@
                     
                     <!-- Active Filters -->
                     @if(request('genre') || request('trope') || request('author') || request('price_min') || request('price_max'))
-                        <div class="mt-4 flex flex-wrap gap-2">
+                        <div class="mt-6 flex flex-wrap gap-3">
                             @if(request('genre') && $genres->where('id', request('genre'))->first())
-                                <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                <div class="inline-flex items-center px-4 py-2 rounded-full text-xs font-bold bg-orange-100 text-orange-800 shadow-sm">
                                     Genre: {{ $genres->where('id', request('genre'))->first()->name }}
-                                    <a href="{{ route('books.index', request()->except('genre')) }}" class="ml-1 text-purple-600 hover:text-purple-800">
+                                    <a href="{{ route('books.index', request()->except('genre')) }}" class="ml-2 p-0.5 rounded-full hover:bg-orange-200 text-orange-600 transition">
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                         </svg>
@@ -270,9 +249,9 @@
                             @endif
 
                             @if(request('author'))
-                                <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                <div class="inline-flex items-center px-4 py-2 rounded-full text-xs font-bold bg-blue-100 text-blue-800 shadow-sm">
                                     Author: {{ request('author') }}
-                                    <a href="{{ route('books.index', request()->except('author')) }}" class="ml-1 text-blue-600 hover:text-blue-800">
+                                    <a href="{{ route('books.index', request()->except('author')) }}" class="ml-2 p-0.5 rounded-full hover:bg-blue-200 text-blue-600 transition">
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                         </svg>
@@ -281,9 +260,9 @@
                             @endif
                             
                             @if(request('trope') && $tropes->where('id', request('trope'))->first())
-                                <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                                <div class="inline-flex items-center px-4 py-2 rounded-full text-xs font-bold bg-purple-100 text-purple-800 shadow-sm">
                                     Trope: {{ $tropes->where('id', request('trope'))->first()->name }}
-                                    <a href="{{ route('books.index', request()->except('trope')) }}" class="ml-1 text-indigo-600 hover:text-indigo-800">
+                                    <a href="{{ route('books.index', request()->except('trope')) }}" class="ml-2 p-0.5 rounded-full hover:bg-purple-200 text-purple-600 transition">
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                         </svg>
@@ -292,7 +271,7 @@
                             @endif
                             
                             @if(request('price_min') || request('price_max'))
-                                <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                <div class="inline-flex items-center px-4 py-2 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 shadow-sm">
                                     Price: 
                                     @if(request('price_min') && request('price_max'))
                                         RM{{ request('price_min') }} - RM{{ request('price_max') }}
@@ -301,7 +280,7 @@
                                     @else
                                         ≤ RM{{ request('price_max') }}
                                     @endif
-                                    <a href="{{ route('books.index', request()->except(['price_min', 'price_max'])) }}" class="ml-1 text-green-600 hover:text-green-800">
+                                    <a href="{{ route('books.index', request()->except(['price_min', 'price_max'])) }}" class="ml-2 p-0.5 rounded-full hover:bg-emerald-200 text-emerald-600 transition">
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                         </svg>
@@ -310,8 +289,8 @@
                             @endif
                             
                             @if(request('genre') || request('trope') || request('author') || request('price_min') || request('price_max'))
-                                <a href="{{ route('books.index') }}" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 hover:bg-gray-200">
-                                    Clear All Filters
+                                <a href="{{ route('books.index') }}" class="inline-flex items-center px-4 py-2 rounded-full text-xs font-bold bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-900 transition hover:shadow-sm">
+                                    Clear All
                                 </a>
                             @endif
                         </div>
@@ -319,14 +298,14 @@
                 </div>
 
                 @if($books->isEmpty())
-                    <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-100 text-center">
+                    <div class="glass-card p-8 rounded-xl text-center">
                         <div class="flex flex-col items-center justify-center py-12">
                             <svg class="w-16 h-16 text-gray-300 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                             <h3 class="text-xl font-bold text-gray-700 mb-2">No Books Found</h3>
                             <p class="text-gray-500 mb-6 max-w-md">We couldn't find any books matching your current filters. Try adjusting your search criteria.</p>
-                            <a href="{{ route('books.index') }}" class="px-5 py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition duration-300 inline-flex items-center">
+                            <a href="{{ route('books.index') }}" class="px-5 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition duration-300 inline-flex items-center">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                                 </svg>
@@ -338,161 +317,7 @@
                     <!-- Books Grid -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         @foreach($books as $book)
-                            <div class="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col h-full">
-                                <!-- Book Cover with Overlay Actions -->
-                                <div class="relative overflow-hidden">
-                                    <a href="{{ route('books.show', $book) }}" class="block">
-                                        <div class="aspect-[2/3] w-full bg-gray-50 {{ $book->stock <= 0 ? 'grayscale opacity-90' : '' }}">
-                                        @if($book->cover_image)
-                                                <img src="{{ asset('storage/' . $book->cover_image) }}" alt="{{ $book->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                        @else
-                                                <div class="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                                                <svg class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                                                </svg>
-                                            </div>
-                                        @endif
-                                    </div>
-                                </a>
-                                    
-                                    <!-- Condition Badge -->
-                                    <div class="absolute top-3 left-3 flex flex-col gap-2">
-                                        @if(($book->condition ?? 'new') === 'preloved')
-                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/90 backdrop-blur-sm text-white shadow-sm">
-                                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                                                </svg>
-                                                Preloved
-                                            </span>
-                                        @else
-                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-500/90 backdrop-blur-sm text-white shadow-sm">
-                                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                </svg>
-                                                New
-                                            </span>
-                                        @endif
-                                        <!-- Genre Badge -->
-                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-white/90 backdrop-blur-sm text-gray-700 shadow-sm">
-                                            {{ $book->genre->name }}
-                                        </span>
-                                    </div>
-                                    
-                                    <!-- Wishlist Button -->
-                                    <div class="absolute top-3 right-3 z-10">
-                                        @auth
-                                            <button type="button" 
-                                                class="wishlist-btn p-2 bg-white/90 rounded-full hover:bg-white transition-colors duration-200 backdrop-blur-sm shadow-sm"
-                                                data-book-id="{{ $book->id }}"
-                                                data-in-wishlist="{{ Auth::user()->hasBookInWishlist($book->id) ? 'true' : 'false' }}"
-                                                tabindex="0"
-                                                aria-label="{{ Auth::user()->hasBookInWishlist($book->id) ? 'Remove from wishlist' : 'Add to wishlist' }}"
-                                            >
-                                                @if(Auth::user()->hasBookInWishlist($book->id))
-                                                    <svg class="w-4 h-4 text-pink-600 pointer-events-none" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
-                                                    </svg>
-                                                @else
-                                                    <svg class="w-4 h-4 text-gray-700 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                                                    </svg>
-                                                @endif
-                                            </button>
-                                        @else
-                                            <button type="button" class="p-2 bg-white/90 rounded-full hover:bg-white transition-colors duration-200 backdrop-blur-sm shadow-sm" tabindex="0" aria-label="Login to add to wishlist">
-                                                <svg class="w-4 h-4 text-gray-700 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                                                </svg>
-                                            </button>
-                                        @endauth
-                                    </div>
-                                    
-                                    <!-- Promotions / Stock Badges -->
-                                    @if($book->is_on_sale)
-                                        <div class="absolute bottom-3 left-3">
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-500 text-white shadow-sm">
-                                                -{{ $book->discount_percent }}%
-                                            </span>
-                                        </div>
-                                    @endif
-
-                                    @if($book->stock <= 0)
-                                        <div class="absolute bottom-3 right-3">
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800 shadow-sm">
-                                                Out of Stock
-                                            </span>
-                                        </div>
-                                    @endif
-
-                                    <!-- Overlay Actions -->
-                                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center p-4">
-                                        @if($book->stock > 0)
-                                            <button 
-                                                type="button" 
-                                                class="ajax-add-to-cart w-full px-4 py-2 bg-white/90 backdrop-blur-sm text-gray-900 font-medium rounded-lg hover:bg-white transition-colors duration-200"
-                                                data-book-id="{{ $book->id }}"
-                                                data-quantity="1"
-                                            >
-                                                Add to Cart
-                                            </button>
-                                        @else
-                                            <button type="button" class="w-full px-4 py-2 bg-white/90 backdrop-blur-sm text-gray-900 font-medium rounded-lg opacity-50 cursor-not-allowed" disabled>
-                                                Out of Stock
-                                            </button>
-                                        @endif
-                                    </div>
-                                </div>
-                                
-                                <!-- Book Details -->
-                                <div class="p-5 flex flex-col flex-grow">
-                                    <a href="{{ route('books.show', $book) }}" class="block group-hover:text-purple-700 transition-colors duration-200">
-                                        <h3 class="font-bold text-gray-900 mb-1 line-clamp-2">{{ $book->title }}</h3>
-                                    </a>
-                                    <p class="text-sm text-gray-600 mb-2">by {{ $book->author }}</p>
-                                    
-                                    <!-- Rating -->
-                                    <div class="flex items-center mb-3">
-                                        @php
-                                            $avgRating = $book->average_rating;
-                                            $reviewsCount = $book->reviews_count;
-                                        @endphp
-                                        <div class="flex">
-                                            @for ($i = 1; $i <= 5; $i++)
-                                                <svg class="w-4 h-4 {{ $i <= ($avgRating ?: 0) ? 'text-yellow-400' : 'text-gray-300' }}" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                                </svg>
-                                            @endfor
-                                        </div>
-                                        <span class="text-xs text-gray-500 ml-1">{{ $avgRating ? number_format($avgRating, 1) : 'No' }} ({{ $reviewsCount }})</span>
-                                    </div>
-                                    
-                                    <!-- Tropes -->
-                                    @if($book->tropes->isNotEmpty())
-                                        <div class="flex flex-wrap gap-1 mb-4">
-                                            @foreach($book->tropes->take(2) as $trope)
-                                                <span class="text-xs text-gray-500 px-2 py-1 bg-gray-50 rounded-full">{{ $trope->name }}</span>
-                                            @endforeach
-                                            @if($book->tropes->count() > 2)
-                                                <span class="text-xs text-gray-500 px-2 py-1 bg-gray-50 rounded-full">+{{ $book->tropes->count() - 2 }}</span>
-                                            @endif
-                                        </div>
-                                    @endif
-                                    
-                                    <!-- Price -->
-                                    <div class="mt-auto pt-3 border-t border-gray-100 flex items-center justify-between">
-                                        @if($book->is_on_sale)
-                                            <div class="flex items-baseline space-x-2">
-                                                <span class="text-lg font-bold {{ $book->stock <= 0 ? 'text-gray-500' : 'bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent' }}">RM {{ number_format($book->final_price, 2) }}</span>
-                                                <span class="text-sm text-gray-500 line-through">RM {{ number_format($book->price, 2) }}</span>
-                                            </div>
-                                        @else
-                                            <span class="text-lg font-bold {{ $book->stock <= 0 ? 'text-gray-500' : 'bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent' }}">RM {{ number_format($book->price, 2) }}</span>
-                                        @endif
-
-                                        <!-- Right area kept clean intentionally for minimalist look -->
-                                    </div>
-                                </div>
-                            </div>
+                            <x-book-card :book="$book" />
                         @endforeach
                     </div>
 

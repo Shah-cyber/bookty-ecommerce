@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Coupon;
+use App\Models\CouponUsage;
 use App\Services\PostageRateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -46,12 +48,12 @@ class CheckoutController extends Controller
             'shipping_actual_cost' => 'nullable|numeric|min:0',
         ]);
         
-        // --- Start Calculation Logic (Same as before) ---
+        // --- Start Calculation Logic (Same as before, but with promotions & coupons) ---
         
-        // Calculate subtotal amount
-        $totalAmount = 0;
+        // Calculate subtotal amount using the book's final price (includes flash sales / discounts)
+        $subtotal = 0.0;
         foreach ($cart->items as $item) {
-            $totalAmount += $item->book->price * $item->quantity;
+            $subtotal += $item->book->final_price * $item->quantity;
         }
 
         // Determine shipping region and rate
@@ -82,12 +84,11 @@ class CheckoutController extends Controller
         // Check for free shipping via promotions or coupons
         $isFreeShipping = false;
         $appliedCouponCode = $request->input('coupon_code');
+        $coupon = null;
         if ($appliedCouponCode) {
-            $coupon = \App\Models\Coupon::where('code', $appliedCouponCode)->first();
-            if ($coupon && $coupon->is_active && now()->between($coupon->starts_at, $coupon->expires_at)) {
-                if ($coupon->free_shipping) {
-                    $isFreeShipping = true;
-                }
+            $coupon = Coupon::where('code', $appliedCouponCode)->first();
+            if ($coupon && $coupon->is_active && now()->between($coupon->starts_at, $coupon->expires_at) && $coupon->free_shipping) {
+                $isFreeShipping = true;
             }
         }
 
@@ -106,8 +107,14 @@ class CheckoutController extends Controller
             $shippingCustomerPrice = 0;
         }
 
-        // Add shipping to total
-        $totalAmount += $shippingCustomerPrice;
+        // Calculate coupon discount (monetary) based on subtotal
+        $discountAmount = 0.0;
+        if ($coupon && $coupon->isValidFor(Auth::user(), $subtotal)) {
+            $discountAmount = $coupon->calculateDiscount($subtotal);
+        }
+        
+        // Final total = subtotal - discount + shipping
+        $totalAmount = max(0, $subtotal - $discountAmount + $shippingCustomerPrice);
         
         // --- End Calculation Logic ---
 
@@ -138,6 +145,11 @@ class CheckoutController extends Controller
                 'shipping_postal_code' => $request->shipping_postal_code,
                 'shipping_phone' => $request->shipping_phone,
                 'is_free_shipping' => $isFreeShipping,
+
+                // Coupon metadata
+                'coupon_id' => $coupon?->id,
+                'coupon_code' => $coupon?->code,
+                'discount_amount' => $discountAmount,
             ]);
             
             // 3. Create order items and update stock
@@ -150,13 +162,15 @@ class CheckoutController extends Controller
                     throw new \Exception("Not enough stock for {$book->title}");
                 }
                 
+                $sellingPrice = $book->final_price;
+
                 OrderItem::create([
                     'order_id' => $order->id,
                     'book_id' => $item->book_id,
                     'quantity' => $item->quantity,
-                    'price' => $book->price,
+                    'price' => $sellingPrice,
                     'cost_price' => $book->cost_price,
-                    'total_selling' => $book->price * $item->quantity,
+                    'total_selling' => $sellingPrice * $item->quantity,
                     'total_cost' => ($book->cost_price ?? 0) * $item->quantity,
                 ]);
                 
@@ -187,6 +201,16 @@ class CheckoutController extends Controller
                     'toyyibpay_bill_code' => $paymentResult['bill_code'],
                     'toyyibpay_payment_url' => $paymentResult['payment_url'],
                 ]);
+
+                // 6.2 SUCCESS: Record coupon usage (including free-shipping-only coupons)
+                if ($coupon) {
+                    CouponUsage::create([
+                        'coupon_id' => $coupon->id,
+                        'user_id' => $order->user_id,
+                        'order_id' => $order->id,
+                        'discount_amount' => $discountAmount,
+                    ]);
+                }
 
                 // 6.5. SUCCESS: Auto-save shipping info to user profile if profile is incomplete
                 // This improves UX by automatically filling profile from checkout data

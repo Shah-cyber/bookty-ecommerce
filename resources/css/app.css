@@ -18,6 +18,7 @@
         display: -webkit-box;
         -webkit-box-orient: vertical;
         -webkit-line-clamp: 1;
+        line-clamp: 1;
     }
 
     .line-clamp-2 {
@@ -25,6 +26,7 @@
         display: -webkit-box;
         -webkit-box-orient: vertical;
         -webkit-line-clamp: 2;
+        line-clamp: 2;
     }
 
     .line-clamp-3 {
@@ -32,6 +34,7 @@
         display: -webkit-box;
         -webkit-box-orient: vertical;
         -webkit-line-clamp: 3;
+        line-clamp: 3;
     }
 
     /* Scrollbar Hide */
@@ -177,5 +180,72 @@
         90% {
             transform: translate3d(0, -1px, 0);
         }
+    }
+    /* Glassmorphism Utilities */
+    .glass {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .glass-dark {
+        background: rgba(17, 24, 39, 0.7);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+    }
+
+    /* Fix for border-radius overflow on hover in Webkit */
+    .mask-image-rounded {
+        mask-image: radial-gradient(white, black);
+        -webkit-mask-image: -webkit-radial-gradient(white, black);
+        border-radius: inherit;
+    }
+}
+
+@layer components {
+    .btn-liquid {
+        @apply relative inline-flex items-center justify-center px-4 py-3 rounded-full
+               text-sm font-semibold text-white bg-slate-900/90 shadow-lg
+               overflow-hidden transition-all duration-300 border border-slate-900/60;
+    }
+
+    .btn-liquid::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(120deg, rgba(255,255,255,0.1), rgba(255,255,255,0.4), rgba(255,255,255,0.1));
+        transform: translateX(-100%);
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .btn-liquid:hover {
+        @apply bg-gradient-to-r from-primary-500 via-primary-400 to-bookty-purple-500 border-transparent;
+        transform: translateY(-1px) scale(1.01);
+        box-shadow: 0 14px 30px rgba(15, 23, 42, 0.45);
+    }
+
+    .btn-liquid:hover::before {
+        animation: shimmer 1.2s forwards;
+        opacity: 0.7;
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
     }
 }

@@ -50,6 +50,15 @@ class BookDiscountController extends Controller
                 ->where('is_active', true)
                 ->update(['is_active' => false]);
             
+            // Validate sensible ranges
+            $book = Book::findOrFail($request->book_id);
+            if ($request->discount_type === 'percent' && ($request->discount_value <= 0 || $request->discount_value > 100)) {
+                return back()->withInput()->with('error', 'Percentage discount must be between 1 and 100.');
+            }
+            if ($request->discount_type === 'amount' && $request->discount_value > $book->price) {
+                return back()->withInput()->with('error', 'Fixed discount must be less than or equal to the book price (RM '.number_format($book->price, 2).').');
+            }
+            
             // Create new discount
             $discount = new BookDiscount();
             $discount->book_id = $request->book_id;
@@ -63,7 +72,8 @@ class BookDiscountController extends Controller
             $discount->starts_at = $request->starts_at;
             $discount->ends_at = $request->ends_at;
             $discount->description = $request->description;
-            $discount->free_shipping = $request->has('free_shipping') ? true : false;
+            // Handle free shipping toggle correctly (hidden 0 + checkbox 1)
+            $discount->free_shipping = $request->boolean('free_shipping');
             $discount->is_active = true;
             $discount->save();
             
@@ -116,6 +126,15 @@ class BookDiscountController extends Controller
         try {
             DB::beginTransaction();
             
+            // Validate sensible ranges for the chosen book
+            $book = Book::findOrFail($request->book_id);
+            if ($request->discount_type === 'percent' && ($request->discount_value <= 0 || $request->discount_value > 100)) {
+                return back()->withInput()->with('error', 'Percentage discount must be between 1 and 100.');
+            }
+            if ($request->discount_type === 'amount' && $request->discount_value > $book->price) {
+                return back()->withInput()->with('error', 'Fixed discount must be less than or equal to the book price (RM '.number_format($book->price, 2).').');
+            }
+            
             // If the discount is being activated and it's for a different book than before,
             // deactivate any existing active discounts for the new book
             if ($request->is_active && $request->book_id != $discount->book_id) {
@@ -140,8 +159,9 @@ class BookDiscountController extends Controller
             $discount->starts_at = $request->starts_at;
             $discount->ends_at = $request->ends_at;
             $discount->description = $request->description;
-            $discount->free_shipping = $request->has('free_shipping') ? true : false;
-            $discount->is_active = $request->has('is_active') ? true : false;
+            // Toggles
+            $discount->free_shipping = $request->boolean('free_shipping');
+            $discount->is_active = $request->boolean('is_active');
             $discount->save();
             
             DB::commit();
