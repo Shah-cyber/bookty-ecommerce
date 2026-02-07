@@ -3,8 +3,8 @@
 <div
     class="group relative w-full aspect-[3/4] rounded-[2.5rem] overflow-hidden shadow-xl bg-gray-900/5 transform-gpu hover:-translate-y-1 transition-transform duration-300"
 >
-    <!-- Background Image -->
-    <div class="absolute inset-0 rounded-[2.5rem] overflow-hidden z-0 mask-image-rounded">
+    <!-- Background Image - Clickable link to book detail -->
+    <a href="{{ route('books.show', $book->slug) }}" class="absolute inset-0 rounded-[2.5rem] overflow-hidden z-0 mask-image-rounded cursor-pointer">
         @if($book->cover_image)
             <img
                 src="{{ asset('storage/' . $book->cover_image) }}"
@@ -22,7 +22,7 @@
 
         <!-- Subtle top gradient for readability -->
         <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent pointer-events-none"></div>
-    </div>
+    </a>
 
     <!-- Top badges + wishlist -->
     <div class="absolute top-4 left-4 right-4 flex justify-between items-start z-20">

@@ -1,4 +1,4 @@
-<nav x-data="{ open: false }"
+<nav x-data="{ mobileMenuOpen: false }"
     class="bg-white/80 backdrop-blur-xl shadow-sm z-50 sticky top-0 transition-all duration-300 nav-fade-in border-b border-gray-100">
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -287,9 +287,9 @@
 
             <div class="-mr-2 flex items-center sm:hidden">
 
-                <button @click="open = !open" type="button"
+                <button @click="mobileMenuOpen = !mobileMenuOpen" type="button"
                     class="group inline-flex items-center justify-center p-3 rounded-full text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none transition-all duration-300"
-                    :aria-expanded="open.toString()" aria-controls="mobile-menu">
+                    :aria-expanded="mobileMenuOpen.toString()">
 
                     <span class="sr-only">Open main menu</span>
 
@@ -310,225 +310,155 @@
 
 
 
+    
+
     <!-- Enhanced Mobile menu -->
 
-    <div class="sm:hidden" id="mobile-menu" x-show="open" x-transition:enter="transition ease-out duration-200"
+    <div class="sm:hidden" id="mobile-menu" x-show="mobileMenuOpen" x-cloak x-transition:enter="transition ease-out duration-200"
         x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0"
         x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0"
-        x-transition:leave-end="opacity-0 -translate-y-2" @keydown.escape.window="open=false">
+        x-transition:leave-end="opacity-0 -translate-y-2" @keydown.escape.window="mobileMenuOpen=false">
 
-        <div
-            class="fixed inset-x-0 top-0 mt-20 bg-[#FAF7F5]/95 backdrop-blur-md border-t border-[#9D84B7]/10 shadow-lg">
+        <div class="fixed inset-x-0 top-24 bottom-0 bg-white/95 backdrop-blur-xl border-t border-gray-100 overflow-y-auto z-[9999]">
 
-            <div class="pt-4 pb-3 space-y-2 px-4" x-data="{ colOpen: false }">
-
-                <!-- Logo on top for mobile -->
-
-                <a href="{{ route('home') }}" class="flex items-center mb-2">
-
-                    <img src="{{ asset('images/BooktyL.png') }}" alt="Bookty Logo" class="h-8 w-auto">
-
-                    <span class="ml-2 text-lg font-bold text-[#2D2D2D] font-serif">Bookty</span>
-
-                </a>
+            <div class="pt-6 pb-6 space-y-2 px-4" x-data="{ colOpen: false }">
 
                 <a href="{{ route('home') }}"
-                    class="flex items-center px-4 py-3 rounded-2xl {{ request()->routeIs('home') ? 'bg-white text-[#9D84B7] border-l-4 border-[#9D84B7]' : 'text-[#5D4B68] hover:bg-white hover:text-[#9D84B7]' }} text-base font-medium transition-all duration-200">
-
-                    <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-
+                    class="flex items-center px-4 py-3 rounded-2xl {{ request()->routeIs('home') ? 'bg-indigo-50 text-indigo-700 font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium' }} text-base transition-all duration-200">
+                    <svg class="w-5 h-5 mr-3 {{ request()->routeIs('home') ? 'text-indigo-500' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                     </svg>
-
                     Home
-
                 </a>
 
                 <a href="{{ route('books.index') }}"
-                    class="flex items-center px-4 py-3 rounded-2xl {{ request()->routeIs('books.*') ? 'bg-white text-[#9D84B7] border-l-4 border-[#9D84B7]' : 'text-[#5D4B68] hover:bg-white hover:text-[#9D84B7]' }} text-base font-medium transition-all duration-200">
-
-                    <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-
+                    class="flex items-center px-4 py-3 rounded-2xl {{ request()->routeIs('books.*') ? 'bg-indigo-50 text-indigo-700 font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium' }} text-base transition-all duration-200">
+                    <svg class="w-5 h-5 mr-3 {{ request()->routeIs('books.*') ? 'text-indigo-500' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                     </svg>
-
                     Shop
-
                 </a>
 
                 <!-- Collections (mobile) with author list -->
-
                 <button @click="colOpen = !colOpen" type="button"
-                    class="w-full flex items-center justify-between px-4 py-3 rounded-2xl text-[#5D4B68] hover:bg-white hover:text-[#9D84B7] text-base font-medium transition-all duration-200 h-12">
-
+                    class="w-full flex items-center justify-between px-4 py-3 rounded-2xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 text-base font-medium transition-all duration-200">
                     <span class="flex items-center">
-
-                        <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-
+                        <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                         </svg>
-
                         Collections
-
                     </span>
-
-                    <svg class="w-4 h-4 ml-2 text-gray-500 transition-transform" :class="colOpen ? 'rotate-180' : ''"
+                    <svg class="w-4 h-4 ml-2 text-gray-400 transition-transform duration-200" :class="colOpen ? 'rotate-180' : ''"
                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-
                     </svg>
-
                 </button>
 
-                <div x-show="colOpen" x-transition class="pl-4 space-y-1">
-
+                <div x-show="colOpen" x-transition class="pl-4 space-y-1 overflow-hidden">
                     @php $mobileAuthors = \App\Models\Book::select('author')->distinct()->orderBy('author')->limit(8)->pluck('author'); @endphp
-
+                    
                     @foreach($mobileAuthors as $mAuthor)
-
                         <a href="{{ route('books.index', ['author' => $mAuthor]) }}"
-                            class="flex items-center px-4 py-2 rounded-xl text-[#5D4B68] hover:bg-white hover:text-[#9D84B7] text-sm font-medium transition-colors">
-
+                            class="flex items-center px-4 py-2 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-indigo-600 text-sm font-medium transition-colors">
                             <span class="truncate">{{ $mAuthor }}</span>
-
                         </a>
-
                     @endforeach
 
                     <a href="{{ route('books.index') }}"
-                        class="block px-4 py-2 text-sm text-[#9D84B7] font-medium hover:text-[#5D4B68]">View All →</a>
-
+                        class="block px-4 py-2 text-sm text-indigo-600 font-bold hover:text-indigo-800 transition-colors">
+                        View All Collections →
+                    </a>
                 </div>
 
                 <a href="{{ route('about') }}"
-                    class="flex items-center px-4 py-3 rounded-2xl {{ request()->routeIs('about') ? 'bg-white text-[#9D84B7] border-l-4 border-[#9D84B7]' : 'text-[#5D4B68] hover:bg-white hover:text-[#9D84B7]' }} text-base font-medium transition-all duration-200">
-
-                    <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-
+                    class="flex items-center px-4 py-3 rounded-2xl {{ request()->routeIs('about') ? 'bg-indigo-50 text-indigo-700 font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium' }} text-base transition-all duration-200">
+                    <svg class="w-5 h-5 mr-3 {{ request()->routeIs('about') ? 'text-indigo-500' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-
                     About
-
                 </a>
 
                 <a href="#"
-                    class="flex items-center px-4 py-3 rounded-2xl text-[#5D4B68] hover:bg-white hover:text-[#9D84B7] text-base font-medium transition-all duration-200">
-
-                    <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-
+                    class="flex items-center px-4 py-3 rounded-2xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 text-base font-medium transition-all duration-200">
+                    <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
-
                     Contact
-
                 </a>
 
-
-
                 <!-- Search (mobile) -->
-
-                <div class="pt-2">
-
-                    <label for="search-mobile" class="sr-only">Search</label>
-
-                    <input id="search-mobile" name="search-mobile"
-                        class="block w-full px-4 py-3 border border-gray-200 rounded-2xl leading-5 bg-gray-50/80 backdrop-blur-sm placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 focus:bg-white text-base"
-                        placeholder="Search for books..." type="search">
-
+                <div class="pt-4 px-2">
+                    <form action="{{ route('books.index') }}" method="GET">
+                        <label for="search-mobile" class="sr-only">Search</label>
+                        <div class="relative">
+                            <input id="search-mobile" name="search"
+                                class="block w-full pl-11 pr-4 py-3 border border-gray-200 rounded-2xl leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-base transition-all duration-200"
+                                placeholder="Search for books..." type="search">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </form>
                 </div>
 
             </div>
 
-            <div class="pt-4 pb-6 border-t border-gray-100 px-4">
+            <div class="pt-6 pb-8 border-t border-gray-100 px-6 bg-gray-50/50">
 
                 @auth
-
-                    <div class="flex items-center px-4 py-3 bg-white/50 rounded-2xl">
-
+                    <div class="flex items-center p-4 bg-white rounded-2xl border border-gray-100 shadow-sm mb-6">
                         <div class="flex-shrink-0">
-
-                            <div class="h-12 w-12 rounded-xl bg-[#9D84B7] flex items-center justify-center shadow-lg">
-
-                                <span class="text-lg font-bold text-white">{{ substr(Auth::user()->name, 0, 1) }}</span>
-
+                            <div class="h-12 w-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md">
+                                <span class="text-xl font-bold text-white">{{ substr(Auth::user()->name, 0, 1) }}</span>
                             </div>
-
                         </div>
-
-                        <div class="ml-3 flex-1">
-
-                            <div class="text-base font-semibold text-[#5D4B68]">{{ Auth::user()->name }}</div>
-
-                            <div class="text-sm text-[#5D4B68]/70">{{ Auth::user()->email }}</div>
-
+                        <div class="ml-4 flex-1 min-w-0">
+                            <div class="text-base font-bold text-gray-900 truncate">{{ Auth::user()->name }}</div>
+                            <div class="text-sm text-gray-500 truncate">{{ Auth::user()->email }}</div>
                         </div>
-
-                        <div class="ml-auto">
-
-                            <!-- Mobile Cart -->
-
-                            <a href="{{ route('cart.index') }}"
-                                class="p-2 rounded-full bg-white border border-gray-100 text-gray-600 hover:text-gray-900 relative transition-all duration-200 shadow-sm">
-                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                                </svg>
-                                @php $cartCount = Auth::user()->cart ? Auth::user()->cart->items->count() : 0; @endphp
-                                @if($cartCount > 0)
-                                    <span class="absolute -top-1 -right-1 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 text-xs font-bold leading-none text-white transform bg-red-500 rounded-full border border-white">{{ $cartCount }}</span>
-                                @endif
-                            </a>
-
-                        </div>
-
+                        
+                        <!-- Mobile Cart Badge inside profile card -->
+                        <a href="{{ route('cart.index') }}" class="ml-2 relative p-2 text-gray-400 hover:text-indigo-600 transition-colors">
+                            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                            </svg>
+                            @if(Auth::user()->cart && Auth::user()->cart->items->count() > 0)
+                                <span class="absolute top-0 right-0 block h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white"></span>
+                            @endif
+                        </a>
                     </div>
 
-                    <div class="mt-4 space-y-2">
-
+                    <div class="space-y-2">
                         @if(Auth::user()->hasRole('admin') || Auth::user()->hasRole('superadmin'))
                             <a href="{{ route('admin.dashboard') }}"
-                                class="flex items-center px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50 hover:text-gray-900 text-base font-bold transition-all duration-200">
+                                class="flex items-center px-4 py-3 rounded-xl text-gray-700 hover:bg-white hover:text-indigo-600 hover:shadow-sm text-sm font-bold transition-all duration-200">
                                 <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                                 </svg>
                                 Admin Dashboard
                             </a>
                         @endif
 
                         <a href="{{ route('profile.edit') }}"
-                            class="flex items-center px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50 hover:text-gray-900 text-base font-bold transition-all duration-200">
+                            class="flex items-center px-4 py-3 rounded-xl text-gray-700 hover:bg-white hover:text-indigo-600 hover:shadow-sm text-sm font-bold transition-all duration-200">
                             <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                             </svg>
                             Your Profile
                         </a>
 
                         <a href="{{ route('profile.orders') }}"
-                            class="flex items-center px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50 hover:text-gray-900 text-base font-bold transition-all duration-200">
+                            class="flex items-center px-4 py-3 rounded-xl text-gray-700 hover:bg-white hover:text-indigo-600 hover:shadow-sm text-sm font-bold transition-all duration-200">
                             <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                             </svg>
                             Your Orders
                         </a>
 
                         <a href="{{ route('wishlist.index') }}"
-                            class="flex items-center justify-between px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50 hover:text-gray-900 text-base font-bold transition-all duration-200">
+                            class="flex items-center justify-between px-4 py-3 rounded-xl text-gray-700 hover:bg-white hover:text-indigo-600 hover:shadow-sm text-sm font-bold transition-all duration-200">
                             <div class="flex items-center">
                                 <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -544,29 +474,26 @@
                         <form method="POST" action="{{ route('logout') }}" onsubmit="return handleLogout(event, this)">
                             @csrf
                             <button type="submit"
-                                class="flex items-center w-full px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 hover:text-red-700 text-base font-bold transition-all duration-200">
+                                class="flex items-center w-full px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 hover:text-red-700 hover:shadow-sm text-sm font-bold transition-all duration-200 mt-4">
                                 <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                                 </svg>
                                 Sign out
                             </button>
                         </form>
-
                     </div>
 
                 @else
-
-                    <div class="mt-4 space-y-3 px-4 pb-4">
+                    <div class="space-y-3 pb-8">
                         <button onclick="document.dispatchEvent(new CustomEvent('open-auth-modal', {detail: 'login'}))"
-                            class="w-full px-4 py-3 text-center rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900 text-base font-bold transition-all duration-200">
+                            class="w-full px-6 py-4 text-center rounded-2xl border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-gray-900 text-base font-bold transition-all duration-200 shadow-sm">
                             Log in
                         </button>
                         <button onclick="document.dispatchEvent(new CustomEvent('open-auth-modal', {detail: 'register'}))"
-                            class="w-full px-4 py-3 text-center rounded-xl bg-gray-900 text-white hover:bg-black text-base font-bold transition-all duration-200 shadow-md">
+                            class="w-full px-6 py-4 text-center rounded-2xl bg-gray-900 text-white hover:bg-black text-base font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]">
                             Sign up
                         </button>
                     </div>
-
                 @endauth
 
             </div>

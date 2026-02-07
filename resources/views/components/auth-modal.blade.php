@@ -331,6 +331,24 @@ function authModal() {
             this.clearErrors();
         },
 
+        validateLoginEmail() {
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (this.loginForm.email && !emailPattern.test(this.loginForm.email)) {
+                this.loginErrors.email = 'Please enter a valid email address.';
+            } else {
+                delete this.loginErrors.email;
+            }
+        },
+
+        validateLoginPassword() {
+            const allowedPassword = /^[A-Za-z0-9@_&$]{8,12}$/;
+            if (this.loginForm.password && !allowedPassword.test(this.loginForm.password)) {
+                this.loginErrors.password = 'Password must be 8–12 chars; only letters, numbers, and @ _ & $ are allowed.';
+            } else {
+                delete this.loginErrors.password;
+            }
+        },
+
         async submitLogin() {
             this.isLoading = true;
             this.clearErrors();

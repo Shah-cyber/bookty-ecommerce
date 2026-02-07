@@ -24,7 +24,7 @@
         </style>
     </head>
     <body class="font-sans antialiased" data-layout="customer">
-        <div class="min-h-screen bg-slate-50 relative overflow-hidden">
+        <div class="min-h-screen bg-slate-50 relative">
             <!-- Liquid Background Blobs -->
             <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
                 <div class="absolute -top-40 -left-40 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float"></div>
@@ -48,6 +48,8 @@
             <main>
                 @yield('content')
             </main>
+            
+            @include('layouts.footer')
             </div>
         </div>
         

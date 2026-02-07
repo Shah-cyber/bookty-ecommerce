@@ -1,62 +1,128 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container mx-auto px-4 py-8">
-        <div class="mb-6">
-            <a href="{{ route('books.index') }}" class="inline-flex items-center text-sm font-medium text-primary-700 hover:text-primary-900">
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                </svg>
-                Back to Books
-            </a>
+    <style>
+        /* Enhanced Liquid Glass Theme Styles */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(16px) saturate(150%);
+            -webkit-backdrop-filter: blur(16px) saturate(150%);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 
+                0 4px 24px rgba(0, 0, 0, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5);
+        }
+        .glass-sidebar {
+            background: rgba(248, 250, 252, 0.7);
+            backdrop-filter: blur(20px) saturate(150%);
+            -webkit-backdrop-filter: blur(20px) saturate(150%);
+            border-left: 1px solid rgba(255, 255, 255, 0.6);
+        }
+        .glass-button {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+        .glass-button:hover {
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+            transform: translateY(-2px);
+        }
+        .book-cover-shadow {
+            box-shadow: 
+                0 20px 40px -12px rgba(0, 0, 0, 0.3),
+                0 8px 16px -6px rgba(0, 0, 0, 0.2);
+        }
+        .ambient-glow {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.5;
+            pointer-events: none;
+            z-index: 0;
+        }
+    </style>
+
+    <div class="min-h-screen py-8" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);">
+        <!-- Ambient Background Glows for Glass Effect -->
+        <div class="fixed inset-0 overflow-hidden pointer-events-none">
+            <div class="ambient-glow w-[500px] h-[500px] bg-violet-300/40" style="top: -200px; left: -150px;"></div>
+            <div class="ambient-glow w-[400px] h-[400px] bg-sky-300/30" style="top: 30%; right: -100px;"></div>
+            <div class="ambient-glow w-[350px] h-[350px] bg-rose-300/25" style="bottom: -100px; left: 30%;"></div>
         </div>
 
-        {{-- Flash messages are now handled by JavaScript toast notifications --}}
+        <div class="container mx-auto px-4 relative z-10">
+            <!-- Breadcrumb Navigation -->
+            <nav class="mb-8 flex items-center space-x-2 text-sm">
+                <a href="{{ route('home') }}" class="text-gray-500 hover:text-gray-900 transition-colors">Home</a>
+                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+                <a href="{{ route('books.index') }}" class="text-gray-500 hover:text-gray-900 transition-colors">Books</a>
+                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+                <span class="text-gray-900 font-medium truncate max-w-xs">{{ $book->title }}</span>
+            </nav>
 
-        <div class="relative rounded-[2rem] bg-gradient-to-br from-gray-50 via-primary-50 to-white shadow-xl overflow-hidden">
-            <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(255,255,255,0.9),_transparent_55%),_radial-gradient(circle_at_bottom_right,_rgba(15,23,42,0.12),_transparent_55%)] pointer-events-none"></div>
+            {{-- Flash messages are now handled by JavaScript toast notifications --}}
 
-            <div class="relative z-10 lg:flex">
-                <!-- Book Cover -->
-                <div class="lg:w-1/3 p-6">
-                    <div class="sticky top-6">
-                        <div class="relative rounded-[1.75rem] overflow-hidden shadow-xl">
+            <!-- Main Book Detail Card -->
+            <div class="glass-panel rounded-3xl overflow-hidden">
+                <div class="lg:flex">
+
+                <!-- Book Cover Section (Smaller) -->
+                <div class="lg:w-1/4 p-6 lg:p-8">
+                    <div class="sticky top-8">
+                        <!-- Book Cover with Enhanced Shadow -->
+                        <div class="relative rounded-2xl overflow-hidden book-cover-shadow group">
                             @if($book->cover_image)
                                 <img
                                     src="{{ asset('storage/' . $book->cover_image) }}"
                                     alt="{{ $book->title }}"
-                                    class="w-full h-auto object-cover transform transition-transform duration-700 ease-out hover:scale-105"
+                                    class="w-full h-auto object-cover transform transition-transform duration-700 ease-out group-hover:scale-[1.02]"
                                 >
                             @else
-                                <div class="w-full h-96 bg-gray-200 flex items-center justify-center">
-                                    <svg class="h-24 w-24 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                <div class="w-full aspect-[3/4] bg-gray-100 flex items-center justify-center rounded-2xl">
+                                    <svg class="h-20 w-20 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                                     </svg>
                                 </div>
                             @endif
 
-                            <!-- Top badges on cover -->
+                            <!-- Floating Badges -->
                             <div class="absolute top-4 left-4 right-4 flex justify-between items-start">
                                 <div class="flex flex-col gap-2">
                                     @if($book->is_on_sale)
-                                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold bg-white/85 text-gray-900 shadow-md">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+                                        <span class="glass-button inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-gray-900">
+                                            <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
                                             {{ $book->discount_percent }}% OFF
                                         </span>
                                     @endif
-                                    <span class="inline-flex items-center px-3 py-1.5 rounded-full text-[11px] font-semibold shadow-md
-                                                 {{ ($book->condition ?? 'new') === 'preloved'
-                                                        ? 'bg-amber-100/90 text-amber-900'
-                                                        : 'bg-emerald-100/90 text-emerald-900' }}">
+                                    <span class="glass-button inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold
+                                        {{ ($book->condition ?? 'new') === 'preloved' ? 'text-amber-800' : 'text-emerald-800' }}">
                                         {{ $book->condition_label ?? 'New' }}
                                     </span>
                                 </div>
 
+                                <!-- Wishlist Button -->
                                 <div class="pointer-events-auto">
                                     @auth
                                         <button
                                             id="wishlist-button"
-                                            class="wishlist-btn p-2.5 rounded-full bg-white/15 hover:bg-white/25 border border-white/40 text-white hover:text-red-500 backdrop-blur-md shadow-md transition-all duration-300"
+                                            class="wishlist-btn glass-button h-11 w-11 flex items-center justify-center rounded-full text-gray-600 hover:text-red-500 transition-all duration-300"
                                             data-book-id="{{ $book->id }}"
                                             data-in-wishlist="{{ Auth::user()->hasBookInWishlist($book->id) ? 'true' : 'false' }}"
                                             aria-label="{{ Auth::user()->hasBookInWishlist($book->id) ? 'Remove from wishlist' : 'Add to wishlist' }}"
@@ -69,69 +135,70 @@
                                             </svg>
                                         </button>
                                     @else
-                                        <a
-                                            href="{{ route('login') }}"
-                                            class="p-2.5 rounded-full bg-white/15 hover:bg-white/25 border border-white/40 text-white hover:text-red-500 backdrop-blur-md shadow-md transition-all duration-300"
+                                        <button
+                                            type="button"
+                                            onclick="document.dispatchEvent(new CustomEvent('open-auth-modal', {detail: 'login'}))"
+                                            class="glass-button h-11 w-11 flex items-center justify-center rounded-full text-gray-600 hover:text-red-500 transition-all duration-300"
                                             aria-label="Sign in to save"
                                         >
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                       d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                                             </svg>
-                                        </a>
+                                        </button>
                                     @endauth
                                 </div>
                             </div>
                         </div>
 
-                        <div class="mt-6 space-y-4">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    @if($book->is_on_sale)
-                                        <div class="flex items-baseline gap-2">
-                                            <span class="text-3xl font-bold text-primary-700">
-                                                RM {{ number_format($book->final_price, 2) }}
-                                            </span>
-                                            <span class="text-lg text-gray-400 line-through">
-                                                RM {{ number_format($book->price, 2) }}
-                                            </span>
-                                            <span class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-700">
-                                                -{{ $book->discount_percent }}%
-                                            </span>
-                                        </div>
-                                    @else
-                                        <span class="text-3xl font-bold text-primary-700">
+                        <!-- Purchase Panel -->
+                        <div class="mt-6 glass-card rounded-2xl p-5">
+                            <!-- Price & Stock -->
+                            <div class="mb-5">
+                                @if($book->is_on_sale)
+                                    <div class="flex items-center gap-2 flex-wrap mb-1">
+                                        <span class="text-2xl font-bold text-gray-900">
+                                            RM {{ number_format($book->final_price, 2) }}
+                                        </span>
+                                        <span class="text-sm text-gray-400 line-through">
                                             RM {{ number_format($book->price, 2) }}
                                         </span>
-                                    @endif
-                                    <p class="mt-1 text-xs text-gray-500">
-                                        {{ $book->stock > 0 ? 'Available and ready to ship' : 'Currently out of stock' }}
-                                    </p>
+                                        <span class="px-1.5 py-0.5 text-xs font-bold rounded bg-red-100 text-red-600">
+                                            -{{ $book->discount_percent }}%
+                                        </span>
+                                    </div>
+                                @else
+                                    <span class="text-2xl font-bold text-gray-900 block mb-1">
+                                        RM {{ number_format($book->price, 2) }}
+                                    </span>
+                                @endif
+                                <div class="flex items-center gap-2 text-sm">
+                                    <span class="inline-flex items-center gap-1 {{ $book->stock > 0 ? 'text-emerald-600' : 'text-red-500' }}">
+                                        <span class="w-1.5 h-1.5 rounded-full {{ $book->stock > 0 ? 'bg-emerald-500' : 'bg-red-500' }}"></span>
+                                        {{ $book->stock > 0 ? 'In Stock' : 'Out of Stock' }}
+                                    </span>
+                                    <span class="text-gray-400">•</span>
+                                    <span class="text-gray-500">{{ $book->stock > 0 ? 'Ready to ship' : 'Currently unavailable' }}</span>
                                 </div>
-                                <span class="ml-4 inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
-                                             {{ $book->stock > 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700' }}">
-                                    <span class="w-2 h-2 rounded-full mr-1 {{ $book->stock > 0 ? 'bg-emerald-500' : 'bg-red-500' }}"></span>
-                                    {{ $book->stock > 0 ? 'In stock' : 'Out of stock' }}
-                                </span>
                             </div>
 
-                            <div class="flex flex-col space-y-3">
+                            <!-- Action Buttons -->
+                            <div class="space-y-3">
                                 @if($book->stock > 0)
                                     <button
                                         type="button"
-                                        class="btn-liquid w-full ajax-add-to-cart"
+                                        class="w-full py-3.5 px-6 rounded-xl bg-gray-900 hover:bg-gray-800 text-white text-sm font-semibold flex items-center justify-center gap-2 transition-all duration-300 shadow-lg hover:shadow-xl ajax-add-to-cart"
                                         data-book-id="{{ $book->id }}"
                                     >
-                                        <span>Add to Cart</span>
-                                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                                         </svg>
+                                        Add to Cart
                                     </button>
                                 @else
                                     <button
                                         type="button"
-                                        class="w-full py-3 rounded-full bg-gray-200/80 text-gray-500 text-sm font-semibold cursor-not-allowed border border-gray-200"
+                                        class="w-full py-3.5 px-6 rounded-xl bg-gray-100 text-gray-400 text-sm font-semibold cursor-not-allowed border border-gray-200"
                                         disabled
                                     >
                                         Out of Stock
@@ -142,157 +209,146 @@
                                     <button
                                         type="button"
                                         id="wishlist-button-secondary"
-                                        class="wishlist-btn w-full px-4 py-2 rounded-full border text-sm font-medium flex items-center justify-center gap-2
-                                               {{ Auth::user()->hasBookInWishlist($book->id)
-                                                    ? 'bg-primary-50 text-primary-700 border-primary-200 hover:bg-primary-100'
-                                                    : 'bg-white/60 text-gray-800 border-gray-200 hover:bg-gray-50' }}"
+                                        class="wishlist-btn w-full py-3 px-6 rounded-xl glass-button text-sm font-medium flex items-center justify-center gap-2
+                                            {{ Auth::user()->hasBookInWishlist($book->id) ? 'text-red-600' : 'text-gray-700' }}"
                                         data-book-id="{{ $book->id }}"
                                         data-in-wishlist="{{ Auth::user()->hasBookInWishlist($book->id) ? 'true' : 'false' }}"
                                     >
                                         @if(Auth::user()->hasBookInWishlist($book->id))
-                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20">
                                                 <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
                                             </svg>
-                                            <span>Remove from Wishlist</span>
+                                            <span>Saved to Wishlist</span>
                                         @else
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                                             </svg>
                                             <span>Add to Wishlist</span>
                                         @endif
                                     </button>
                                 @else
-                                    <a
-                                        href="{{ route('login') }}"
-                                        class="w-full px-4 py-2 rounded-full bg-white/70 text-gray-800 border border-gray-200 hover:bg-gray-50 flex items-center justify-center gap-2 text-sm"
+                                    <button
+                                        type="button"
+                                        onclick="document.dispatchEvent(new CustomEvent('open-auth-modal', {detail: 'login'}))"
+                                        class="w-full py-3 px-6 rounded-xl glass-button text-gray-700 text-sm font-medium flex items-center justify-center gap-2"
                                     >
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                                         </svg>
-                                        Sign in to save this book
-                                    </a>
+                                        Sign in to Save
+                                    </button>
                                 @endauth
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Book Details -->
-                <div class="lg:w-1/2 p-8 border-t lg:border-t-0 lg:border-l border-gray-200">
-                    <h1 class="text-4xl font-bold font-serif text-slate-900 !leading-tight mb-2">{{ $book->title }}</h1>
-                    <p class="text-xl text-slate-500 mb-6">by <a href="#" class="hover:underline">{{ $book->author }}</a></p>
+                <!-- Book Details Section -->
+                <div class="lg:w-1/2 p-6 lg:p-8 border-l border-white/30">
+                    <!-- Title & Author -->
+                    <div class="mb-5">
+                        <h1 class="text-2xl lg:text-3xl font-bold text-gray-900 leading-tight mb-2">{{ $book->title }}</h1>
+                        <p class="text-base text-gray-500">by <span class="text-gray-700 font-medium">{{ $book->author }}</span></p>
+                    </div>
 
-                    <div class="flex flex-wrap gap-2 mb-8">
-                        <!-- Condition Badge -->
+                    <!-- Tags/Badges -->
+                    <div class="flex flex-wrap gap-2 mb-6">
                         @if(($book->condition ?? 'new') === 'preloved')
-                            <span class="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-amber-100 text-amber-800 hover:bg-amber-200 transition-colors border border-amber-200">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                                </svg>
+                            <span class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-amber-50 text-amber-700 border border-amber-200">
                                 Preloved
                             </span>
                         @else
-                            <span class="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-green-100 text-green-800 hover:bg-green-200 transition-colors border border-green-200">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
+                            <span class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                                 New
                             </span>
                         @endif
-                        <span class="px-3 py-1 text-sm font-medium rounded-full bg-primary-100 text-primary-800 hover:bg-primary-200 transition-colors">
+                        <span class="px-3 py-1 text-xs font-semibold rounded-full bg-purple-50 text-purple-700 border border-purple-200">
                             {{ $book->genre->name }}
                         </span>
                         @foreach($book->tropes as $trope)
-                            <span class="px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors">
+                            <span class="px-3 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-600 border border-gray-200">
                                 {{ $trope->name }}
                             </span>
                         @endforeach
                     </div>
 
-                    <div class="mb-8">
-                        <h2 class="text-2xl font-bold text-slate-900 mb-4">Synopsis</h2>
+                    <!-- Synopsis Card -->
+                    <div class="glass-card rounded-xl p-5 mb-6">
+                        <h2 class="text-base font-bold text-gray-900 mb-3 flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
+                            </svg>
+                            Synopsis
+                        </h2>
                         <div class="relative">
-                            <div id="synopsis-content" class="prose max-w-none text-slate-600 text-base leading-relaxed max-h-28 overflow-hidden transition-all duration-500 ease-in-out">
+                            <div id="synopsis-content" class="text-gray-600 text-sm leading-relaxed max-h-24 overflow-hidden transition-all duration-500 ease-in-out">
                                 <p>{{ $book->synopsis }}</p>
                             </div>
-                            <div id="synopsis-fade" class="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-white to-transparent pointer-events-none"></div>
-                            <button id="toggle-synopsis" class="text-primary-600 hover:text-primary-800 font-semibold mt-2 text-sm">Read More</button>
+                            <div id="synopsis-fade" class="absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t from-white/80 to-transparent pointer-events-none"></div>
                         </div>
+                        <button id="toggle-synopsis" class="text-gray-900 hover:text-gray-700 font-medium mt-2 text-xs inline-flex items-center gap-1">
+                            Read More
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
                     </div>
 
-                    <div class="border-t border-gray-200 pt-8">
-                        <h2 class="text-2xl font-bold text-slate-900 mb-6">Book Details</h2>
-                        <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                            <div class="border-b border-gray-100 pb-3">
-                                <dt class="text-sm font-medium text-slate-500">Title</dt>
-                                <dd class="mt-1 text-base text-slate-900">{{ $book->title }}</dd>
+                    <!-- Book Details Grid -->
+                    <div class="glass-card rounded-xl p-5">
+                        <h2 class="text-base font-bold text-gray-900 mb-4 flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            Book Details
+                        </h2>
+                        <dl class="grid grid-cols-2 gap-3">
+                            <div class="p-3 rounded-lg bg-gray-50/60">
+                                <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Author</dt>
+                                <dd class="text-sm font-semibold text-gray-900">{{ $book->author }}</dd>
                             </div>
-                            <div class="border-b border-gray-100 pb-3">
-                                <dt class="text-sm font-medium text-slate-500">Author</dt>
-                                <dd class="mt-1 text-base text-slate-900">{{ $book->author }}</dd>
+                            <div class="p-3 rounded-lg bg-gray-50/60">
+                                <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Genre</dt>
+                                <dd class="text-sm font-semibold text-gray-900">{{ $book->genre->name }}</dd>
                             </div>
-                            <div class="border-b border-gray-100 pb-3">
-                                <dt class="text-sm font-medium text-slate-500">Condition</dt>
-                                <dd class="mt-1 text-base text-slate-900">
-                                    @if(($book->condition ?? 'new') === 'preloved')
-                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200">
-                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                                            </svg>
-                                            Preloved
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                            </svg>
-                                            New
-                                        </span>
-                                    @endif
-                                </dd>
+                            <div class="p-3 rounded-lg bg-gray-50/60">
+                                <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Condition</dt>
+                                <dd class="text-sm font-semibold text-gray-900">{{ $book->condition_label ?? 'New' }}</dd>
                             </div>
-                            <div class="border-b border-gray-100 pb-3">
-                                <dt class="text-sm font-medium text-slate-500">Genre</dt>
-                                <dd class="mt-1 text-base text-slate-900">{{ $book->genre->name }}</dd>
-                            </div>
-                            <div class="border-b border-gray-100 pb-3">
-                                <dt class="text-sm font-medium text-slate-500">Tropes</dt>
-                                <dd class="mt-1 text-base text-slate-900">
-                                    {{ $book->tropes->pluck('name')->join(', ') }}
-                                </dd>
+                            <div class="p-3 rounded-lg bg-gray-50/60">
+                                <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Tropes</dt>
+                                <dd class="text-sm font-semibold text-gray-900 truncate">{{ $book->tropes->pluck('name')->join(', ') ?: 'None' }}</dd>
                             </div>
                         </dl>
                     </div>
                 </div>
 
                 <!-- Similar Books Sidebar -->
-                <div class="lg:w-1/4 p-6 border-t lg:border-t-0 lg:border-l border-gray-200 bg-gray-50">
-                    <div class="sticky top-6">
-                        <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center">
-                            <svg class="w-5 h-5 mr-2 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                <div class="lg:w-1/4 p-6 glass-sidebar">
+                    <div class="sticky top-8">
+                        <h3 class="text-base font-bold text-gray-900 mb-4 flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                             </svg>
                             Similar Books
                         </h3>
                         
-                        <div id="similar-books-list" class="space-y-4">
+                        <div id="similar-books-list" class="space-y-3">
                             <!-- Loading state -->
-                            <div class="text-center py-8">
-                                <div class="inline-flex items-center px-3 py-2 bg-white rounded-lg shadow-sm">
-                                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <div class="text-center py-6">
+                                <div class="inline-flex items-center px-3 py-2 glass-card rounded-lg">
+                                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                     </svg>
-                                    <span class="text-sm text-gray-600">Loading...</span>
+                                    <span class="text-xs text-gray-600">Loading...</span>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- View More Button -->
-                        <div class="mt-6">
-                            <a href="{{ route('books.index') }}" class="block w-full text-center px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors duration-200">
+                        <!-- View All Button -->
+                        <div class="mt-5">
+                            <a href="{{ route('books.index') }}" class="block w-full text-center px-4 py-2.5 bg-gray-900 text-white text-xs font-semibold rounded-xl hover:bg-gray-800 transition-all duration-300 shadow-md hover:shadow-lg">
                                 View All Books
                             </a>
                         </div>
@@ -301,20 +357,20 @@
             </div>
         </div>
 
-        <!-- Customer Reviews -->
-        <div class="mt-12 p-6">
-            <div class="max-w-screen-xl mx-auto">
-                <div class="flex max-lg:flex-col gap-12">
+        <!-- Customer Reviews Section -->
+        <div class="mt-12 glass-panel rounded-3xl p-8 lg:p-10">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex max-lg:flex-col gap-10 lg:gap-16">
                     <!-- Left Sidebar - Review Statistics -->
-                    <div class="max-w-sm w-full">
+                    <div class="lg:w-80 shrink-0">
                         <div>
-                            <h2 class="text-2xl font-bold text-slate-900 !leading-tight mb-2">Customer reviews</h2>
-                            <div class="flex items-center gap-2">
-                                <div class="flex items-center gap-0.5 text-orange-500">
+                            <h2 class="text-2xl font-bold text-gray-900 mb-4">Customer Reviews</h2>
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="flex items-center gap-0.5 text-amber-400">
                                     @for ($i = 1; $i <= 5; $i++)
                                         @if ($i <= $reviewStats['average'])
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-[18px] h-[18px] fill-current" viewBox="0 0 24 24">
-                                                <path d="M12 17.42L6.25 21.54c-.29.2-.66-.09-.56-.43l2.14-6.74L2.08 10.15c-.26-.2-.13-.6.2-.62l7.07-.05L11.62 2.66c.1-.32.56-.32.66 0l2.24 6.82 7.07.05c.33.01.46.42.2.62l-5.75 4.22 2.14 6.74c.1.34-.27.63-.56.43L12 17.42z" />
+                                            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                                                <path d="M12 17.42L6.25 21.54c-.29.2-.66-.09-.56-.43l2.14-6.74L2.08 10.15c-.26-.2-.13-.6.2-.62l7.07-.05L11.62 2.66c.1-.32.56-.32.66 0l2.24 6.82 7.07.05c.33.01.46.42.2.62l-5.75 4.22 2.14 6.74c.1.34-.27.63-.56.43L12 17.42z"/>
                                             </svg>
                                         @else
                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-[18px] h-[18px] text-gray-300 fill-current" viewBox="0 0 24 24">
@@ -425,173 +481,82 @@
                         @endif
 
                         <!-- Individual Reviews -->
-                        <div class="divide-y divide-gray-300 {{ $reviewsWithImages->count() > 0 ? 'mt-8' : '' }}">
-                            @forelse($reviews as $review)
-                                <div class="py-6">
-                                    <div class="flex items-center gap-4">
-                                        <div class="shrink-0">
-                                            <div class="w-11 h-11 rounded-full bg-gradient-to-br from-primary-500 to-primary-400 flex items-center justify-center text-white font-semibold border-2 border-gray-400">
-                                                {{ strtoupper(substr($review->user->name, 0, 1)) }}
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm text-slate-900 font-semibold">{{ $review->user->name }}</p>
-                                            <div class="flex items-center gap-2 mt-2">
-                                                <span class="w-4 h-4 flex items-center justify-center rounded-full bg-green-600/20">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-2 h-2 fill-green-700" viewBox="0 0 24 24">
-                                                        <path d="M9.225 20.656a1.206 1.206 0 0 1-1.71 0L.683 13.823a1.815 1.815 0 0 1 0-2.566l.855-.856a1.815 1.815 0 0 1 2.567 0l4.265 4.266L19.895 3.14a1.815 1.815 0 0 1 2.567 0l.855.856a1.815 1.815 0 0 1 0 2.566z" />
-                                                    </svg>
-                                                </span>
-                                                <p class="text-slate-600 text-xs">Verified Buyer</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="mt-4">
-                                        <h6 class="text-slate-900 text-[15px] font-semibold">{{ $review->title ?? 'Customer Review' }}</h6>
-                                        <div class="flex items-center space-x-0.5 text-orange-500 mt-2">
-                                            @for ($i = 1; $i <= 5; $i++)
-                                                @if($i <= $review->rating)
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-[18px] h-[18px] fill-current" viewBox="0 0 24 24">
-                                                        <path d="M12 17.42L6.25 21.54c-.29.2-.66-.09-.56-.43l2.14-6.74L2.08 10.15c-.26-.2-.13-.6.2-.62l7.07-.05L11.62 2.66c.1-.32.56-.32.66 0l2.24 6.82 7.07.05c.33.01.46.42.2.62l-5.75 4.22 2.14 6.74c.1.34-.27.63-.56.43L12 17.42z" />
-                                                    </svg>
-                                                @else
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-[18px] h-[18px] text-gray-300 fill-current" viewBox="0 0 24 24">
-                                                        <path d="M12 17.42L6.25 21.54c-.29.2-.66-.09-.56-.43l2.14-6.74L2.08 10.15c-.26-.2-.13-.6.2-.62l7.07-.05L11.62 2.66c.1-.32.56-.32.66 0l2.24 6.82 7.07.05c.33.01.46.42.2.62l-5.75 4.22 2.14 6.74c.1.34-.27.63-.56.43L12 17.42z" />
-                                                    </svg>
-                                                @endif
-                                            @endfor
-                                            <p class="text-slate-600 text-sm !ml-2">{{ $review->created_at->diffForHumans() }}</p>
-                                        </div>
-                                        @if($review->comment)
-                                            <div class="mt-4">
-                                                <p class="text-slate-600 text-sm leading-relaxed">{{ $review->comment }}</p>
-                                            </div>
-                                        @endif
-                                    </div>
-                                    
-                                    <!-- Review Images -->
-                                    @if($review->hasImages())
-                                        <div class="flex items-center gap-4 mt-4 overflow-auto">
-                                            @foreach($review->image_urls as $index => $imageUrl)
-                                                <img src="{{ $imageUrl }}" 
-                                                     class="bg-gray-100 object-cover p-2 w-48 h-48 cursor-pointer hover:opacity-90 transition-opacity" 
-                                                     alt="review-img-{{ $index + 1 }}" 
-                                                     onclick="openImageModal('{{ $imageUrl }}', {{ $index }}, {{ json_encode($review->image_urls) }})" />
-                                            @endforeach
-                                        </div>
-                                    @endif
-                                    
-                                    <!-- Review Actions -->
-                                    <div class="mt-4">
-                                        <p class="text-xs text-gray-500 mb-2">{{ $review->helpful_count }} people found this helpful</p>
-                                        <div class="flex items-center gap-4">
-                                            @auth
-                                                <button type="button" 
-                                                        class="helpful-btn px-3 py-1.5 text-xs font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 {{ $review->isMarkedHelpfulBy(Auth::id()) ? 'bg-blue-100 text-blue-700 border-blue-300' : '' }}"
-                                                        data-review-id="{{ $review->id }}"
-                                                        data-is-helpful="{{ $review->isMarkedHelpfulBy(Auth::id()) ? 'true' : 'false' }}">
-                                                    {{ $review->isMarkedHelpfulBy(Auth::id()) ? 'Helpful ✓' : 'Helpful' }}
-                                                </button>
-                                                <button type="button" 
-                                                        class="report-btn text-sm font-medium text-blue-600 hover:underline"
-                                                        data-review-id="{{ $review->id }}">
-                                                    Report abuse
-                                                </button>
-                                            @endauth
-                                        </div>
-                                    </div>
-                                </div>
-                            @empty
-                                <div class="py-6 text-center">
-                                    <p class="text-gray-500">No reviews yet. Be the first to review this book!</p>
-                                </div>
-                            @endforelse
-                            
-                            @if($reviews->hasPages())
-                                <div class="py-6">
-                                    <ul class="flex space-x-4 justify-end">
-                                        {{-- Previous Page Link --}}
-                                        @if ($reviews->onFirstPage())
-                                            <li class="flex items-center justify-center shrink-0 bg-gray-100 w-9 h-9 rounded-full cursor-not-allowed">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 fill-gray-300" viewBox="0 0 55.753 55.753">
-                                                    <path d="M12.745 23.915c.283-.282.59-.52.913-.727L35.266 1.581a5.4 5.4 0 0 1 7.637 7.638L24.294 27.828l18.705 18.706a5.4 5.4 0 0 1-7.636 7.637L13.658 32.464a5.367 5.367 0 0 1-.913-.727 5.367 5.367 0 0 1-1.572-3.911 5.369 5.369 0 0 1 1.572-3.911z" data-original="#000000" />
-                                                </svg>
-                                            </li>
-                                        @else
-                                            <li class="flex items-center justify-center shrink-0 hover:bg-gray-50 border-2 border-gray-300 cursor-pointer w-9 h-9 rounded-full">
-                                                <a href="{{ $reviews->previousPageUrl() }}" class="flex items-center justify-center w-full h-full">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3 fill-gray-400" viewBox="0 0 55.753 55.753">
-                                                        <path d="M12.745 23.915c.283-.282.59-.52.913-.727L35.266 1.581a5.4 5.4 0 0 1 7.637 7.638L24.294 27.828l18.705 18.706a5.4 5.4 0 0 1-7.636 7.637L13.658 32.464a5.367 5.367 0 0 1-.913-.727 5.367 5.367 0 0 1-1.572-3.911 5.369 5.369 0 0 1 1.572-3.911z" data-original="#000000" />
-                                                    </svg>
-                                                </a>
-                                            </li>
-                                        @endif
-
-                                        {{-- Pagination Elements --}}
-                                        @php
-                                            $start = max(1, $reviews->currentPage() - 2);
-                                            $end = min($reviews->lastPage(), $reviews->currentPage() + 2);
-                                        @endphp
-
-                                        {{-- First page --}}
-                                        @if($start > 1)
-                                            <li class="flex items-center justify-center shrink-0 hover:bg-gray-50 border-2 border-gray-300 cursor-pointer text-[15px] font-medium text-slate-900 w-9 h-9 rounded-full">
-                                                <a href="{{ $reviews->url(1) }}" class="flex items-center justify-center w-full h-full">1</a>
-                                            </li>
-                                            @if($start > 2)
-                                                <li class="flex items-center justify-center shrink-0 text-[15px] font-medium text-slate-900 w-9 h-9">
-                                                    <span>...</span>
-                                                </li>
-                                            @endif
-                                        @endif
-
-                                        {{-- Page numbers around current page --}}
-                                        @for ($page = $start; $page <= $end; $page++)
-                                            @if ($page == $reviews->currentPage())
-                                                <li class="flex items-center justify-center shrink-0 bg-blue-500 border-2 border-blue-500 cursor-pointer text-[15px] font-medium text-white w-9 h-9 rounded-full">
-                                                    {{ $page }}
-                                                </li>
-                                            @else
-                                                <li class="flex items-center justify-center shrink-0 hover:bg-gray-50 border-2 border-gray-300 cursor-pointer text-[15px] font-medium text-slate-900 w-9 h-9 rounded-full">
-                                                    <a href="{{ $reviews->url($page) }}" class="flex items-center justify-center w-full h-full">{{ $page }}</a>
-                                                </li>
-                                            @endif
-                                        @endfor
-
-                                        {{-- Last page --}}
-                                        @if($end < $reviews->lastPage())
-                                            @if($end < $reviews->lastPage() - 1)
-                                                <li class="flex items-center justify-center shrink-0 text-[15px] font-medium text-slate-900 w-9 h-9">
-                                                    <span>...</span>
-                                                </li>
-                                            @endif
-                                            <li class="flex items-center justify-center shrink-0 hover:bg-gray-50 border-2 border-gray-300 cursor-pointer text-[15px] font-medium text-slate-900 w-9 h-9 rounded-full">
-                                                <a href="{{ $reviews->url($reviews->lastPage()) }}" class="flex items-center justify-center w-full h-full">{{ $reviews->lastPage() }}</a>
-                                            </li>
-                                        @endif
-
-                                        {{-- Next Page Link --}}
-                                        @if ($reviews->hasMorePages())
-                                            <li class="flex items-center justify-center shrink-0 hover:bg-gray-50 border-2 border-gray-300 cursor-pointer w-9 h-9 rounded-full">
-                                                <a href="{{ $reviews->nextPageUrl() }}" class="flex items-center justify-center w-full h-full">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3 fill-gray-400 rotate-180" viewBox="0 0 55.753 55.753">
-                                                        <path d="M12.745 23.915c.283-.282.59-.52.913-.727L35.266 1.581a5.4 5.4 0 0 1 7.637 7.638L24.294 27.828l18.705 18.706a5.4 5.4 0 0 1-7.636 7.637L13.658 32.464a5.367 5.367 0 0 1-.913-.727 5.367 5.367 0 0 1-1.572-3.911 5.369 5.369 0 0 1 1.572-3.911z" data-original="#000000" />
-                                                    </svg>
-                                                </a>
-                                            </li>
-                                        @else
-                                            <li class="flex items-center justify-center shrink-0 bg-gray-100 w-9 h-9 rounded-full cursor-not-allowed">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 fill-gray-300 rotate-180" viewBox="0 0 55.753 55.753">
-                                                    <path d="M12.745 23.915c.283-.282.59-.52.913-.727L35.266 1.581a5.4 5.4 0 0 1 7.637 7.638L24.294 27.828l18.705 18.706a5.4 5.4 0 0 1-7.636 7.637L13.658 32.464a5.367 5.367 0 0 1-.913-.727 5.367 5.367 0 0 1-1.572-3.911 5.369 5.369 0 0 1 1.572-3.911z" data-original="#000000" />
-                                                </svg>
-                                            </li>
-                                        @endif
-                                    </ul>
-                                </div>
-                            @endif
+                        <div id="reviews-container" data-reviews-url="{{ route('books.reviews', $book) }}" class="divide-y divide-gray-300 {{ $reviewsWithImages->count() > 0 ? 'mt-8' : '' }}">
+                            @include('books.partials.reviews-list')
                         </div>
                     </div>
                 </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // function to initialize pagination links
+            function initPagination() {
+                document.querySelectorAll('.ajax-pagination-link').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const href = this.getAttribute('href');
+                        const container = document.getElementById('reviews-container');
+                        const reviewsBaseUrl = container.dataset.reviewsUrl;
+                        
+                        // Construct the correct AJAX URL
+                        // We always want to hit the reviews endpoint
+                        // Extract query parameters (like page=2) from the link href
+                        let targetUrl = href;
+                        try {
+                            const urlObj = new URL(href);
+                            const params = new URLSearchParams(urlObj.search);
+                            // If reviewsBaseUrl already has query params, we need to handle that, but typically it doesn't
+                            // We just append the params from the clicked link
+                            targetUrl = `${reviewsBaseUrl}?${params.toString()}`;
+                        } catch (err) {
+                            console.error('Invalid URL:', href);
+                            // Fallback to trying to append /reviews if relative (unlikely)
+                            if (!href.includes('/reviews')) {
+                                targetUrl = href.replace(window.location.pathname, window.location.pathname + '/reviews');
+                            }
+                        }
+                        
+                        loadReviews(targetUrl);
+                    });
+                });
+            }
+
+            // function to load reviews via AJAX
+            function loadReviews(url) {
+                // Show loading state
+                const container = document.getElementById('reviews-container');
+                container.style.opacity = '0.5';
+                
+                fetch(url, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.text();
+                })
+                .then(html => {
+                    container.innerHTML = html;
+                    container.style.opacity = '1';
+                    
+                    // Re-initialize pagination links for the new content
+                    initPagination();
+                    
+                    // Scroll to top of reviews container
+                    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                })
+                .catch(error => {
+                    console.error('Error loading reviews:', error);
+                    container.style.opacity = '1';
+                    alert('Failed to load reviews. Please try again.');
+                });
+            }
+
+            // Initial initialization
+            initPagination();
+        });
+    </script>
             </div>
         </div>
         
@@ -721,46 +686,50 @@
         </div>
     </div>
 
-    <!-- Image Gallery Modal -->
-    <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-75 overflow-y-auto h-full w-full hidden z-50">
-        <div class="relative top-0 mx-auto p-5 w-full h-full flex items-center justify-center">
-            <div class="relative bg-white rounded-lg shadow-lg max-w-4xl max-h-full w-full h-full flex flex-col">
-                <!-- Modal Header -->
-                <div class="flex justify-between items-center p-4 border-b border-gray-200">
-                    <h3 class="text-lg font-medium text-gray-900">Review Photos</h3>
-                    <button type="button" id="closeImageModal" class="text-gray-400 hover:text-gray-600">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </button>
+    <!-- Image Gallery Modal (Shopee-style) -->
+    <div id="imageModal" class="fixed inset-0 z-[100] hidden">
+        <!-- Dark Overlay -->
+        <div class="absolute inset-0 bg-black/95"></div>
+        
+        <!-- Modal Container -->
+        <div class="relative w-full h-full flex flex-col">
+            <!-- Header -->
+            <div class="shrink-0 flex items-center justify-between px-6 py-4">
+                <div class="flex items-center gap-3">
+                    <span class="text-white font-medium">Review Photos</span>
+                    <span id="imageCounter" class="text-white/60 text-sm">1 / 5</span>
                 </div>
+                <button type="button" id="closeImageModal" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-all">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Main Image Area -->
+            <div class="flex-1 relative flex items-center justify-center px-16 py-4 min-h-0">
+                <!-- Previous Button -->
+                <button id="prevImage" class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-all z-10">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                </button>
                 
-                <!-- Modal Body -->
-                <div class="flex-1 flex items-center justify-center p-4">
-                    <div class="relative w-full h-full flex items-center justify-center">
-                        <!-- Main Image -->
-                        <img id="modalMainImage" src="" alt="Review image" class="max-w-full max-h-full object-contain">
-                        
-                        <!-- Navigation Arrows -->
-                        <button id="prevImage" class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                            </svg>
-                        </button>
-                        
-                        <button id="nextImage" class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
+                <!-- Main Image -->
+                <img id="modalMainImage" src="" alt="Review image" class="max-w-full max-h-full object-contain rounded-lg transition-opacity duration-300">
                 
-                <!-- Thumbnail Navigation -->
-                <div id="thumbnailContainer" class="p-4 border-t border-gray-200">
-                    <div id="thumbnails" class="flex space-x-2 overflow-x-auto">
-                        <!-- Thumbnails will be inserted here -->
-                    </div>
+                <!-- Next Button -->
+                <button id="nextImage" class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-all z-10">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Thumbnail Strip -->
+            <div class="shrink-0 px-6 py-4 bg-black/50">
+                <div id="thumbnails" class="flex items-center justify-center gap-2 overflow-x-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent py-1">
+                    <!-- Thumbnails will be inserted here -->
                 </div>
             </div>
         </div>
@@ -1249,16 +1218,20 @@
                 const modal = document.getElementById('imageModal');
                 const mainImage = document.getElementById('modalMainImage');
                 const thumbnails = document.getElementById('thumbnails');
+                const imageCounter = document.getElementById('imageCounter');
                 
                 // Set main image
                 mainImage.src = imageUrl;
+                
+                // Update counter
+                imageCounter.textContent = `${index + 1} / ${images.length}`;
                 
                 // Create thumbnails
                 thumbnails.innerHTML = '';
                 images.forEach((img, idx) => {
                     const thumbnail = document.createElement('img');
                     thumbnail.src = img;
-                    thumbnail.className = `w-16 h-16 object-cover rounded cursor-pointer border-2 ${idx === index ? 'border-purple-500' : 'border-gray-200'}`;
+                    thumbnail.className = `w-16 h-16 object-cover rounded-lg cursor-pointer transition-all duration-200 ${idx === index ? 'ring-2 ring-white ring-offset-2 ring-offset-black opacity-100' : 'opacity-50 hover:opacity-80'}`;
                     thumbnail.onclick = () => switchImage(idx);
                     thumbnails.appendChild(thumbnail);
                 });
@@ -1267,8 +1240,11 @@
                 const prevBtn = document.getElementById('prevImage');
                 const nextBtn = document.getElementById('nextImage');
                 
-                prevBtn.style.display = images.length > 1 ? 'block' : 'none';
-                nextBtn.style.display = images.length > 1 ? 'block' : 'none';
+                prevBtn.style.display = images.length > 1 ? 'flex' : 'none';
+                nextBtn.style.display = images.length > 1 ? 'flex' : 'none';
+                
+                // Lock body scroll
+                document.body.style.overflow = 'hidden';
                 
                 modal.classList.remove('hidden');
             }
@@ -1277,39 +1253,62 @@
                 currentImageIndex = index;
                 const mainImage = document.getElementById('modalMainImage');
                 const thumbnails = document.getElementById('thumbnails');
+                const imageCounter = document.getElementById('imageCounter');
                 
-                mainImage.src = currentImages[index];
+                // Fade effect
+                mainImage.style.opacity = '0';
+                setTimeout(() => {
+                    mainImage.src = currentImages[index];
+                    mainImage.style.opacity = '1';
+                }, 150);
+                
+                // Update counter
+                imageCounter.textContent = `${index + 1} / ${currentImages.length}`;
                 
                 // Update thumbnail selection
                 Array.from(thumbnails.children).forEach((thumb, idx) => {
-                    thumb.className = `w-16 h-16 object-cover rounded cursor-pointer border-2 ${idx === index ? 'border-purple-500' : 'border-gray-200'}`;
+                    thumb.className = `w-16 h-16 object-cover rounded-lg cursor-pointer transition-all duration-200 ${idx === index ? 'ring-2 ring-white ring-offset-2 ring-offset-black opacity-100' : 'opacity-50 hover:opacity-80'}`;
                 });
             }
             
             function nextImage() {
                 if (currentImageIndex < currentImages.length - 1) {
                     switchImage(currentImageIndex + 1);
+                } else {
+                    // Loop to first image
+                    switchImage(0);
                 }
             }
             
             function prevImage() {
                 if (currentImageIndex > 0) {
                     switchImage(currentImageIndex - 1);
+                } else {
+                    // Loop to last image
+                    switchImage(currentImages.length - 1);
                 }
             }
             
-            // Modal event listeners
-            document.getElementById('closeImageModal').addEventListener('click', function() {
+            function closeImageModal() {
                 document.getElementById('imageModal').classList.add('hidden');
-            });
+                document.body.style.overflow = '';
+            }
+            
+            // Make image modal functions global
+            window.openImageModal = openImageModal;
+            window.switchImage = switchImage;
+            window.closeImageModal = closeImageModal;
+            
+            // Modal event listeners
+            document.getElementById('closeImageModal').addEventListener('click', closeImageModal);
             
             document.getElementById('nextImage').addEventListener('click', nextImage);
             document.getElementById('prevImage').addEventListener('click', prevImage);
             
-            // Close modal when clicking outside
+            // Close modal when clicking on background (not on content)
             document.getElementById('imageModal').addEventListener('click', function(e) {
-                if (e.target === this) {
-                    this.classList.add('hidden');
+                if (e.target === this || e.target.classList.contains('bg-black/95')) {
+                    closeImageModal();
                 }
             });
             
@@ -1318,7 +1317,7 @@
                 const modal = document.getElementById('imageModal');
                 if (!modal.classList.contains('hidden')) {
                     if (e.key === 'Escape') {
-                        modal.classList.add('hidden');
+                        closeImageModal();
                     } else if (e.key === 'ArrowLeft') {
                         prevImage();
                     } else if (e.key === 'ArrowRight') {
