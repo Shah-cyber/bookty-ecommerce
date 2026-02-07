@@ -343,104 +343,147 @@ window.RecommendationManager = {
         
         // Condition logic
         const isPreloved = (book.condition === 'preloved');
-        const conditionLabel = isPreloved ? 'Preloved' : 'New';
-        const conditionClasses = isPreloved ? 'bg-amber-100 text-amber-800' : 'bg-[#e0fcd6] text-emerald-800';
+        const conditionLabel = book.condition_label || (isPreloved ? 'Preloved' : 'New');
+        const conditionClasses = isPreloved ? 'bg-amber-100/90 text-amber-900' : 'bg-emerald-100/90 text-emerald-900';
 
         // Genre label
-        const genreName = book.genre?.name || book.genre || 'Book';
+        const genreName = (book.genre?.name || book.genre || 'GENRE').toUpperCase();
+        
+        // Wishlist logic
+        const inWishlist = book.in_wishlist;
 
         return `
-            <div class="group relative w-full aspect-[3/4] rounded-[2.5rem] overflow-hidden bg-white shadow-lg hover:shadow-2xl transition-all duration-300 transform-gpu hover:-translate-y-1">
-                <!-- Fix for border-radius overflow -->
+            <div class="group relative w-full aspect-[3/4] rounded-[2.5rem] overflow-hidden shadow-xl bg-gray-900 transform-gpu hover:-translate-y-1 transition-transform duration-300">
+                <!-- Background Image -->
                 <div class="absolute inset-0 rounded-[2.5rem] overflow-hidden z-0 mask-image-rounded">
-                    
-                    <!-- Background Image -->
-                    <div class="absolute inset-x-0 top-0 h-[70%]">
-                        <a href="${book.link}" class="block w-full h-full">
-                            ${book.cover_image ? 
-                                `<img src="${book.cover_image}" alt="${book.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 backface-hidden">` : 
-                                `<div class="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                                    <svg class="h-16 w-16 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                                    </svg>
-                                </div>`
-                            }
-                        </a>
-                    </div>
+                    ${book.cover_image ? 
+                        `<img src="${book.cover_image}" alt="${book.title}" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 opacity-90 group-hover:opacity-100">` : 
+                        `<div class="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
+                            <svg class="h-16 w-16 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                            </svg>
+                        </div>`
+                    }
 
-                    <!-- White Gradient Overlay -->
-                    <div class="absolute inset-0 bg-gradient-to-t from-white via-white/90 to-transparent pointer-events-none" style="background: linear-gradient(to top, #ffffff 30%, rgba(255,255,255,0.95) 45%, rgba(255,255,255,0) 70%);"></div>
+                    <!-- Dark gradient overlay for text readability -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none"></div>
+                </div>
 
-                    <!-- Top Actions -->
-                    <div class="absolute top-4 left-4 right-4 flex justify-between items-start z-10 pointer-events-none">
-                        <div class="flex flex-col gap-2 pointer-events-auto">
-                            <!-- Discount Badge -->
-                            ${book.is_on_sale ? `
-                                <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[11px] font-bold bg-white text-gray-900 shadow-md transform hover:scale-105 transition-transform duration-200">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
-                                    ${discountPercent}% OFF
-                                </span>
-                            ` : ''}
-                            
-                            <!-- Condition Badge -->
-                            <span class="inline-flex items-center px-3.5 py-1.5 rounded-full text-[11px] font-bold shadow-md ${conditionClasses}">
-                                ${conditionLabel}
+                <!-- Top badges + wishlist -->
+                <div class="absolute top-4 left-4 right-4 flex justify-between items-start z-20">
+                    <div class="flex flex-col gap-2">
+                        <!-- Discount badge -->
+                        ${book.is_on_sale ? `
+                            <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[11px] font-bold bg-white/90 text-gray-900 shadow-md backdrop-blur-md">
+                                <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+                                ${discountPercent}% OFF
                             </span>
-                        </div>
-
-                        <!-- Match Score Badge (Specific to Recommendations) -->
-                        ${book.score ? `
-                            <div class="pointer-events-auto">
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-700 shadow-sm border border-purple-200">
-                                    ${Math.round(book.score * 100)}% Match
-                                </span>
-                            </div>
                         ` : ''}
+                        
+                        <!-- Condition badge -->
+                        <span class="inline-flex items-center px-3.5 py-1.5 rounded-full text-[11px] font-bold shadow-md ${conditionClasses}">
+                            ${conditionLabel}
+                        </span>
                     </div>
 
-                    <!-- Content Area -->
-                    <div class="absolute bottom-0 left-0 right-0 p-6 z-20">
-                        
-                        <!-- Floating Data Points -->
-                        <div class="-mt-12 mb-4 flex justify-between items-center transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500 relative z-30">
-                            <!-- Genre Badge -->
-                            <span class="inline-block px-4 py-1.5 rounded bg-orange-100 text-orange-800 text-[10px] font-bold uppercase tracking-wider shadow-sm">
-                                ${genreName}
-                            </span>
+                    <!-- Wishlist button with glass effect -->
+                    <div class="pointer-events-auto">
+                        <button
+                            class="wishlist-btn p-2.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/30 text-white hover:text-red-500 backdrop-blur-md transition-all duration-300 shadow-lg"
+                            data-book-id="${book.id}"
+                            data-in-wishlist="${inWishlist ? 'true' : 'false'}"
+                            aria-label="${inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}"
+                        >
+                            <svg class="w-5 h-5 ${inWishlist ? 'fill-current text-red-500' : 'fill-none'}" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
 
-                            <!-- Price Pill -->
-                            <span class="px-5 py-2.5 rounded-full bg-white text-gray-900 font-bold text-sm shadow-[0_4px_10px_rgba(0,0,0,0.1)] border border-gray-100">
-                                RM ${parseFloat(book.final_price || book.price).toFixed(2)}
-                            </span>
+                <!-- Liquid Glass bottom panel -->
+                <div class="absolute inset-x-3 bottom-3 z-30 transform translate-y-[62px] group-hover:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]">
+                    <!-- Original Liquid Glass Style: Translucent bg-white/30 with blur -->
+                    <div class="relative rounded-3xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.3)] px-4 py-4 sm:px-5 sm:py-5 text-white ring-1 ring-white/10">
+                        
+                        <!-- Top row: genre + match + price -->
+                        <div class="flex items-center justify-between mb-3 mt-1">
+                            <div class="flex items-center gap-2">
+                                <span class="inline-flex items-center px-3 py-1 rounded-full bg-white/20 text-[10px] font-bold tracking-wide text-white uppercase backdrop-blur-sm shadow-sm border border-white/10">
+                                    ${genreName}
+                                </span>
+                                
+                                <!-- Match Score (Inline) -->
+                                ${book.score ? `
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold bg-purple-500/80 text-white shadow-sm backdrop-blur-sm border border-purple-400/30">
+                                        <svg class="w-2.5 h-2.5 mr-0.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                        ${Math.round(book.score * 100)}%
+                                    </span>
+                                ` : ''}
+                            </div>
+
+                            <div class="text-right">
+                                ${book.is_on_sale ? `
+                                    <div class="text-[11px] text-white/70 line-through decoration-red-500/80 decoration-2 drop-shadow-md font-medium">
+                                        RM ${parseFloat(book.price).toFixed(2)}
+                                    </div>
+                                    <div class="text-base font-extrabold text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
+                                        RM ${parseFloat(book.final_price).toFixed(2)}
+                                    </div>
+                                ` : `
+                                    <div class="text-base font-extrabold text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
+                                        RM ${parseFloat(book.price).toFixed(2)}
+                                    </div>
+                                `}
+                            </div>
                         </div>
 
                         <!-- Title & Author -->
-                        <div class="mb-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                        <div class="mb-3">
                             <a href="${book.link}" class="block group/title">
-                                <h3 class="text-2xl font-bold text-gray-900 mb-1 leading-tight line-clamp-1 group-hover/title:text-primary-600 transition-colors">
+                                <h3 class="text-[15px] sm:text-base font-bold text-white mb-0.5 leading-snug line-clamp-2 drop-shadow-md group-hover/title:text-pink-300 transition-colors">
                                     ${book.title}
                                 </h3>
                             </a>
-                            <p class="text-gray-500 text-sm font-medium">${book.author}</p>
+                            <p class="text-[11px] text-gray-200 font-medium drop-shadow-sm">
+                                ${book.author}
+                            </p>
+
+                            ${(book.stock <= 5 && book.stock > 0) ? `
+                                <div class="mt-2 flex items-center gap-1.5">
+                                    <span class="w-3.5 h-3.5 rounded-full border border-amber-200/50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
+                                        <span class="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)] animate-pulse"></span>
+                                    </span>
+                                    <span class="text-[11px] text-amber-300 font-bold drop-shadow-sm">
+                                        Only ${book.stock} left
+                                    </span>
+                                </div>
+                            ` : ''}
                         </div>
 
-                        <!-- Add to Cart Button -->
-                        <div class="relative z-30 pt-2">
-                           ${(book.stock > 0) ? `
-                                <button type="button" 
-                                        class="ajax-add-to-cart w-full py-4 bg-white text-gray-900 font-bold rounded-2xl hover:bg-gray-50 active:scale-[0.98] transition-all duration-300 shadow-md border border-gray-100 flex items-center justify-center gap-2"
-                                        data-book-id="${book.id}"
-                                        data-quantity="1">
+                        <!-- Add to Cart -->
+                        <div class="pt-1">
+                            ${book.stock > 0 ? `
+                                <button
+                                    type="button"
+                                    class="btn-liquid w-full ajax-add-to-cart"
+                                    data-book-id="${book.id}"
+                                    data-quantity="1"
+                                >
                                     <span>Add to cart</span>
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                                     </svg>
                                 </button>
-                           ` : `
-                                <button type="button" class="w-full py-4 bg-gray-100 text-gray-400 font-bold rounded-2xl cursor-not-allowed border border-gray-200" disabled>
-                                    Out of Stock
+                            ` : `
+                                <button
+                                    type="button"
+                                    class="w-full py-3 rounded-full bg-white/10 text-gray-400 text-sm font-bold cursor-not-allowed border border-white/20 backdrop-blur-sm"
+                                    disabled
+                                >
+                                    Out of stock
                                 </button>
-                           `}
+                            `}
                         </div>
                     </div>
                 </div>

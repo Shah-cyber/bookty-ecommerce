@@ -195,7 +195,7 @@
                 <h2 class="text-xl font-bold text-white">Flash Sale Preview</h2>
             </div>
             <div class="p-6">
-                <x-flash-sale-countdown :end-time="$flashSale->ends_at->toIso8601String()" :title="$flashSale->name" class="mb-6">
+                <x-flash-sale-countdown :end-time="$flashSale->ends_at->toIso8601String()" :title="$flashSale->name" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg p-4 shadow-lg mb-6">
                     <p class="text-sm">{{ $flashSale->description }}</p>
                 </x-flash-sale-countdown>
                 

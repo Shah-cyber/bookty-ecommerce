@@ -44,6 +44,8 @@ class RecommendationController extends Controller
 
     private function serializeBook(Book $book): array
     {
+        $discountPercent = $book->price > 0 ? round((($book->price - $book->final_price) / $book->price) * 100) : 0;
+        
         return [
             'id' => $book->id,
             'title' => $book->title,
@@ -51,6 +53,8 @@ class RecommendationController extends Controller
             'price' => $book->price,
             'final_price' => $book->final_price,
             'is_on_sale' => $book->is_on_sale,
+            'discount_percent' => $discountPercent,
+            'in_wishlist' => Auth::check() ? Auth::user()->hasBookInWishlist($book->id) : false,
             'genre' => $book->genre?->name,
             'tropes' => $book->tropes->pluck('name')->values(),
             'cover_image' => $book->cover_image ? asset('storage/'.$book->cover_image) : null,
