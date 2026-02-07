@@ -11,6 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Drop orphaned table from previous failed migration (table was created before FK failed)
+        Schema::dropIfExists('postage_rate_history');
+
         Schema::create('postage_rate_history', function (Blueprint $table) {
             $table->id();
             $table->foreignId('postage_rate_id')
