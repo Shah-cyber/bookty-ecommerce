@@ -34,7 +34,7 @@ class ToastManager {
             position: 'fixed',
             top: '20px',
             right: '20px',
-            zIndex: '9999',
+            zIndex: '10001',
             maxWidth: '320px',
             display: 'flex',
             flexDirection: 'column',
@@ -43,7 +43,7 @@ class ToastManager {
         });
         
         // Also add Tailwind classes as fallback
-        this.container.className = 'fixed top-5 right-5 z-50 space-y-4';
+        this.container.className = 'fixed top-5 right-5 z-[10001] space-y-4';
         
         document.body.appendChild(this.container);
         

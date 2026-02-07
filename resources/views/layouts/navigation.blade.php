@@ -313,13 +313,15 @@
     
 
     <!-- Enhanced Mobile menu -->
+    
+    <template x-teleport="body">
+        <div class="sm:hidden" id="mobile-menu" x-show="mobileMenuOpen" x-cloak 
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0"
+            x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0"
+            x-transition:leave-end="opacity-0 -translate-y-2" @keydown.escape.window="mobileMenuOpen=false">
 
-    <div class="sm:hidden" id="mobile-menu" x-show="mobileMenuOpen" x-cloak x-transition:enter="transition ease-out duration-200"
-        x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0"
-        x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0"
-        x-transition:leave-end="opacity-0 -translate-y-2" @keydown.escape.window="mobileMenuOpen=false">
-
-        <div class="fixed inset-x-0 top-24 bottom-0 bg-white/95 backdrop-blur-xl border-t border-gray-100 overflow-y-auto z-[9999]">
+            <div class="fixed inset-x-0 top-24 bottom-0 bg-white/95 backdrop-blur-xl border-t border-gray-100 overflow-y-auto z-[9999]">
 
             <div class="pt-6 pb-6 space-y-2 px-4" x-data="{ colOpen: false }">
 
@@ -386,22 +388,7 @@
                     Contact
                 </a>
 
-                <!-- Search (mobile) -->
-                <div class="pt-4 px-2">
-                    <form action="{{ route('books.index') }}" method="GET">
-                        <label for="search-mobile" class="sr-only">Search</label>
-                        <div class="relative">
-                            <input id="search-mobile" name="search"
-                                class="block w-full pl-11 pr-4 py-3 border border-gray-200 rounded-2xl leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-base transition-all duration-200"
-                                placeholder="Search for books..." type="search">
-                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+          
 
             </div>
 
@@ -501,5 +488,7 @@
         </div>
 
     </div>
+
+    </template>
 
 </nav>
