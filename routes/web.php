@@ -37,6 +37,7 @@ Route::get('/api/recommendations/similar/{book}', [\App\Http\Controllers\Api\Rec
     ->name('api.recommendations.similar');
 Route::get('/books', [CustomerBookController::class, 'index'])->name('books.index');
 Route::get('/books/{book:slug}', [CustomerBookController::class, 'show'])->name('books.show');
+Route::get('/books/{book:slug}/reviews', [CustomerBookController::class, 'reviews'])->name('books.reviews');
 
 // About page route
 Route::get('/about', [AboutController::class, 'index'])->name('about');

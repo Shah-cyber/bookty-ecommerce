@@ -951,13 +951,18 @@
                 const totalSlidesElement = document.getElementById('totalSlides');
                 const progressBar = document.getElementById('progressBar');
 
+                // Exit early if essential elements don't exist
+                if (!carousel || !prevBtn || !nextBtn || !dotsContainer) {
+                    return;
+                }
+
                 const totalBooks = {{ $newArrivals->count() }};
                 const booksPerPage = 5; // Show 5 books per page
                 const totalPages = Math.ceil(totalBooks / booksPerPage);
                 let currentPage = 0;
 
                 // Update total slides display
-                totalSlidesElement.textContent = totalPages;
+                if (totalSlidesElement) totalSlidesElement.textContent = totalPages;
 
                 // Generate dots based on number of pages
                 function generateDots() {
@@ -993,9 +998,9 @@
                     }
 
                     // Update progress indicator
-                    currentSlideElement.textContent = currentPage + 1;
+                    if (currentSlideElement) currentSlideElement.textContent = currentPage + 1;
                     const progressPercentage = ((currentPage + 1) / totalPages) * 100;
-                    progressBar.style.width = `${progressPercentage}%`;
+                    if (progressBar) progressBar.style.width = `${progressPercentage}%`;
 
                     // Update button states
                     if (currentPage === 0) {
@@ -1589,66 +1594,6 @@
             </div>
         </div>
 
-        <!-- Newsletter -->
-        <section class="py-24 bg-gray-50 relative overflow-hidden">
-            {{-- Subtle ambient gradients --}}
-            <div class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-indigo-100/50 rounded-full blur-[120px] pointer-events-none"></div>
-            <div class="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-rose-100/50 rounded-full blur-[120px] pointer-events-none"></div>
-
-            <div class="container mx-auto px-6 relative z-10">
-                <div
-                    class="max-w-3xl mx-auto rounded-[2.5rem] bg-white border border-gray-100 shadow-2xl shadow-gray-200/50 px-8 py-12 md:px-14 md:py-16 text-center"
-                    data-aos="fade-up"
-                >
-                    {{-- Decorative Icon --}}
-                    <div class="mx-auto w-16 h-16 mb-6 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                        </svg>
-                    </div>
-
-                    {{-- Header --}}
-                    <div class="mb-8">
-                        <p class="text-xs font-bold tracking-[0.2em] uppercase text-indigo-600 mb-3">Newsletter</p>
-                        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 font-serif tracking-tight leading-tight mb-4">
-                            Stay in the loop with new books & deals
-                        </h2>
-                        <p class="text-base md:text-lg text-gray-500 font-light leading-relaxed max-w-xl mx-auto">
-                            Get occasional updates about fresh arrivals, curated picks, and exclusive Bookty offers.
-                        </p>
-                    </div>
-
-                    {{-- Newsletter Form --}}
-                    <div class="mt-8">
-                        <form class="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
-                            <div class="flex-1 relative group">
-                                <input
-                                    type="email"
-                                    placeholder="Enter your email address"
-                                    class="w-full px-5 py-4 text-sm md:text-base text-gray-900 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-400 focus:bg-white transition-all duration-300 placeholder-gray-400"
-                                >
-                            </div>
-                            <button
-                                type="submit"
-                                class="group inline-flex justify-center items-center px-8 py-4 bg-gray-900 text-white text-sm md:text-base font-bold rounded-2xl hover:bg-black transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
-                            >
-                                <span class="flex items-center">
-                                    Subscribe
-                                    <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                                    </svg>
-                                </span>
-                            </button>
-                        </form>
-
-                        {{-- Privacy Notice --}}
-                        <p class="mt-5 text-xs text-gray-400 font-medium">
-                            We only send thoughtful updates. No spam, unsubscribe anytime.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
 
         <!-- Load Recommendations Script -->
         @auth

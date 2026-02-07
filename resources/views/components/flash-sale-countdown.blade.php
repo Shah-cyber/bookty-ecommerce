@@ -53,6 +53,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const minutesEl = timer.querySelector('.minutes');
         const secondsEl = timer.querySelector('.seconds');
         
+        // Skip if elements don't exist
+        if (!daysEl || !hoursEl || !minutesEl || !secondsEl) {
+            return;
+        }
+        
         // Update the countdown every second
         const countdownInterval = setInterval(function() {
             // Get current time
@@ -64,10 +69,10 @@ document.addEventListener('DOMContentLoaded', function() {
             // If the countdown is over, clear interval and show expired message
             if (distance < 0) {
                 clearInterval(countdownInterval);
-                daysEl.textContent = '00';
-                hoursEl.textContent = '00';
-                minutesEl.textContent = '00';
-                secondsEl.textContent = '00';
+                if (daysEl) daysEl.textContent = '00';
+                if (hoursEl) hoursEl.textContent = '00';
+                if (minutesEl) minutesEl.textContent = '00';
+                if (secondsEl) secondsEl.textContent = '00';
                 
                 // Optional: reload page or update UI when countdown ends
                 // window.location.reload();
@@ -81,10 +86,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
             
             // Display the result with leading zeros
-            daysEl.textContent = days.toString().padStart(2, '0');
-            hoursEl.textContent = hours.toString().padStart(2, '0');
-            minutesEl.textContent = minutes.toString().padStart(2, '0');
-            secondsEl.textContent = seconds.toString().padStart(2, '0');
+            if (daysEl) daysEl.textContent = days.toString().padStart(2, '0');
+            if (hoursEl) hoursEl.textContent = hours.toString().padStart(2, '0');
+            if (minutesEl) minutesEl.textContent = minutes.toString().padStart(2, '0');
+            if (secondsEl) secondsEl.textContent = seconds.toString().padStart(2, '0');
         }, 1000);
     });
 });

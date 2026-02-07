@@ -127,6 +127,21 @@ class BookController extends Controller
     }
     
     /**
+     * Get paginated reviews for AJAX requests
+     */
+    public function reviews(Book $book, Request $request)
+    {
+        $reviews = $book->reviews()
+            ->with('user')
+            ->where('is_approved', true)
+            ->orderBy('created_at', 'desc')
+            ->paginate(5);
+        
+        // Return the partial view for AJAX
+        return view('books.partials.reviews-list', compact('book', 'reviews'));
+    }
+    
+    /**
      * Calculate review statistics for the book
      */
     private function calculateReviewStats($book)
