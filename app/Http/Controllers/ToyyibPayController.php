@@ -66,7 +66,7 @@ class ToyyibPayController extends Controller
                 case 1: // Success
                     $updateData = [
                         'payment_status' => 'paid',
-                        'status' => 'processing',
+                        // Keep status as 'pending' (Order Placed) - admin will update to 'processing' when preparing
                         'toyyibpay_invoice_no' => $refNo,
                         'toyyibpay_payment_date' => now(),
                     ];
@@ -200,7 +200,7 @@ class ToyyibPayController extends Controller
             // If payment is successful, update invoice and payment date
             if ($statusId == 1) {
                 $updateData['payment_status'] = 'paid';
-                $updateData['status'] = 'processing';
+                // Keep status as 'pending' (Order Placed) - admin will update to 'processing' when preparing
                 
                 // Update invoice number if provided
                 if ($refNo) {
