@@ -12,23 +12,12 @@
              x-transition:leave="ease-in duration-300" 
              x-transition:leave-start="opacity-100 scale-100" 
              x-transition:leave-end="opacity-0 scale-95" 
-             class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-auto overflow-hidden z-10 border border-gray-100">
-            {{-- Header - Classy, refined aesthetic --}}
-            <div class="relative overflow-hidden">
-                {{-- Rich dark gradient base --}}
-                <div class="absolute inset-0 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-800"></div>
-                
-                {{-- Subtle warm vignette --}}
-                <div class="absolute inset-0" style="background: radial-gradient(ellipse at center, transparent 0%, transparent 50%, rgba(15,23,42,0.5) 100%);"></div>
-                
-                {{-- Elegant single accent glow --}}
-                <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-32 bg-amber-500/5 rounded-full blur-3xl"></div>
-                
-                {{-- Refined grain texture --}}
-                <div class="absolute inset-0 opacity-[0.015]" style="background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0); background-size: 32px 32px;"></div>
-                
-                {{-- Close button - refined minimal --}}
-                <button type="button" @click="closeModal()" class="absolute top-5 right-5 z-20 w-8 h-8 flex items-center justify-center rounded-full text-white/50 hover:text-white/90 hover:bg-white/5 transition-all duration-300">
+             class="relative bg-white/30 backdrop-blur-xl rounded-[2.5rem] shadow-[0_18px_45px_rgba(15,23,42,0.35)] w-full max-w-md mx-auto overflow-hidden z-10 border-t border-white/40 transition-all">
+            
+            {{-- Header - Clean Glass Aesthetic --}}
+            <div class="relative pt-10 pb-6 px-10 text-center">
+                {{-- Close button --}}
+                <button type="button" @click="closeModal()" class="absolute top-5 right-5 z-20 w-8 h-8 flex items-center justify-center rounded-full text-gray-700 hover:text-gray-900 hover:bg-white/20 transition-all duration-300">
                     <span class="sr-only">Close</span>
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
                         <path d="M18 6L6 18M6 6l12 12" />
@@ -36,42 +25,29 @@
                 </button>
                 
                 {{-- Content --}}
-                <div class="relative z-10 px-10 pt-10 pb-10">
-                    <div class="text-center">
-                        {{-- Logo - refined with gold accent --}}
-                        <div class="relative inline-block mb-6">
-                            <div class="absolute -inset-px rounded-2xl bg-gradient-to-br from-amber-400/20 via-transparent to-amber-600/10 rounded-2xl opacity-60"></div>
-                            <div class="relative flex items-center justify-center w-20 h-20 rounded-2xl bg-white/[0.06] backdrop-blur-sm border border-white/[0.08] shadow-[0_0_0_1px_rgba(255,255,255,0.04)_inset]">
-                                <img src="{{ asset('images/BooktyL.png') }}" alt="Bookty Logo" class="h-11 w-auto">
-                            </div>
+                <div class="relative z-10">
+                    {{-- Logo --}}
+                    <div class="inline-block mb-4">
+                        <div class="relative flex items-center justify-center w-16 h-16 rounded-2xl bg-white/40 shadow-sm border border-white/60">
+                            <img src="{{ asset('images/BooktyL.png') }}" alt="Bookty Logo" class="h-8 w-auto">
                         </div>
-                        
-                        {{-- Elegant divider --}}
-                        <div class="flex items-center justify-center gap-3 mb-5">
-                            <span class="w-8 h-px bg-gradient-to-r from-transparent to-amber-400/40"></span>
-                            <span class="w-1 h-1 rounded-full bg-amber-400/50"></span>
-                            <span class="w-8 h-px bg-gradient-to-l from-transparent to-amber-400/40"></span>
-                        </div>
-                        
-                        <h1 class="text-2xl sm:text-3xl font-semibold mb-2 font-serif tracking-tight text-white/95" style="letter-spacing: -0.02em;">
-                            Welcome to Bookty
-                        </h1>
-                        <p class="text-slate-400/90 text-xs sm:text-sm font-normal tracking-[0.15em] uppercase">Your gateway to endless stories</p>
                     </div>
+                    
+                    <h1 class="text-2xl font-bold text-gray-900 mb-1 font-serif tracking-tight">
+                        Welcome back
+                    </h1>
+                    <p class="text-gray-600 text-sm font-medium tracking-wide">Your gateway to endless stories</p>
                 </div>
-                
-                {{-- Smooth bottom curve --}}
-                <div class="absolute -bottom-px left-0 right-0 h-8 bg-white rounded-t-3xl"></div>
             </div>
             
             {{-- Content area --}}
-            <div class="px-8 pb-8 pt-4 -mt-4">
-                {{-- Tab Navigation - overlaps curve for seamless flow --}}
-                <div class="flex bg-slate-100 rounded-xl p-1 mb-6 relative z-10 shadow-sm">
-                    <button @click="switchTab('login')" :class="{'bg-white shadow-sm text-gray-900': currentTab === 'login', 'text-gray-600 hover:text-gray-900': currentTab !== 'login'}" class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-200 focus:outline-none">
+            <div class="px-8 pb-8">
+                {{-- Tab Navigation --}}
+                <div class="flex bg-white/20 rounded-xl p-1 mb-6 relative z-10 border border-white/30">
+                    <button @click="switchTab('login')" :class="{'bg-white/60 shadow-sm text-gray-900': currentTab === 'login', 'text-gray-600 hover:text-gray-900': currentTab !== 'login'}" class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-200 focus:outline-none">
                         Sign In
                     </button>
-                    <button @click="switchTab('register')" :class="{'bg-white shadow-sm text-gray-900': currentTab === 'register', 'text-gray-600 hover:text-gray-900': currentTab !== 'register'}" class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-200 focus:outline-none">
+                    <button @click="switchTab('register')" :class="{'bg-white/60 shadow-sm text-gray-900': currentTab === 'register', 'text-gray-600 hover:text-gray-900': currentTab !== 'register'}" class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-200 focus:outline-none">
                         Sign Up
                     </button>
                 </div>
@@ -91,15 +67,15 @@
                             @csrf
                             {{-- Email --}}
                             <div>
-                                <label for="login_email" class="block text-sm font-semibold text-gray-900 mb-2">Email Address</label>
+                                <label for="login_email" class="block text-sm font-semibold text-gray-800 mb-2">Email Address</label>
                                 <div class="relative">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path>
                                         </svg>
                                     </div>
                                     <input type="email" id="login_email" name="email" x-model="loginForm.email" required @input="validateLoginEmail()" oninvalid="this.setCustomValidity(' ')" oninput="this.setCustomValidity('')"
-                                           class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:bg-white focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 transition-all duration-200"
+                                           class="w-full pl-10 pr-4 py-3 bg-white/50 border border-white/60 rounded-xl focus:bg-white/80 focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 transition-all duration-200 placeholder-gray-500"
                                            placeholder="Enter your email">
                                 </div>
                                 <p x-show="loginErrors.email" x-text="loginErrors.email" class="mt-2 text-sm text-red-500"></p>
@@ -107,15 +83,15 @@
 
                             {{-- Password --}}
                             <div>
-                                <label for="login_password" class="block text-sm font-semibold text-gray-900 mb-2">Password</label>
+                                <label for="login_password" class="block text-sm font-semibold text-gray-800 mb-2">Password</label>
                                 <div class="relative">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
                                         </svg>
                                     </div>
                                     <input type="password" id="login_password" name="password" x-model="loginForm.password" required minlength="8" maxlength="12" @input="validateLoginPassword()"
-                                           class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:bg-white focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 transition-all duration-200"
+                                           class="w-full pl-10 pr-4 py-3 bg-white/50 border border-white/60 rounded-xl focus:bg-white/80 focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 transition-all duration-200 placeholder-gray-500"
                                            placeholder="Enter your password">
                                 </div>
                                 <p x-show="loginErrors.password" x-text="loginErrors.password" class="mt-2 text-sm text-red-500"></p>
@@ -125,10 +101,10 @@
                             <div class="flex items-center justify-between text-sm">
                                 <label class="flex items-center cursor-pointer">
                                     <input type="checkbox" id="remember_me" name="remember" x-model="loginForm.remember" 
-                                           class="h-4 w-4 text-gray-900 focus:ring-gray-900 border-gray-300 rounded">
+                                           class="h-4 w-4 text-gray-900 focus:ring-gray-900 border-gray-300 rounded bg-white/50">
                                     <span class="ml-2 text-gray-700">Remember me</span>
                                 </label>
-                                <a href="#" class="text-gray-600 hover:text-gray-900 font-medium">Forgot password?</a>
+                                <a href="#" class="text-gray-700 hover:text-gray-900 font-medium">Forgot password?</a>
                             </div>
 
                             {{-- Submit Button - matches homepage CTA (bg-gray-900) --}}
@@ -152,16 +128,16 @@
                             {{-- Divider --}}
                             <div class="relative">
                                 <div class="absolute inset-0 flex items-center">
-                                    <div class="w-full border-t border-gray-200"></div>
+                                    <div class="w-full border-t border-gray-300/50"></div>
                                 </div>
                                 <div class="relative flex justify-center text-xs">
-                                    <span class="px-4 bg-white text-gray-500 font-medium">OR CONTINUE WITH</span>
+                                    <span class="px-4 bg-transparent text-gray-500 font-medium backdrop-blur-sm rounded">OR CONTINUE WITH</span>
                                 </div>
                             </div>
                             
                             {{-- Google Login Button --}}
                             <a href="{{ route('auth.google') }}" 
-                               class="w-full flex items-center justify-center px-4 py-3 bg-white border border-gray-200 rounded-full text-gray-700 font-bold hover:bg-gray-50 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-900/10 transition-all duration-200 group">
+                               class="w-full flex items-center justify-center px-4 py-3 bg-white/70 border border-white/60 rounded-full text-gray-700 font-bold hover:bg-white hover:border-white focus:outline-none focus:ring-2 focus:ring-gray-900/10 transition-all duration-200 group shadow-sm">
                                 <svg class="w-5 h-5 mr-3 group-hover:scale-110 transition-transform duration-200" viewBox="0 0 24 24">
                                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                                     <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
