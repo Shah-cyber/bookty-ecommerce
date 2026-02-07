@@ -1,8 +1,8 @@
-{{-- Authentication Modal Component --}}
+{{-- Authentication Modal Component - Matches Homepage Theme --}}
 <div x-data="authModal()" x-show="isOpen" x-cloak @open-auth-modal.document="openModal($event.detail)" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
     {{-- Background overlay --}}
     <div class="flex items-center justify-center min-h-screen p-4">
-        <div x-show="isOpen" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-black bg-transparent backdrop-blur-sm transition-all" @click="closeModal()"></div>
+        <div x-show="isOpen" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-black/40 backdrop-blur-md transition-all" @click="closeModal()"></div>
 
         {{-- Modal panel --}}
         <div x-show="isOpen" 
@@ -12,36 +12,66 @@
              x-transition:leave="ease-in duration-300" 
              x-transition:leave-start="opacity-100 scale-100" 
              x-transition:leave-end="opacity-0 scale-95" 
-             class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-auto overflow-hidden z-10">
-            {{-- Header with gradient background --}}
-            <div class="bg-gradient-to-br from-purple-600 via-purple-700 to-pink-600 px-8 pt-8 pb-6">
-                {{-- Close button --}}
-                <button type="button" @click="closeModal()" class="absolute top-4 right-4 text-white/70 hover:text-white transition-colors">
+             class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-auto overflow-hidden z-10 border border-gray-100">
+            {{-- Header - Classy, refined aesthetic --}}
+            <div class="relative overflow-hidden">
+                {{-- Rich dark gradient base --}}
+                <div class="absolute inset-0 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-800"></div>
+                
+                {{-- Subtle warm vignette --}}
+                <div class="absolute inset-0" style="background: radial-gradient(ellipse at center, transparent 0%, transparent 50%, rgba(15,23,42,0.5) 100%);"></div>
+                
+                {{-- Elegant single accent glow --}}
+                <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-32 bg-amber-500/5 rounded-full blur-3xl"></div>
+                
+                {{-- Refined grain texture --}}
+                <div class="absolute inset-0 opacity-[0.015]" style="background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0); background-size: 32px 32px;"></div>
+                
+                {{-- Close button - refined minimal --}}
+                <button type="button" @click="closeModal()" class="absolute top-5 right-5 z-20 w-8 h-8 flex items-center justify-center rounded-full text-white/50 hover:text-white/90 hover:bg-white/5 transition-all duration-300">
                     <span class="sr-only">Close</span>
-                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                        <path d="M18 6L6 18M6 6l12 12" />
                     </svg>
                 </button>
                 
-                {{-- Logo and title --}}
-                <div class="text-center text-white">
-                    <div class="inline-flex items-center justify-center w-16 h-16 bg-white/20 backdrop-blur-lg rounded-full mb-4">
-                        <img src="{{ asset('images/BooktyL.png') }}" alt="Bookty Logo" class="h-10 w-auto">
+                {{-- Content --}}
+                <div class="relative z-10 px-10 pt-10 pb-10">
+                    <div class="text-center">
+                        {{-- Logo - refined with gold accent --}}
+                        <div class="relative inline-block mb-6">
+                            <div class="absolute -inset-px rounded-2xl bg-gradient-to-br from-amber-400/20 via-transparent to-amber-600/10 rounded-2xl opacity-60"></div>
+                            <div class="relative flex items-center justify-center w-20 h-20 rounded-2xl bg-white/[0.06] backdrop-blur-sm border border-white/[0.08] shadow-[0_0_0_1px_rgba(255,255,255,0.04)_inset]">
+                                <img src="{{ asset('images/BooktyL.png') }}" alt="Bookty Logo" class="h-11 w-auto">
+                            </div>
+                        </div>
+                        
+                        {{-- Elegant divider --}}
+                        <div class="flex items-center justify-center gap-3 mb-5">
+                            <span class="w-8 h-px bg-gradient-to-r from-transparent to-amber-400/40"></span>
+                            <span class="w-1 h-1 rounded-full bg-amber-400/50"></span>
+                            <span class="w-8 h-px bg-gradient-to-l from-transparent to-amber-400/40"></span>
+                        </div>
+                        
+                        <h1 class="text-2xl sm:text-3xl font-semibold mb-2 font-serif tracking-tight text-white/95" style="letter-spacing: -0.02em;">
+                            Welcome to Bookty
+                        </h1>
+                        <p class="text-slate-400/90 text-xs sm:text-sm font-normal tracking-[0.15em] uppercase">Your gateway to endless stories</p>
                     </div>
-                    <h1 class="text-2xl font-bold mb-2">Welcome to Bookty</h1>
-                    <p class="text-purple-100 text-sm">Your gateway to endless stories</p>
                 </div>
                 
+                {{-- Smooth bottom curve --}}
+                <div class="absolute -bottom-px left-0 right-0 h-8 bg-white rounded-t-3xl"></div>
             </div>
-            <br>
+            
             {{-- Content area --}}
-            <div class="px-8 pb-8">
-                {{-- Tab Navigation --}}
-                <div class="flex bg-gray-100 rounded-xl p-1 mb-6 -mt-4 relative z-10">
-                    <button @click="switchTab('login')" :class="{'bg-white shadow-sm text-gray-900': currentTab === 'login', 'text-gray-600 hover:text-gray-900': currentTab !== 'login'}" class="flex-1 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none">
+            <div class="px-8 pb-8 pt-4 -mt-4">
+                {{-- Tab Navigation - overlaps curve for seamless flow --}}
+                <div class="flex bg-slate-100 rounded-xl p-1 mb-6 relative z-10 shadow-sm">
+                    <button @click="switchTab('login')" :class="{'bg-white shadow-sm text-gray-900': currentTab === 'login', 'text-gray-600 hover:text-gray-900': currentTab !== 'login'}" class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-200 focus:outline-none">
                         Sign In
                     </button>
-                    <button @click="switchTab('register')" :class="{'bg-white shadow-sm text-gray-900': currentTab === 'register', 'text-gray-600 hover:text-gray-900': currentTab !== 'register'}" class="flex-1 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none">
+                    <button @click="switchTab('register')" :class="{'bg-white shadow-sm text-gray-900': currentTab === 'register', 'text-gray-600 hover:text-gray-900': currentTab !== 'register'}" class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-200 focus:outline-none">
                         Sign Up
                     </button>
                 </div>
@@ -69,7 +99,7 @@
                                         </svg>
                                     </div>
                                     <input type="email" id="login_email" name="email" x-model="loginForm.email" required @input="validateLoginEmail()" oninvalid="this.setCustomValidity(' ')" oninput="this.setCustomValidity('')"
-                                           class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200"
+                                           class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:bg-white focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 transition-all duration-200"
                                            placeholder="Enter your email">
                                 </div>
                                 <p x-show="loginErrors.email" x-text="loginErrors.email" class="mt-2 text-sm text-red-500"></p>
@@ -85,7 +115,7 @@
                                         </svg>
                                     </div>
                                     <input type="password" id="login_password" name="password" x-model="loginForm.password" required minlength="8" maxlength="12" @input="validateLoginPassword()"
-                                           class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200"
+                                           class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:bg-white focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 transition-all duration-200"
                                            placeholder="Enter your password">
                                 </div>
                                 <p x-show="loginErrors.password" x-text="loginErrors.password" class="mt-2 text-sm text-red-500"></p>
@@ -95,15 +125,15 @@
                             <div class="flex items-center justify-between text-sm">
                                 <label class="flex items-center cursor-pointer">
                                     <input type="checkbox" id="remember_me" name="remember" x-model="loginForm.remember" 
-                                           class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
+                                           class="h-4 w-4 text-gray-900 focus:ring-gray-900 border-gray-300 rounded">
                                     <span class="ml-2 text-gray-700">Remember me</span>
                                 </label>
-                                <a href="#" class="text-purple-600 hover:text-purple-700 font-medium">Forgot password?</a>
+                                <a href="#" class="text-gray-600 hover:text-gray-900 font-medium">Forgot password?</a>
                             </div>
 
-                            {{-- Submit Button --}}
+                            {{-- Submit Button - matches homepage CTA (bg-gray-900) --}}
                             <button type="submit" :disabled="isLoading" 
-                                    class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 px-4 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                                    class="w-full bg-gray-900 hover:bg-black text-white font-bold py-3 px-4 rounded-full shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:hover:scale-100">
                                 <span x-show="!isLoading" class="flex items-center justify-center">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
@@ -131,7 +161,7 @@
                             
                             {{-- Google Login Button --}}
                             <a href="{{ route('auth.google') }}" 
-                               class="w-full flex items-center justify-center px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all duration-200 group">
+                               class="w-full flex items-center justify-center px-4 py-3 bg-white border border-gray-200 rounded-full text-gray-700 font-bold hover:bg-gray-50 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-900/10 transition-all duration-200 group">
                                 <svg class="w-5 h-5 mr-3 group-hover:scale-110 transition-transform duration-200" viewBox="0 0 24 24">
                                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                                     <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -164,7 +194,7 @@
                                         </svg>
                                     </div>
                                     <input type="text" id="register_name" name="name" x-model="registerForm.name" required @input="validateRegisterName()"
-                                           class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200"
+                                           class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:bg-white focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 transition-all duration-200"
                                            placeholder="Enter your full name">
                                 </div>
                                 <p x-show="registerErrors.name" x-text="registerErrors.name" class="mt-2 text-sm text-red-500"></p>
@@ -180,7 +210,7 @@
                                         </svg>
                                     </div>
                                     <input type="email" id="register_email" name="email" x-model="registerForm.email" required @input="validateRegisterEmail()" oninvalid="this.setCustomValidity(' ')" oninput="this.setCustomValidity('')"
-                                           class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200"
+                                           class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:bg-white focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 transition-all duration-200"
                                            placeholder="Enter your email">
                                 </div>
                                 <p x-show="registerErrors.email" x-text="registerErrors.email" class="mt-2 text-sm text-red-500"></p>
@@ -196,7 +226,7 @@
                                         </svg>
                                     </div>
                                     <input type="password" id="register_password" name="password" x-model="registerForm.password" required minlength="8" maxlength="12" @input="validateRegisterPassword()"
-                                           class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200"
+                                           class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:bg-white focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 transition-all duration-200"
                                            placeholder="Create a password">
                                 </div>
                                 <p x-show="registerErrors.password" x-text="registerErrors.password" class="mt-2 text-sm text-red-500"></p>
@@ -212,15 +242,15 @@
                                         </svg>
                                     </div>
                                     <input type="password" id="register_password_confirmation" name="password_confirmation" x-model="registerForm.password_confirmation" required minlength="8" maxlength="12" @input="validateRegisterPasswordConfirmation()"
-                                           class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200"
+                                           class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:bg-white focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 transition-all duration-200"
                                            placeholder="Confirm your password">
                                 </div>
                                 <p x-show="registerErrors.password_confirmation" x-text="registerErrors.password_confirmation" class="mt-2 text-sm text-red-500"></p>
                             </div>
 
-                            {{-- Submit Button --}}
+                            {{-- Submit Button - matches homepage CTA --}}
                             <button type="submit" :disabled="isLoading" 
-                                    class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 px-4 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                                    class="w-full bg-gray-900 hover:bg-black text-white font-bold py-3 px-4 rounded-full shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:hover:scale-100">
                                 <span x-show="!isLoading" class="flex items-center justify-center">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
@@ -248,7 +278,7 @@
                             
                             {{-- Google Login Button --}}
                             <a href="{{ route('auth.google') }}" 
-                               class="w-full flex items-center justify-center px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all duration-200 group">
+                               class="w-full flex items-center justify-center px-4 py-3 bg-white border border-gray-200 rounded-full text-gray-700 font-bold hover:bg-gray-50 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-900/10 transition-all duration-200 group">
                                 <svg class="w-5 h-5 mr-3 group-hover:scale-110 transition-transform duration-200" viewBox="0 0 24 24">
                                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                                     <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
