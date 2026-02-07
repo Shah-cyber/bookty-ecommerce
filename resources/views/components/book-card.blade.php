@@ -64,16 +64,17 @@
                     </svg>
                 </button>
             @else
-                <a
-                    href="{{ route('login') }}"
+                <button
+                    onclick="document.dispatchEvent(new CustomEvent('open-auth-modal', { detail: 'login' }))"
                     class="p-2.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/30
                            text-white hover:text-red-500 backdrop-blur-md transition-all duration-300 shadow-md"
+                    aria-label="Login to add to wishlist"
                 >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                     </svg>
-                </a>
+                </button>
             @endauth
         </div>
     </div>
@@ -84,26 +85,26 @@
                group-hover:translate-y-0 transition-transform duration-500
                ease-[cubic-bezier(0.34,1.56,0.64,1)]">
         <div
-            class="relative rounded-3xl bg-white/30 backdrop-blur-xl border-t border-white/40
-                   shadow-[0_18px_45px_rgba(15,23,42,0.35)] px-4 py-4 sm:px-5 sm:py-5 text-gray-900"
+            class="relative rounded-3xl bg-white/10 backdrop-blur-xl border border-white/20
+                   shadow-[0_8px_32px_rgba(0,0,0,0.3)] px-4 py-4 sm:px-5 sm:py-5 text-white ring-1 ring-white/10"
         >
             <!-- Top row: genre + price -->
-            <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center justify-between mb-3 mt-1">
                 <span
-                    class="inline-flex items-center px-3 py-1 rounded-full bg-white/70 text-[10px] font-semibold tracking-wide text-gray-700">
+                    class="inline-flex items-center px-3 py-1 rounded-full bg-white/20 text-[10px] font-bold tracking-wide text-white uppercase backdrop-blur-sm shadow-sm border border-white/10">
                     {{ strtoupper($book->genre->name ?? 'GENRE') }}
                 </span>
 
                 <div class="text-right">
                     @if($book->is_on_sale)
-                        <div class="text-[11px] text-gray-500 line-through">
+                        <div class="text-[11px] text-white/70 line-through decoration-red-500/80 decoration-2 drop-shadow-md font-medium">
                             RM {{ number_format($book->price, 2) }}
                         </div>
-                        <div class="text-base font-semibold text-emerald-700">
+                        <div class="text-base font-extrabold text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
                             RM {{ number_format($book->final_price, 2) }}
                         </div>
                     @else
-                        <div class="text-base font-semibold text-gray-900">
+                        <div class="text-base font-extrabold text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
                             RM {{ number_format($book->price, 2) }}
                         </div>
                     @endif
@@ -114,22 +115,22 @@
             <div class="mb-3">
                 <a href="{{ route('books.show', $book) }}" class="block group/title">
                     <h3
-                        class="text-[15px] sm:text-base font-bold text-gray-900 mb-0.5 leading-snug line-clamp-2
-                               group-hover/title:text-primary-700 transition-colors">
+                        class="text-[15px] sm:text-base font-bold text-white mb-0.5 leading-snug line-clamp-2
+                               drop-shadow-md group-hover/title:text-pink-300 transition-colors">
                         {{ $book->title }}
                     </h3>
                 </a>
-                <p class="text-[11px] text-gray-600 font-medium">
+                <p class="text-[11px] text-gray-200 font-medium drop-shadow-sm">
                     {{ $book->author }}
                 </p>
 
                 @if($book->stock <= 5 && $book->stock > 0)
                     <div class="mt-2 flex items-center gap-1.5">
                         <span
-                            class="w-3.5 h-3.5 rounded-full border border-amber-200 flex items-center justify-center">
-                            <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                            class="w-3.5 h-3.5 rounded-full border border-amber-200/50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
+                            <span class="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)] animate-pulse"></span>
                         </span>
-                        <span class="text-[11px] text-amber-600 font-medium">
+                        <span class="text-[11px] text-amber-300 font-bold drop-shadow-sm">
                             Only {{ $book->stock }} left
                         </span>
                     </div>
@@ -172,6 +173,7 @@
                             </form>
                         </div>
                     @else
+                    @auth
                         <button
                             type="button"
                             class="btn-liquid w-full ajax-add-to-cart"
@@ -184,6 +186,19 @@
                                       d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                             </svg>
                         </button>
+                    @else
+                        <button
+                            type="button"
+                            class="btn-liquid w-full"
+                            onclick="document.dispatchEvent(new CustomEvent('open-auth-modal', { detail: 'login' }))"
+                        >
+                            <span>Add to cart</span>
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                            </svg>
+                        </button>
+                    @endauth
                     @endif
                 @else
                     <button

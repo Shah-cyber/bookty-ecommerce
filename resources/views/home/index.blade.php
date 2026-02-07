@@ -310,21 +310,32 @@
                                     </svg>
                                 </a>
                                 @if($firstHero)
-                                    <button onclick="quickAddToCart({{ $firstHero?->id }})" id="hero-quick-add" class="quick-add-btn group relative inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 border border-gray-200 text-gray-700 font-bold rounded-full bg-white hover:bg-gray-50 transition-all duration-300 shadow-sm hover:shadow-md hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed">
-                                        <span class="btn-text relative flex items-center">
-                                            <svg class="w-5 h-5 mr-2 text-gray-400 group-hover:text-gray-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                                            </svg>
-                                            Quick Add
-                                        </span>
-                                        <span class="loading-spinner hidden relative">
-                                            <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-gray-600 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                            </svg>
-                                            Adding...
-                                        </span>
-                                    </button>
+                                    @auth
+                                        <button onclick="quickAddToCart({{ $firstHero?->id }})" id="hero-quick-add" class="quick-add-btn group relative inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 border border-gray-200 text-gray-700 font-bold rounded-full bg-white hover:bg-gray-50 transition-all duration-300 shadow-sm hover:shadow-md hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                                            <span class="btn-text relative flex items-center">
+                                                <svg class="w-5 h-5 mr-2 text-gray-400 group-hover:text-gray-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                                                </svg>
+                                                Quick Add
+                                            </span>
+                                            <span class="loading-spinner hidden relative">
+                                                <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-gray-600 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                </svg>
+                                                Adding...
+                                            </span>
+                                        </button>
+                                    @else
+                                        <button onclick="document.dispatchEvent(new CustomEvent('open-auth-modal', { detail: 'login' }))" id="hero-quick-add-guest" class="group relative inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 border border-gray-200 text-gray-700 font-bold rounded-full bg-white hover:bg-gray-50 transition-all duration-300 shadow-sm hover:shadow-md hover:border-gray-300">
+                                            <span class="relative flex items-center">
+                                                <svg class="w-5 h-5 mr-2 text-gray-400 group-hover:text-gray-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                                                </svg>
+                                                Quick Add
+                                            </span>
+                                        </button>
+                                    @endauth
                                 @endif
                             </div>
 
@@ -921,213 +932,12 @@
             });
         </script>
 
-        <!-- Current Promotions Hub -->
-        @if(($activeFlashSale ?? null) || (isset($activeBookDiscounts) && $activeBookDiscounts->count()) || (isset($activeCoupons) && $activeCoupons->count()))
-            <section class="py-16 bg-gray-50">
-                <div class="container mx-auto px-6">
-                    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-10" data-aos="fade-up">
-                        <div>
-                            <p class="text-xs font-semibold tracking-[0.2em] uppercase text-primary-600 mb-2">Live promotions</p>
-                            <h2 class="text-3xl md:text-4xl font-bold text-gray-900">
-                                Deals happening right now
-                            </h2>
-                            <p class="mt-2 text-sm md:text-base text-gray-600 max-w-xl">
-                                Time‑limited flash sales, book‑specific discounts and sitewide coupon codes curated for you.
-                            </p>
-                        </div>
-                        <div class="text-xs text-gray-500">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full bg-white shadow-sm border border-gray-200">
-                                <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
-                                Updating in real time
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {{-- Flash sale card --}}
-                        @if(isset($activeFlashSale) && $activeFlashSale)
-                            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-600 via-primary-700 to-bookty-purple-800 text-white shadow-xl" data-aos="fade-up" data-aos-delay="100">
-                                <div class="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_top_left,_rgba(255,255,255,0.35),_transparent_55%),_radial-gradient(circle_at_bottom_right,_rgba(15,23,42,0.55),_transparent_60%)]"></div>
-                                <div class="relative z-10 p-6 flex flex-col h-full">
-                                    <div class="flex items-center justify-between mb-3">
-                                        <span class="inline-flex items-center px-3 py-1 rounded-full bg-white/15 border border-white/30 text-[11px] font-semibold tracking-[0.16em] uppercase">
-                                            Flash Sale
-                                        </span>
-                                        <span class="text-xs text-white/80">
-                                            {{ $activeFlashSale->books->count() }} books
-                                        </span>
-                                    </div>
-
-                                    <h3 class="text-xl font-bold mb-2 line-clamp-2">
-                                        {{ $activeFlashSale->name }}
-                                    </h3>
-                                    @if($activeFlashSale->description)
-                                        <p class="text-sm text-white/80 mb-4 line-clamp-3">
-                                            {{ $activeFlashSale->description }}
-                                        </p>
-                                    @endif
-
-                                    <x-flash-sale-countdown :end-time="$activeFlashSale->ends_at->toIso8601String()" title="Ends in" class="bg-white/10 border border-white/20 mt-auto">
-                                        <p class="text-[11px] text-white/80">
-                                            Prices auto‑revert when the countdown hits zero.
-                                        </p>
-                                    </x-flash-sale-countdown>
-
-                                    <div class="mt-4 flex items-center justify-between">
-                                        <div class="flex -space-x-2">
-                                            @foreach($activeFlashSale->books->take(3) as $promoBook)
-                                                <div class="h-10 w-8 rounded-md overflow-hidden border border-white/40 shadow-sm">
-                                                    @if($promoBook->cover_image)
-                                                        <img src="{{ asset('storage/' . $promoBook->cover_image) }}" alt="{{ $promoBook->title }}" class="h-full w-full object-cover">
-                                                    @else
-                                                        <div class="h-full w-full bg-white/10 flex items-center justify-center text-[10px]">
-                                                            {{ Str::limit($promoBook->title, 3, '') }}
-                                                        </div>
-                                                    @endif
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                        <a href="{{ route('books.index') }}" class="inline-flex items-center px-4 py-2 rounded-full bg-white text-primary-700 text-xs font-semibold shadow hover:bg-primary-50 transition">
-                                            Shop flash sale
-                                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H7" />
-                                            </svg>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
-
-                        {{-- Book discount card --}}
-                        @if(isset($activeBookDiscounts) && $activeBookDiscounts->count())
-                            @php
-                                $discountSample = $activeBookDiscounts->first();
-                                $discountEndsAt = optional(
-                                    $activeBookDiscounts->filter(fn($d) => $d->ends_at)->sortBy('ends_at')->first()
-                                )->ends_at;
-                            @endphp
-                            <div class="rounded-3xl bg-white shadow-xl border border-gray-100 flex flex-col" data-aos="fade-up" data-aos-delay="200">
-                                <div class="p-6 flex-1 flex flex-col">
-                                    <div class="flex items-center justify-between mb-3">
-                                        <span class="inline-flex items-center px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-semibold tracking-[0.16em] uppercase">
-                                            Book Deals
-                                        </span>
-                                        <span class="text-xs text-gray-500">
-                                            {{ $activeBookDiscounts->count() }} active
-                                        </span>
-                                    </div>
-                                    <h3 class="text-lg font-bold text-gray-900 mb-2">
-                                        Save on readers’ favourites
-                                    </h3>
-                                    <p class="text-sm text-gray-600 mb-4">
-                                        Hand‑picked titles with fixed and percentage discounts, refreshed regularly.
-                                    </p>
-
-                                    @if($discountEndsAt)
-                                        <x-flash-sale-countdown :end-time="$discountEndsAt->toIso8601String()" title="Best deals refresh in" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-md">
-                                            <p class="text-[11px] text-emerald-50">
-                                                Discount windows may close earlier when stocks run out.
-                                            </p>
-                                        </x-flash-sale-countdown>
-                                    @endif
-
-                                    <div class="mt-4 flex items-center justify-between">
-                                        <div class="flex flex-col text-xs text-gray-500">
-                                            <span>
-                                                Example: {{ Str::limit($discountSample->book->title, 30) }}
-                                            </span>
-                                            <span class="mt-1">
-                                                Now 
-                                                <span class="font-semibold text-primary-700">
-                                                    RM {{ number_format($discountSample->book->final_price, 2) }}
-                                                </span>
-                                                (was RM {{ number_format($discountSample->book->price, 2) }})
-                                            </span>
-                                        </div>
-                                        <a href="{{ route('books.index') }}" class="inline-flex items-center px-4 py-2 rounded-full bg-gray-900 text-white text-xs font-semibold shadow hover:bg-black transition">
-                                            Browse discounted
-                                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H7" />
-                                            </svg>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
-
-                        {{-- Coupon card --}}
-                        @if(isset($activeCoupons) && $activeCoupons->count())
-                            @php
-                                $primaryCoupon = $activeCoupons->first();
-                            @endphp
-                            <div class="rounded-3xl bg-gradient-to-br from-bookty-purple-700 via-bookty-purple-800 to-slate-900 text-white shadow-xl flex flex-col" data-aos="fade-up" data-aos-delay="300">
-                                <div class="p-6 flex-1 flex flex-col">
-                                    <div class="flex items-center justify-between mb-3">
-                                        <span class="inline-flex items-center px-3 py-1 rounded-full bg-white/10 border border-white/20 text-[11px] font-semibold tracking-[0.16em] uppercase">
-                                            Coupon Codes
-                                        </span>
-                                        <span class="text-xs text-primary-100">
-                                            {{ $activeCoupons->count() }} available
-                                        </span>
-                                    </div>
-
-                                    <h3 class="text-lg font-bold mb-2 flex items-center flex-wrap gap-2">
-                                        <span>Use code</span>
-                                        <button type="button"
-                                                class="copy-coupon-btn inline-flex items-center gap-1 px-2 py-1 rounded bg-white text-primary-700 text-sm font-black tracking-wider shadow-sm hover:bg-primary-50 transition"
-                                                data-coupon-code="{{ $primaryCoupon->code }}">
-                                            <span class="coupon-code-text">{{ $primaryCoupon->code }}</span>
-                                            <svg class="w-3.5 h-3.5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2M10 18h8a2 2 0 002-2v-8a2 2 0 00-2-2h-2"/>
-                                            </svg>
-                                        </button>
-                                        <span class="text-[11px] text-primary-100 copy-status hidden">Copied!</span>
-                                    </h3>
-                                    <p class="text-sm text-primary-100 mb-3">
-                                        {{ $primaryCoupon->description ?? 'Apply this code at checkout to unlock extra savings.' }}
-                                    </p>
-
-                                    <ul class="text-xs text-primary-100 space-y-1 mb-4">
-                                        @if($primaryCoupon->discount_type === 'percentage')
-                                            <li>• {{ $primaryCoupon->discount_value }}% off your order total</li>
-                                        @elseif($primaryCoupon->discount_type === 'fixed')
-                                            <li>• RM {{ number_format($primaryCoupon->discount_value, 2) }} off your order</li>
-                                        @endif
-                                        @if($primaryCoupon->free_shipping)
-                                            <li>• Free shipping when this coupon is applied</li>
-                                        @endif
-                                        @if($primaryCoupon->min_purchase_amount > 0)
-                                            <li>• Min spend RM {{ number_format($primaryCoupon->min_purchase_amount, 2) }}</li>
-                                        @endif
-                                    </ul>
-
-                                    @if($primaryCoupon->expires_at)
-                                        <x-flash-sale-countdown :end-time="$primaryCoupon->expires_at->toIso8601String()" title="Coupon expires in" class="bg-white/10 border border-white/20">
-                                            <p class="text-[11px] text-primary-100">
-                                                Limited‑time offer. You can only use this coupon a few times.
-                                            </p>
-                                        </x-flash-sale-countdown>
-                                    @endif
-
-                                    <div class="mt-4 flex items-center justify-between text-xs">
-                                        <span class="text-primary-100">
-                                            Apply the code on the checkout page.
-                                        </span>
-                                        <a href="{{ route('checkout.index') }}" class="inline-flex items-center px-4 py-2 rounded-full bg-white text-primary-700 font-semibold shadow hover:bg-primary-50 transition">
-                                            Go to checkout
-                                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H7" />
-                                            </svg>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-            </section>
-        @endif
+        <!-- Current Promotions Hub - Component -->
+        <x-promotions-hub 
+            :active-flash-sale="$activeFlashSale ?? null" 
+            :active-book-discounts="$activeBookDiscounts ?? null" 
+            :active-coupons="$activeCoupons ?? null" 
+        />
 
 
 
@@ -1313,72 +1123,217 @@
         </script>
 
 
-    <!-- Enhanced Browse By Category (Modern White Theme) -->
-    <div class="py-24 bg-gray-50">
-        <div class="container mx-auto px-6">
-            <div class="text-center mb-16" data-aos="fade-up">
-                <span class="inline-block py-1 pr-3 pl-1 rounded-full bg-white border border-gray-200 text-gray-800 text-xs font-bold uppercase tracking-wider mb-4 shadow-sm items-center gap-2">
-                    <span class="inline-block w-6 h-4 bg-gray-900 text-white rounded-full text-[9px] leading-4 text-center mr-2">ALL</span>
-                    Browse Categories
-                </span>
-                <h2 class="text-4xl font-bold text-gray-900 mb-4 tracking-tight">
-                    Find Your Next Adventure
-                </h2>
-                <p class="text-lg text-gray-500 max-w-2xl mx-auto font-light">
-                    Explore our diverse collection organized by your favorite genres.
-                </p>
+    <!-- Enhanced Browse By Category (Auto-Scrolling Carousel) -->
+    <section class="py-24 bg-white relative overflow-hidden" x-data="categoryCarousel()">
+        {{-- Subtle ambient gradients --}}
+        <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-purple-50/60 rounded-full blur-[150px] pointer-events-none"></div>
+        <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-50/60 rounded-full blur-[150px] pointer-events-none"></div>
+
+        <div class="container mx-auto px-6 relative z-10">
+            {{-- Section Header --}}
+            <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12" data-aos="fade-up">
+                <div class="max-w-xl">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="relative flex h-2.5 w-2.5">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-500 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-purple-600"></span>
+                        </span>
+                        <p class="text-xs font-bold tracking-[0.2em] uppercase text-purple-600">Explore Genres</p>
+                    </div>
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-900 font-serif tracking-tight leading-tight mb-4">
+                        Find Your Next Adventure
+                    </h2>
+                    <p class="text-lg text-gray-500 font-light leading-relaxed">
+                        Discover stories across every genre, from timeless classics to modern masterpieces.
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    {{-- Navigation Arrows --}}
+                    <button @click="scrollLeft()" class="p-3 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 transition-all duration-300 shadow-sm hover:shadow-md">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <button @click="scrollRight()" class="p-3 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 transition-all duration-300 shadow-sm hover:shadow-md">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                    <a href="{{ route('books.index') }}" class="hidden md:inline-flex items-center px-6 py-3 bg-gray-900 text-white text-sm font-bold rounded-full hover:bg-black transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02]">
+                        <span>View All</span>
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                        </svg>
+                    </a>
+                </div>
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                @foreach($genres as $genre)
-                    <a href="{{ route('books.index', ['genre' => $genre->id]) }}" class="group relative bg-white rounded-[2rem] p-8 transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] border border-gray-100 overflow-hidden" data-aos="fade-up" data-aos-delay="{{ $loop->index * 50 }}">
-                        
-                        <!-- Hover Gradient Background -->
-                        <div class="absolute inset-0 bg-gradient-to-br from-gray-50 to-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            {{-- Category Carousel --}}
+            <div class="relative" @mouseenter="pauseAutoScroll()" @mouseleave="resumeAutoScroll()">
+                {{-- Gradient Fade Edges --}}
+                <div class="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
+                <div class="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
 
-                        <div class="relative z-10 flex flex-col items-center text-center">
-                            <!-- Category Icon -->
-                            <div class="inline-flex items-center justify-center h-20 w-20 rounded-2xl bg-gray-50 text-gray-400 group-hover:bg-gray-900 group-hover:text-white transition-all duration-300 mb-6 shadow-inner group-hover:shadow-lg group-hover:scale-110">
-                                @php
-                                    $icons = [
-                                        'romance' => 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z',
-                                        'mystery' => 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z',
-                                        'fantasy' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
-                                        'fiction' => 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253',
-                                        'science' => 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z',
-                                        'thriller' => 'M13 10V3L4 14h7v7l9-11h-7z',
-                                        'biography' => 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
-                                        'history' => 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'
-                                    ];
-                                    $genreLower = strtolower($genre->name);
-                                    $iconPath = $icons[$genreLower] ?? $icons['fiction'];
-                                @endphp
-                                <svg class="h-8 w-8 transition-transform duration-300 group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="{{ $iconPath }}"/>
-                                </svg>
+                {{-- Scrollable Container --}}
+                <div x-ref="carousel" class="flex gap-5 overflow-x-auto scrollbar-hide scroll-smooth pb-4 -mx-2 px-2">
+                    @foreach($genres as $genre)
+                        @php
+                            $gradients = [
+                                'romance' => 'from-rose-500 to-pink-600',
+                                'mystery' => 'from-slate-700 to-gray-900',
+                                'fantasy' => 'from-violet-500 to-purple-700',
+                                'fiction' => 'from-blue-500 to-indigo-600',
+                                'science' => 'from-cyan-500 to-teal-600',
+                                'thriller' => 'from-red-600 to-rose-700',
+                                'biography' => 'from-amber-500 to-orange-600',
+                                'history' => 'from-emerald-500 to-green-700'
+                            ];
+                            $icons = [
+                                'romance' => 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z',
+                                'mystery' => 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z',
+                                'fantasy' => 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z',
+                                'fiction' => 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253',
+                                'science' => 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z',
+                                'thriller' => 'M13 10V3L4 14h7v7l9-11h-7z',
+                                'biography' => 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
+                                'history' => 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'
+                            ];
+                            $genreLower = strtolower($genre->name);
+                            $gradient = $gradients[$genreLower] ?? 'from-gray-700 to-gray-900';
+                            $iconPath = $icons[$genreLower] ?? $icons['fiction'];
+                        @endphp
+                        <a href="{{ route('books.index', ['genre' => $genre->id]) }}" 
+                           class="group relative flex-shrink-0 w-[220px] md:w-[260px] bg-white rounded-[2rem] p-6 md:p-8 transition-all duration-500 hover:-translate-y-2 border border-gray-100 hover:border-gray-200 overflow-hidden shadow-sm hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)]">
+                            
+                            {{-- Gradient Background on Hover --}}
+                            <div class="absolute inset-0 bg-gradient-to-br {{ $gradient }} opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                            
+                            {{-- Glass Overlay on Hover --}}
+                            <div class="absolute inset-0 bg-white/10 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+                            <div class="relative z-10 flex flex-col items-center text-center">
+                                {{-- Category Icon --}}
+                                <div class="inline-flex items-center justify-center h-16 w-16 md:h-20 md:w-20 rounded-2xl bg-gray-50 group-hover:bg-white/20 transition-all duration-500 mb-5 shadow-inner group-hover:shadow-lg group-hover:scale-110">
+                                    <svg class="h-7 w-7 md:h-8 md:w-8 text-gray-400 group-hover:text-white transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="{{ $iconPath }}"/>
+                                    </svg>
+                                </div>
+                                
+                                {{-- Category Info --}}
+                                <h3 class="text-base md:text-lg font-bold mb-2 text-gray-900 group-hover:text-white transition-colors duration-300">{{ $genre->name }}</h3>
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-500 group-hover:bg-white/20 group-hover:text-white/90 transition-all duration-300">
+                                    {{ $genre->books_count }} books
+                                </span>
                             </div>
                             
-                            <!-- Category Info -->
-                            <h3 class="text-lg font-bold mb-2 text-gray-900 group-hover:text-gray-900 transition-colors duration-300">{{ $genre->name }}</h3>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500 group-hover:bg-white group-hover:text-gray-900 transition-colors duration-300">
-                                {{ $genre->books_count }} books
-                            </span>
-                        </div>
-                    </a>
-                @endforeach
+                            {{-- Arrow indicator on hover --}}
+                            <div class="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-300">
+                                <svg class="w-5 h-5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                                </svg>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
             </div>
             
-            <!-- View All Categories Button -->
-            <div class="text-center mt-16" data-aos="fade-up" data-aos-delay="400">
-                <a href="{{ route('books.index') }}" class="group inline-flex items-center px-8 py-4 bg-gray-900 text-white font-bold rounded-full hover:bg-black transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+            {{-- Mobile View All Button --}}
+            <div class="text-center mt-10 md:hidden" data-aos="fade-up">
+                <a href="{{ route('books.index') }}" class="inline-flex items-center px-8 py-4 bg-gray-900 text-white font-bold rounded-full hover:bg-black transition-all duration-300 shadow-lg">
                     <span>View All Categories</span>
-                    <svg class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
                     </svg>
                 </a>
             </div>
         </div>
-    </div>
+
+        {{-- Carousel Script --}}
+        <script>
+            function categoryCarousel() {
+                return {
+                    autoScrollInterval: null,
+                    scrollSpeed: 1,
+                    isPaused: false,
+                    scrollDirection: 1, // 1 = right, -1 = left
+                    
+                    init() {
+                        this.$nextTick(() => {
+                            this.startAutoScroll();
+                        });
+                    },
+                    
+                    startAutoScroll() {
+                        if (this.autoScrollInterval) return;
+                        
+                        this.autoScrollInterval = setInterval(() => {
+                            if (!this.isPaused) {
+                                const carousel = this.$refs.carousel;
+                                if (carousel) {
+                                    const maxScroll = carousel.scrollWidth - carousel.clientWidth;
+                                    
+                                    // Only scroll if there's content to scroll
+                                    if (maxScroll > 0) {
+                                        carousel.scrollLeft += this.scrollSpeed * this.scrollDirection;
+                                        
+                                        // Bounce back when reaching the end
+                                        if (carousel.scrollLeft >= maxScroll - 5) {
+                                            this.scrollDirection = -1;
+                                        } else if (carousel.scrollLeft <= 5) {
+                                            this.scrollDirection = 1;
+                                        }
+                                    }
+                                }
+                            }
+                        }, 30);
+                    },
+                    
+                    pauseAutoScroll() {
+                        this.isPaused = true;
+                    },
+                    
+                    resumeAutoScroll() {
+                        this.isPaused = false;
+                    },
+                    
+                    scrollLeft() {
+                        const carousel = this.$refs.carousel;
+                        if (carousel) {
+                            const maxScroll = carousel.scrollWidth - carousel.clientWidth;
+                            if (carousel.scrollLeft <= 10 && maxScroll > 0) {
+                                carousel.scrollTo({ left: maxScroll, behavior: 'smooth' });
+                            } else {
+                                carousel.scrollBy({ left: -300, behavior: 'smooth' });
+                            }
+                        }
+                    },
+                    
+                    scrollRight() {
+                        const carousel = this.$refs.carousel;
+                        if (carousel) {
+                            const maxScroll = carousel.scrollWidth - carousel.clientWidth;
+                            if (carousel.scrollLeft >= maxScroll - 10 && maxScroll > 0) {
+                                carousel.scrollTo({ left: 0, behavior: 'smooth' });
+                            } else {
+                                carousel.scrollBy({ left: 300, behavior: 'smooth' });
+                            }
+                        }
+                    }
+                }
+            }
+        </script>
+
+        <style>
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+        </style>
+    </section>
 
         <!-- Customer Testimonials -->
         <div class="py-24 bg-gradient-to-br from-primary-50 via-white to-primary-50">
@@ -1481,12 +1436,12 @@
                             <p class="text-gray-600 mb-4">
                                 Your review helps other readers discover books they'll love and supports our community.
                             </p>
-                            <a href="{{ route('login') }}" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white text-sm font-semibold rounded-full hover:from-primary-700 hover:to-primary-800 transition-all duration-300 shadow-lg hover:shadow-primary-500/30">
+                            <button onclick="document.dispatchEvent(new CustomEvent('open-auth-modal', { detail: 'login' }))" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white text-sm font-semibold rounded-full hover:from-primary-700 hover:to-primary-800 transition-all duration-300 shadow-lg hover:shadow-primary-500/30">
                                 <span class="mr-2">Sign in to leave a review</span>
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H7"/>
                                 </svg>
-                            </a>
+                            </button>
                         </div>
                     </div>
                 @endif
@@ -1635,46 +1590,47 @@
         </div>
 
         <!-- Newsletter -->
-        <div class="py-12 bg-gradient-to-r from-primary-950 via-primary-900 to-primary-800">
-            <div class="container mx-auto px-6">
+        <section class="py-24 bg-gray-50 relative overflow-hidden">
+            {{-- Subtle ambient gradients --}}
+            <div class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-indigo-100/50 rounded-full blur-[120px] pointer-events-none"></div>
+            <div class="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-rose-100/50 rounded-full blur-[120px] pointer-events-none"></div>
+
+            <div class="container mx-auto px-6 relative z-10">
                 <div
-                    class="max-w-4xl mx-auto rounded-3xl bg-primary-900/70 border border-white/10 backdrop-blur-sm px-6 py-8 md:px-10 md:py-10 text-center"
+                    class="max-w-3xl mx-auto rounded-[2.5rem] bg-white border border-gray-100 shadow-2xl shadow-gray-200/50 px-8 py-12 md:px-14 md:py-16 text-center"
                     data-aos="fade-up"
                 >
-                    <!-- Header -->
-                    <div class="mb-6">
-                        <div class="inline-flex items-center px-3 py-1.5 rounded-full bg-white/10 border border-white/15 text-xs font-semibold tracking-[0.16em] uppercase text-primary-100 mb-4">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                            </svg>
-                            Newsletter
-                        </div>
-                        <h2 class="text-2xl md:text-3xl font-semibold text-white mb-2">
-                            Stay in the loop with new books and deals
+                    {{-- Decorative Icon --}}
+                    <div class="mx-auto w-16 h-16 mb-6 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+
+                    {{-- Header --}}
+                    <div class="mb-8">
+                        <p class="text-xs font-bold tracking-[0.2em] uppercase text-indigo-600 mb-3">Newsletter</p>
+                        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 font-serif tracking-tight leading-tight mb-4">
+                            Stay in the loop with new books & deals
                         </h2>
-                        <p class="text-sm md:text-base text-primary-100 max-w-2xl mx-auto">
+                        <p class="text-base md:text-lg text-gray-500 font-light leading-relaxed max-w-xl mx-auto">
                             Get occasional updates about fresh arrivals, curated picks, and exclusive Bookty offers.
                         </p>
                     </div>
 
-                    <!-- Newsletter Form -->
-                    <div class="mt-6">
-                        <form class="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto">
-                            <div class="flex-1 relative">
+                    {{-- Newsletter Form --}}
+                    <div class="mt-8">
+                        <form class="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
+                            <div class="flex-1 relative group">
                                 <input
                                     type="email"
                                     placeholder="Enter your email address"
-                                    class="w-full px-5 py-3 text-sm md:text-base text-gray-900 bg-white/95 backdrop-blur-md rounded-2xl focus:outline-none focus:ring-4 focus:ring-primary-500/50 focus:bg-white transition-all duration-300 placeholder-gray-500"
+                                    class="w-full px-5 py-4 text-sm md:text-base text-gray-900 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-400 focus:bg-white transition-all duration-300 placeholder-gray-400"
                                 >
-                                <div class="absolute inset-y-0 right-0 flex items-center pr-5">
-                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"/>
-                                    </svg>
-                                </div>
                             </div>
                             <button
                                 type="submit"
-                                class="group inline-flex justify-center items-center px-6 py-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 text-sm md:text-base font-semibold rounded-2xl hover:from-yellow-500 hover:to-orange-600 transition-all duration-300 shadow-xl hover:shadow-yellow-500/25 transform hover:scale-[1.02]"
+                                class="group inline-flex justify-center items-center px-8 py-4 bg-gray-900 text-white text-sm md:text-base font-bold rounded-2xl hover:bg-black transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
                             >
                                 <span class="flex items-center">
                                     Subscribe
@@ -1685,14 +1641,14 @@
                             </button>
                         </form>
 
-                        <!-- Privacy Notice -->
-                        <p class="mt-4 text-xs text-primary-200">
+                        {{-- Privacy Notice --}}
+                        <p class="mt-5 text-xs text-gray-400 font-medium">
                             We only send thoughtful updates. No spam, unsubscribe anytime.
                         </p>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
         <!-- Load Recommendations Script -->
         @auth
