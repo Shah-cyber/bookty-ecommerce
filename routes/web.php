@@ -94,6 +94,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/wishlist/add/{book}', [WishlistController::class, 'add'])->name('wishlist.add');
     Route::delete('/wishlist/remove/{book}', [WishlistController::class, 'remove'])->name('wishlist.remove');
     Route::post('/wishlist/toggle/{book}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
+    Route::delete('/wishlist/clear', [WishlistController::class, 'clear'])->name('wishlist.clear');
     
     // Track user interactions for recommendations
     Route::post('/api/track-interaction', function (\Illuminate\Http\Request $request) {
@@ -117,9 +118,11 @@ Route::middleware(['auth', 'role:admin,superadmin'])->prefix('admin')->name('adm
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     
     Route::resource('books', BookController::class);
+    Route::patch('books/{book}/quick-update', [BookController::class, 'quickUpdate'])->name('books.quick-update');
     Route::resource('genres', GenreController::class);
     Route::resource('tropes', TropeController::class);
     Route::resource('orders', OrderController::class);
+    Route::patch('orders/{order}/quick-update', [OrderController::class, 'quickUpdate'])->name('orders.quick-update');
     Route::get('orders/{order}/invoice', [OrderController::class, 'invoice'])->name('orders.invoice');
     Route::get('orders/{order}/invoice/pdf', [OrderController::class, 'invoicePdf'])->name('orders.invoice.pdf');
     Route::resource('customers', CustomerController::class)->only(['index', 'show']);
@@ -141,6 +144,7 @@ Route::middleware(['auth', 'role:admin,superadmin'])->prefix('admin')->name('adm
     // Dashboard data endpoints
     Route::get('top-selling', [DashboardController::class, 'getTopSellingBooksData'])->name('top-selling');
     Route::get('sales-this-period', [DashboardController::class, 'getSalesThisPeriodData'])->name('sales-this-period');
+    Route::get('realtime-stats', [DashboardController::class, 'getRealtimeStats'])->name('realtime-stats');
     
     // Reports
     Route::prefix('reports')->name('reports.')->group(function () {
@@ -186,6 +190,7 @@ Route::middleware(['auth', 'role:admin,superadmin'])->prefix('admin')->name('adm
         Route::get('/', [\App\Http\Controllers\Admin\RecommendationAnalyticsController::class, 'index'])->name('index');
         Route::get('/settings', [\App\Http\Controllers\Admin\RecommendationAnalyticsController::class, 'settings'])->name('settings');
         Route::post('/settings', [\App\Http\Controllers\Admin\RecommendationAnalyticsController::class, 'updateSettings'])->name('settings.update');
+        Route::post('/clear-cache', [\App\Http\Controllers\Admin\RecommendationAnalyticsController::class, 'clearCache'])->name('clear-cache');
         Route::get('/user/{user}', [\App\Http\Controllers\Admin\RecommendationAnalyticsController::class, 'userDetails'])->name('user.details');
     });
 });
@@ -199,6 +204,8 @@ Route::middleware(['auth', 'role:superadmin'])->prefix('superadmin')->name('supe
     Route::get('/api/user-registrations', [App\Http\Controllers\SuperAdmin\DashboardController::class, 'getRealtimeUserRegistrations'])->name('api.user-registrations');
     Route::get('/api/recent-users', [App\Http\Controllers\SuperAdmin\DashboardController::class, 'getRecentUsers'])->name('api.recent-users');
     Route::get('/api/system-health', [App\Http\Controllers\SuperAdmin\DashboardController::class, 'getSystemHealth'])->name('api.system-health');
+    Route::get('/api/sales', [App\Http\Controllers\SuperAdmin\DashboardController::class, 'getSalesData'])->name('api.sales');
+    Route::get('/api/top-selling', [App\Http\Controllers\SuperAdmin\DashboardController::class, 'getTopSellingBooks'])->name('api.top-selling');
     
     // Admin management
     Route::resource('admins', App\Http\Controllers\SuperAdmin\AdminController::class);

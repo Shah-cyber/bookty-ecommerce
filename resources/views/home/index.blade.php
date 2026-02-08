@@ -249,7 +249,7 @@
 
     <div class="min-h-screen bg-white">
         <!-- Hero Section -->
-        <div class="relative overflow-x-hidden bg-white min-h-screen">
+        <div class="relative overflow-x-hidden bg-white min-h-[auto] lg:min-h-screen">
             <!-- Enhanced Animated Background Elements with multiple layers -->
             <div class="absolute inset-0 overflow-hidden">
                 <!-- Layer 1: Large floating blobs -->
@@ -266,8 +266,8 @@
                 <div class="absolute bottom-32 right-1/4 w-24 h-24 bg-white/60 rounded-full filter blur-xl opacity-50 animate-pulse animation-delay-2000"></div>
             </div>
 
-            <div class="container mx-auto px-4 sm:px-6 py-12 sm:py-16 lg:py-20 relative z-10 overflow-visible">
-                <div class="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-12 lg:gap-32 xl:gap-40 min-h-[70vh] lg:min-h-[80vh] overflow-visible">
+            <div class="container mx-auto px-4 sm:px-6 py-8 sm:py-12 lg:py-16 relative z-10 overflow-visible">
+                <div class="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-6 sm:gap-10 lg:gap-16 xl:gap-24 min-h-[auto] lg:min-h-[75vh] overflow-visible">
                     <!-- Left Content (dynamic details) -->
                     @php 
                         // Use recommendations for authenticated users (up to 6 books)
@@ -278,14 +278,14 @@
                         $firstHero = $displayHeroBooks->first(); 
                     @endphp
                     @if($displayHeroBooks->count() > 0)
-                        <div class="flex-1 lg:max-w-[42%] xl:max-w-[45%] text-gray-900 order-2 lg:order-1 flex flex-col items-center lg:items-start text-center lg:text-left flex-shrink-0" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100">
-                            <div class="mb-6" data-aos="fade-down" data-aos-delay="200">
-                                <span class="inline-flex items-center px-4 py-2 bg-white/80 rounded-full text-sm font-bold backdrop-blur-md border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105">
-                                    <span class="relative flex w-2.5 h-2.5 mr-2">
+                        <div class="flex-1 lg:max-w-[42%] xl:max-w-[45%] text-gray-900 order-2 lg:order-1 flex flex-col items-center lg:items-start text-center lg:text-left flex-shrink-0 mt-4 sm:mt-0" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100">
+                            <div class="mb-2 sm:mb-4" data-aos="fade-down" data-aos-delay="200">
+                                <span class="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 bg-white/80 rounded-full text-sm font-bold backdrop-blur-md border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105">
+                                    <span class="relative flex w-2 h-2 sm:w-2.5 sm:h-2.5 mr-1.5 sm:mr-2">
                                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500"></span>
+                                        <span class="relative inline-flex rounded-full h-2 w-2 sm:h-2.5 sm:w-2.5 bg-rose-500"></span>
                                     </span>
-                                    <span id="hero-genre" class="text-fade text-gray-800 tracking-wide uppercase text-xs">
+                                    <span id="hero-genre" class="text-fade text-gray-800 tracking-wide uppercase text-[10px] sm:text-xs">
                                         @if(Auth::check() && $recommendations && $recommendations->count() > 0)
                                             Recommended for You
                                         @else
@@ -294,32 +294,34 @@
                                     </span>
                                 </span>
                             </div>
-                            <h1 id="hero-title" class="text-fade text-5xl md:text-6xl lg:text-7xl font-black leading-tight mb-6 font-sans text-gray-900 tracking-tight break-words" style="line-height: 1.1;" data-aos="fade-up" data-aos-delay="300">
+                            <h1 id="hero-title" class="text-fade text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black leading-tight mb-2 sm:mb-4 font-sans text-gray-900 tracking-tight break-words" style="line-height: 1.15;" data-aos="fade-up" data-aos-delay="300">
                                 {{ $firstHero?->title }}
                             </h1>
-                            <p id="hero-synopsis" class="text-fade text-lg md:text-xl mb-10 w-full text-gray-500 leading-relaxed font-medium max-w-xl" data-aos="fade-up" data-aos-delay="400">
+                            <p id="hero-synopsis" class="text-fade text-sm sm:text-base md:text-lg mb-4 sm:mb-6 w-full text-gray-500 leading-relaxed font-medium max-w-xl line-clamp-2 sm:line-clamp-3 md:line-clamp-none" data-aos="fade-up" data-aos-delay="400">
                                 {{ \Illuminate\Support\Str::limit($firstHero?->synopsis ?? 'Discover your next favorite story.', 180) }}
                             </p>
-                            <div class="flex flex-col sm:flex-row w-full items-stretch sm:items-center justify-center lg:justify-start gap-4 sm:gap-6" data-aos="fade-up" data-aos-delay="500">
-                                <a id="hero-details-link" href="{{ $firstHero ? route('books.show', $firstHero) : '#' }}" class="group relative inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-gray-900 text-white font-bold rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 hover:bg-black">
+                            <div class="flex flex-row w-full items-center justify-center lg:justify-start gap-2 sm:gap-3" data-aos="fade-up" data-aos-delay="500">
+                                <a id="hero-details-link" href="{{ $firstHero ? route('books.show', $firstHero) : '#' }}" class="group relative inline-flex items-center justify-center flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 bg-gray-900 text-white text-xs sm:text-sm font-bold rounded-full transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105 hover:bg-black active:scale-95">
                                     <span class="relative flex items-center">
-                                        View Details
+                                        <span class="sm:hidden">Details</span>
+                                        <span class="hidden sm:inline">View Details</span>
                                     </span>
-                                    <svg class="w-5 h-5 ml-2 relative group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1.5 sm:ml-2 relative group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
                                     </svg>
                                 </a>
                                 @if($firstHero)
                                     @auth
-                                        <button onclick="quickAddToCart({{ $firstHero?->id }})" id="hero-quick-add" class="quick-add-btn group relative inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 border border-gray-200 text-gray-700 font-bold rounded-full bg-white hover:bg-gray-50 transition-all duration-300 shadow-sm hover:shadow-md hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                                        <button onclick="quickAddToCart({{ $firstHero?->id }})" id="hero-quick-add" class="quick-add-btn group relative inline-flex items-center justify-center flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 border border-gray-200 text-gray-700 text-xs sm:text-sm font-bold rounded-full bg-white hover:bg-gray-50 transition-all duration-300 shadow-sm hover:shadow-md hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95">
                                             <span class="btn-text relative flex items-center">
-                                                <svg class="w-5 h-5 mr-2 text-gray-400 group-hover:text-gray-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg class="w-4 h-4 mr-1 sm:mr-1.5 text-gray-400 group-hover:text-gray-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                                                 </svg>
-                                                Quick Add
+                                                <span class="sm:hidden">Add</span>
+                                                <span class="hidden sm:inline">Quick Add</span>
                                             </span>
                                             <span class="loading-spinner hidden relative">
-                                                <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-gray-600 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 sm:h-5 sm:w-5 text-gray-600 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                                 </svg>
@@ -327,67 +329,68 @@
                                             </span>
                                         </button>
                                     @else
-                                        <button onclick="document.dispatchEvent(new CustomEvent('open-auth-modal', { detail: 'login' }))" id="hero-quick-add-guest" class="group relative inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 border border-gray-200 text-gray-700 font-bold rounded-full bg-white hover:bg-gray-50 transition-all duration-300 shadow-sm hover:shadow-md hover:border-gray-300">
+                                        <button onclick="document.dispatchEvent(new CustomEvent('open-auth-modal', { detail: 'login' }))" id="hero-quick-add-guest" class="group relative inline-flex items-center justify-center flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 border border-gray-200 text-gray-700 text-xs sm:text-sm font-bold rounded-full bg-white hover:bg-gray-50 transition-all duration-300 shadow-sm hover:shadow-md hover:border-gray-300 active:scale-95">
                                             <span class="relative flex items-center">
-                                                <svg class="w-5 h-5 mr-2 text-gray-400 group-hover:text-gray-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg class="w-4 h-4 mr-1 sm:mr-1.5 text-gray-400 group-hover:text-gray-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                                                 </svg>
-                                                Quick Add
+                                                <span class="sm:hidden">Add</span>
+                                                <span class="hidden sm:inline">Quick Add</span>
                                             </span>
                                         </button>
                                     @endauth
                                 @endif
                             </div>
 
-                            <!-- Enhanced Stats Row -->
-                            <div class="w-full mt-16 sm:mt-20 pt-10 border-t border-primary-300/20" data-aos="fade-up" data-aos-delay="600">
-                                <div class="flex items-center justify-center lg:justify-start gap-8 sm:gap-12 flex-wrap">
-                                    <div class="group text-center transform hover:scale-110 transition-all duration-300" data-aos="zoom-in" data-aos-delay="200">
-                                        <div class="relative inline-block mb-2">
-                                            <div class="absolute inset-0 bg-primary-300 rounded-2xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-300"></div>
-                                            <div class="relative px-6 py-3 bg-white/80 backdrop-blur-sm rounded-2xl border border-primary-300/20">
-                                                <div class="text-4xl font-extrabold text-[#2D2D2D]">10K+</div>
-                                    </div>
-                                    </div>
-                                        <div class="text-primary-800 text-sm font-semibold mt-2 flex items-center justify-center">
-                                            <svg class="w-4 h-4 mr-1 text-primary-300" fill="currentColor" viewBox="0 0 20 20">
+                            <!-- Enhanced Stats Row - Responsive for all devices -->
+                            <div class="w-full mt-6 sm:mt-10 lg:mt-16 pt-4 sm:pt-6 lg:pt-10 border-t border-gray-200/50" data-aos="fade-up" data-aos-delay="600">
+                                <div class="grid grid-cols-3 gap-2 sm:flex sm:items-center sm:justify-center lg:justify-start sm:gap-6 lg:gap-10">
+                                    <div class="group text-center transform hover:scale-105 transition-all duration-300" data-aos="zoom-in" data-aos-delay="200">
+                                        <div class="relative inline-block mb-1">
+                                            <div class="absolute inset-0 bg-gray-200 rounded-lg blur-md opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
+                                            <div class="relative px-2 sm:px-4 py-1.5 sm:py-2 bg-white/90 backdrop-blur-sm rounded-lg border border-gray-100 shadow-sm">
+                                                <div class="text-lg sm:text-2xl lg:text-3xl font-bold text-gray-900">10K+</div>
+                                            </div>
+                                        </div>
+                                        <div class="text-gray-500 text-[10px] sm:text-xs font-medium mt-1 flex items-center justify-center">
+                                            <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-0.5 sm:mr-1 text-rose-400" fill="currentColor" viewBox="0 0 20 20">
                                                 <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
                                             </svg>
-                                            Happy Readers
+                                            <span class="hidden xs:inline">Happy </span>Readers
+                                        </div>
                                     </div>
-                                </div>
 
-                                    <div class="hidden sm:block w-px h-12 bg-primary-300/20"></div>
+                                    <div class="hidden sm:block w-px h-8 lg:h-10 bg-gray-200"></div>
 
-                                    <div class="group text-center transform hover:scale-110 transition-all duration-300" data-aos="zoom-in" data-aos-delay="400">
-                                        <div class="relative inline-block mb-2">
-                                            <div class="absolute inset-0 bg-primary-300 rounded-2xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-300"></div>
-                                            <div class="relative px-6 py-3 bg-white/80 backdrop-blur-sm rounded-2xl border border-primary-300/20">
-                                                <div class="text-4xl font-extrabold text-[#2D2D2D]">5K+</div>
+                                    <div class="group text-center transform hover:scale-105 transition-all duration-300" data-aos="zoom-in" data-aos-delay="400">
+                                        <div class="relative inline-block mb-1">
+                                            <div class="absolute inset-0 bg-gray-200 rounded-lg blur-md opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
+                                            <div class="relative px-2 sm:px-4 py-1.5 sm:py-2 bg-white/90 backdrop-blur-sm rounded-lg border border-gray-100 shadow-sm">
+                                                <div class="text-lg sm:text-2xl lg:text-3xl font-bold text-gray-900">5K+</div>
                                             </div>
                                         </div>
-                                        <div class="text-primary-800 text-sm font-semibold mt-2 flex items-center justify-center">
-                                            <svg class="w-4 h-4 mr-1 text-primary-300" fill="currentColor" viewBox="0 0 20 20">
+                                        <div class="text-gray-500 text-[10px] sm:text-xs font-medium mt-1 flex items-center justify-center">
+                                            <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-0.5 sm:mr-1 text-rose-400" fill="currentColor" viewBox="0 0 20 20">
                                                 <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/>
                                             </svg>
-                                            Books Available
-                            </div>
-                        </div>
+                                            Books
+                                        </div>
+                                    </div>
 
-                                    <div class="hidden sm:block w-px h-12 bg-primary-300/20"></div>
+                                    <div class="hidden sm:block w-px h-8 lg:h-10 bg-gray-200"></div>
 
-                                    <div class="group text-center transform hover:scale-110 transition-all duration-300" data-aos="zoom-in" data-aos-delay="600">
-                                        <div class="relative inline-block mb-2">
-                                            <div class="absolute inset-0 bg-primary-300 rounded-2xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-300"></div>
-                                            <div class="relative px-6 py-3 bg-white/80 backdrop-blur-sm rounded-2xl border border-primary-300/20">
-                                                <div class="text-4xl font-extrabold text-[#2D2D2D]">4.8/5</div>
+                                    <div class="group text-center transform hover:scale-105 transition-all duration-300" data-aos="zoom-in" data-aos-delay="600">
+                                        <div class="relative inline-block mb-1">
+                                            <div class="absolute inset-0 bg-gray-200 rounded-lg blur-md opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
+                                            <div class="relative px-2 sm:px-4 py-1.5 sm:py-2 bg-white/90 backdrop-blur-sm rounded-lg border border-gray-100 shadow-sm">
+                                                <div class="text-lg sm:text-2xl lg:text-3xl font-bold text-gray-900">4.8/5</div>
                                             </div>
                                         </div>
-                                        <div class="text-primary-800 text-sm font-semibold mt-2 flex items-center justify-center">
-                                            <svg class="w-4 h-4 mr-1 text-primary-300" fill="currentColor" viewBox="0 0 20 20">
+                                        <div class="text-gray-500 text-[10px] sm:text-xs font-medium mt-1 flex items-center justify-center">
+                                            <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-0.5 sm:mr-1 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
                                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                                             </svg>
-                                            Average Rating
+                                            Rating
                                         </div>
                                     </div>
                                 </div>
@@ -395,8 +398,8 @@
                         </div>
 
                         <!-- Right Content - Enhanced 3D Portrait cover slider -->
-                        <div class="flex-1 lg:max-w-[40%] xl:max-w-[35%] w-full order-1 lg:order-2 perspective-container overflow-visible flex-shrink-0 pr-4 lg:pr-6 xl:pr-8" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
-                            <div class="relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-md xl:max-w-lg mx-auto h-[450px] sm:h-[550px] lg:h-[600px] overflow-visible">
+                        <div class="flex-1 lg:max-w-[40%] xl:max-w-[35%] w-full order-1 lg:order-2 perspective-container overflow-visible flex-shrink-0 px-4 sm:px-0 lg:pr-6 xl:pr-8 mb-8 sm:mb-12 lg:mb-0" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
+                            <div class="relative w-full max-w-[240px] sm:max-w-[320px] md:max-w-md lg:max-w-md xl:max-w-lg mx-auto h-[320px] sm:h-[420px] md:h-[500px] lg:h-[580px] overflow-visible">
                                 <!-- Ambient glow effect behind carousel -->
                                 <div class="absolute inset-0 bg-primary-300/20 rounded-3xl blur-3xl scale-110 opacity-50"></div>
 
@@ -473,28 +476,28 @@
                                     @endforeach
                                 </div>
 
-                                <!-- Enhanced Navigation Controls -->
-                                <div class="absolute -bottom-16 left-1/2 transform -translate-x-1/2 flex items-center gap-6 group/nav px-6 py-2 transition-all">
+                                <!-- Enhanced Navigation Controls - Responsive on all devices -->
+                                <div class="absolute -bottom-14 sm:-bottom-16 left-1/2 transform -translate-x-1/2 flex items-center gap-4 sm:gap-6 group/nav px-3 sm:px-6 py-2 bg-white/80 backdrop-blur-sm rounded-full shadow-sm border border-gray-100 transition-all">
                                     <!-- Prev Arrow -->
-                                    <button id="carousel-prev" class="p-3 rounded-full bg-white text-gray-400 shadow-sm border border-gray-100 hover:bg-gray-50 hover:text-gray-900 hover:shadow-md transition-all duration-300 opacity-0 group-hover/nav:opacity-100 -translate-x-2 group-hover/nav:translate-x-0">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <button id="carousel-prev" class="p-2 sm:p-2.5 rounded-full bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-all duration-300 active:scale-95">
+                                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                                         </svg>
                                     </button>
                                     
                                     <!-- Dots -->
-                                    <div class="flex gap-3" id="carousel-dots">
+                                    <div class="flex gap-1.5 sm:gap-2" id="carousel-dots">
                                         @foreach($displayHeroBooks as $i => $book)
                                             <button 
-                                                class="carousel-dot w-2 h-2 rounded-full transition-all duration-300 {{ $i === 0 ? 'bg-gray-800 w-8 scale-110' : 'bg-gray-300 hover:bg-gray-400' }}"
+                                                class="carousel-dot w-2 h-2 rounded-full transition-all duration-300 {{ $i === 0 ? 'bg-gray-800 w-5 sm:w-6 scale-110' : 'bg-gray-300 hover:bg-gray-400' }}"
                                                 data-index="{{ $i }}"
                                             ></button>
                                         @endforeach
                                     </div>
 
                                     <!-- Next Arrow -->
-                                    <button id="carousel-next" class="p-3 rounded-full bg-white text-gray-400 shadow-sm border border-gray-100 hover:bg-gray-50 hover:text-gray-900 hover:shadow-md transition-all duration-300 opacity-0 group-hover/nav:opacity-100 translate-x-2 group-hover/nav:translate-x-0">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <button id="carousel-next" class="p-2 sm:p-2.5 rounded-full bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-all duration-300 active:scale-95">
+                                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                         </svg>
                                     </button>
@@ -724,11 +727,11 @@
                 </script>
             </div>
 
-            <!-- Enhanced Scroll Indicator -->
-            <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center gap-2 scroll-down-indicator">
-                <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Scroll Down</span>
-                <div class="flex flex-col items-center gap-1">
-                    <svg class="w-6 h-10 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <!-- Enhanced Scroll Indicator - Only visible on larger screens -->
+            <div class="hidden lg:flex absolute bottom-8 left-1/2 -translate-x-1/2 flex-col items-center justify-center gap-1.5 scroll-down-indicator">
+                <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Scroll Down</span>
+                <div class="flex flex-col items-center">
+                    <svg class="w-5 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
                     </svg>
                 </div>

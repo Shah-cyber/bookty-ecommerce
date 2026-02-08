@@ -3,63 +3,157 @@
 @section('header', 'Add New Genre')
 
 @section('content')
-    <div class="mb-6">
-        <a href="{{ route('admin.genres.index') }}" class="text-purple-600 hover:text-purple-900">
-            &larr; Back to Genres
+<div class="max-w-3xl mx-auto space-y-6">
+    {{-- Page Header --}}
+    <div class="flex items-center gap-4">
+        <a href="{{ route('admin.genres.index') }}" 
+           class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
         </a>
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Add New Genre</h1>
+            <p class="text-gray-500 dark:text-gray-400 mt-1">Create a new book category</p>
+        </div>
     </div>
 
-    <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
-        <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-6">Add New Genre</h2>
-
-        @if ($errors->any())
-            <div class="bg-red-100 dark:bg-red-900/30 border-l-4 border-red-500 text-red-700 dark:text-red-200 p-4 mb-6" role="alert">
-                <p class="font-bold">Please fix the following errors:</p>
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
+    {{-- Error Alert --}}
+    @if ($errors->any())
+        <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
+            <div class="flex items-start gap-3">
+                <div class="flex-shrink-0">
+                    <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-medium text-red-800 dark:text-red-200">Please fix the following errors:</h3>
+                    <ul class="mt-2 text-sm text-red-700 dark:text-red-300 list-disc list-inside">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
             </div>
-        @endif
+        </div>
+    @endif
 
-        <form action="{{ route('admin.genres.store') }}" method="POST">
+    {{-- Form Card --}}
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Genre Information</h2>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Fill in the details for the new genre</p>
+                </div>
+            </div>
+        </div>
+        
+        <form action="{{ route('admin.genres.store') }}" method="POST" class="p-6 space-y-6">
             @csrf
 
-            <div class="mb-4">
-                <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
-                <input type="text" name="name" id="name" value="{{ old('name') }}" required class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 dark:focus:ring-purple-400 focus:ring-opacity-50">
+            {{-- Name --}}
+            <div>
+                <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Genre Name <span class="text-red-500">*</span>
+                </label>
+                <input type="text" 
+                       name="name" 
+                       id="name" 
+                       value="{{ old('name') }}" 
+                       required 
+                       placeholder="e.g., Romance, Fantasy, Mystery"
+                       class="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors">
             </div>
 
-            <div class="mb-4">
-                <label for="slug" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Slug</label>
-                <input type="text" name="slug" id="slug" value="{{ old('slug') }}" required class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 dark:focus:ring-purple-400 focus:ring-opacity-50">
-                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">URL-friendly version of the name (e.g., "romance")</p>
+            {{-- Slug --}}
+            <div>
+                <label for="slug" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Slug <span class="text-red-500">*</span>
+                </label>
+                <div class="relative">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">/genres/</span>
+                    <input type="text" 
+                           name="slug" 
+                           id="slug" 
+                           value="{{ old('slug') }}" 
+                           required 
+                           placeholder="romance"
+                           class="w-full pl-20 pr-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors">
+                </div>
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    URL-friendly version of the name. Auto-generated from name.
+                </p>
             </div>
 
-            <div class="mb-4">
-                <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
-                <textarea name="description" id="description" rows="4" class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 dark:focus:ring-purple-400 focus:ring-opacity-50">{{ old('description') }}</textarea>
+            {{-- Description --}}
+            <div>
+                <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Description
+                </label>
+                <textarea name="description" 
+                          id="description" 
+                          rows="4" 
+                          placeholder="Describe what this genre encompasses..."
+                          class="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors resize-none">{{ old('description') }}</textarea>
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    Optional. A brief description of this genre for reference.
+                </p>
             </div>
 
-            <div class="mt-6">
-                <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
+            {{-- Actions --}}
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <a href="{{ route('admin.genres.index') }}" 
+                   class="px-4 py-2.5 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors">
+                    Cancel
+                </a>
+                <button type="submit" 
+                        class="px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-xl transition-colors shadow-sm">
                     Create Genre
                 </button>
             </div>
         </form>
     </div>
 
-    <script>
-        // Auto-generate slug from name
-        document.getElementById('name').addEventListener('input', function() {
-            const name = this.value;
-            const slug = name.toLowerCase()
-                .replace(/[^\w\s-]/g, '') // Remove special characters
-                .replace(/\s+/g, '-')     // Replace spaces with hyphens
-                .replace(/-+/g, '-');     // Replace multiple hyphens with single hyphen
-            
-            document.getElementById('slug').value = slug;
-        });
-    </script>
+    {{-- Help Card --}}
+    <div class="bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-200 dark:border-purple-800 p-4">
+        <div class="flex items-start gap-3">
+            <div class="flex-shrink-0">
+                <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <div>
+                <h3 class="text-sm font-medium text-purple-800 dark:text-purple-200">Tips for creating genres</h3>
+                <ul class="mt-2 text-sm text-purple-700 dark:text-purple-300 space-y-1">
+                    <li>Choose clear, recognizable genre names</li>
+                    <li>Keep slugs short and lowercase</li>
+                    <li>Each book can only belong to one genre</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
+
+@push('scripts')
+<script>
+    // Auto-generate slug from name
+    document.getElementById('name').addEventListener('input', function() {
+        const name = this.value;
+        const slug = name.toLowerCase()
+            .replace(/[^\w\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .replace(/^-|-$/g, '');
+        
+        document.getElementById('slug').value = slug;
+    });
+</script>
+@endpush

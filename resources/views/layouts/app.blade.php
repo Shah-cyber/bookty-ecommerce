@@ -61,19 +61,19 @@
             document.addEventListener('DOMContentLoaded', function() {
                 // Handle session flash messages
                 @if(session('success'))
-                    window.showToast('{{ session('success') }}', 'success');
+                    window.showToast({!! json_encode(session('success')) !!}, 'success');
                 @endif
                 
                 @if(session('error'))
-                    window.showToast('{{ session('error') }}', 'error');
+                    window.showToast({!! json_encode(session('error')) !!}, 'error');
                 @endif
                 
                 @if(session('warning'))
-                    window.showToast('{{ session('warning') }}', 'warning');
+                    window.showToast({!! json_encode(session('warning')) !!}, 'warning');
                 @endif
                 
                 @if(session('info'))
-                    window.showToast('{{ session('info') }}', 'info');
+                    window.showToast({!! json_encode(session('info')) !!}, 'info');
                 @endif
                 
                 // Check if we need to open the login modal (e.g. after session expiration)

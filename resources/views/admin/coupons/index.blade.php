@@ -3,206 +3,175 @@
 @section('header', 'Coupon Codes')
 
 @section('content')
-    <div class="mb-6">
-        <div class="flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0">
-            <h2 class="text-2xl font-semibold text-gray-800 dark:text-white">All Coupon Codes</h2>
-            
-            <div class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2">
-                <a href="{{ route('admin.coupons.create') }}" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">
-                    Add New Coupon
-                </a>
-            </div>
+<div class="space-y-6">
+    {{-- Page Header --}}
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Coupon Codes</h1>
+            <p class="text-gray-500 dark:text-gray-400 mt-1">Manage promotional codes and discounts</p>
         </div>
+        <a href="{{ route('admin.coupons.create') }}" 
+           class="inline-flex items-center gap-2 px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-xl transition-colors shadow-sm">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Add Coupon
+        </a>
     </div>
 
-
-    <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-700">
-                    <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Code</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Discount</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Validity</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Usage</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                    @forelse($coupons as $coupon)
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $coupon->code }}</div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                @if($coupon->discount_type === 'fixed')
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                        RM {{ number_format($coupon->discount_value, 2) }} off
-                                    </span>
-                                @else
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                        {{ $coupon->discount_value }}% off
-                                    </span>
-                                @endif
-                                @if($coupon->min_purchase_amount > 0)
-                                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                        Min. purchase: RM {{ number_format($coupon->min_purchase_amount, 2) }}
-                                    </div>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900 dark:text-white">
-                                    From: {{ $coupon->starts_at->format('M d, Y') }}
-                                </div>
-                                <div class="text-sm text-gray-500 dark:text-gray-400">
-                                    To: {{ $coupon->expires_at->format('M d, Y') }}
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900 dark:text-white">
-                                    {{ $coupon->usages_count }} / {{ $coupon->max_uses_total ?: '∞' }} uses
-                                </div>
-                                <div class="text-sm text-gray-500 dark:text-gray-400">
-                                    {{ $coupon->max_uses_per_user ?: '∞' }} per user
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                @if($coupon->is_active)
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                        Active
-                                    </span>
-                                @else
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                                        Inactive
-                                    </span>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <div class="flex space-x-2">
-                                    <a href="{{ route('admin.coupons.show', $coupon->id) }}" class="text-purple-600 dark:text-purple-400 hover:text-purple-900 dark:hover:text-purple-300">View</a>
-                                    <a href="{{ route('admin.coupons.edit', $coupon->id) }}" class="text-purple-600 dark:text-purple-400 hover:text-purple-900 dark:hover:text-purple-300">Edit</a>
-                                    
-                                    <form action="{{ route('admin.coupons.toggle', $coupon->id) }}" method="POST" class="inline">
-                                        @csrf
-                                        <button type="submit" class="{{ $coupon->is_active ? 'text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-300' : 'text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300' }}">
-                                            {{ $coupon->is_active ? 'Deactivate' : 'Activate' }}
-                                        </button>
-                                    </form>
-                                    
-                                    <form action="{{ route('admin.coupons.destroy', $coupon->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this coupon?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">Delete</button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">No coupons found.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+    {{-- Stats Cards --}}
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ $coupons->total() }}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Total Coupons</p>
+                </div>
+            </div>
         </div>
         
-        <!-- Pagination Info and Controls -->
-        <div class="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6">
-            <div class="flex-1 flex justify-between sm:hidden">
-                {{-- Mobile pagination --}}
-                @if ($coupons->hasPages())
-                    <div class="flex space-x-2">
-                        @if ($coupons->onFirstPage())
-                            <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 cursor-not-allowed">
-                                Previous
-                            </span>
-                        @else
-                            <a href="{{ $coupons->previousPageUrl() }}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                Previous
-                            </a>
-                        @endif
-
-                        @if ($coupons->hasMorePages())
-                            <a href="{{ $coupons->nextPageUrl() }}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                Next
-                            </a>
-                        @else
-                            <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 cursor-not-allowed">
-                                Next
-                            </span>
-                        @endif
-                    </div>
-                @endif
-            </div>
-            
-            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                <div>
-                    <p class="text-sm text-gray-700 dark:text-gray-300">
-                        Showing
-                        <span class="font-medium">{{ $coupons->firstItem() ?? 0 }}</span>
-                        to
-                        <span class="font-medium">{{ $coupons->lastItem() ?? 0 }}</span>
-                        of
-                        <span class="font-medium">{{ $coupons->total() }}</span>
-                        entries
-                    </p>
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
                 </div>
-                
                 <div>
-                    {{-- Desktop pagination --}}
-                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                        {{-- Previous Page Link --}}
-                        @if ($coupons->onFirstPage())
-                            <span class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 cursor-not-allowed">
-                                <span class="sr-only">Previous</span>
-                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                </svg>
-                            </span>
-                        @else
-                            <a href="{{ $coupons->previousPageUrl() }}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                <span class="sr-only">Previous</span>
-                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                </svg>
-                            </a>
-                        @endif
-
-                        {{-- Pagination Elements --}}
-                        @foreach ($coupons->getUrlRange(1, $coupons->lastPage()) as $page => $url)
-                            @if ($page == $coupons->currentPage())
-                                <span class="relative inline-flex items-center px-4 py-2 border border-purple-500 text-sm font-medium text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900">
-                                    {{ $page }}
-                                </span>
-                            @else
-                                <a href="{{ $url }}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                    {{ $page }}
-                                </a>
-                            @endif
-                        @endforeach
-
-                        {{-- Next Page Link --}}
-                        @if ($coupons->hasMorePages())
-                            <a href="{{ $coupons->nextPageUrl() }}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                <span class="sr-only">Next</span>
-                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                                </svg>
-                            </a>
-                        @else
-                            <span class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 cursor-not-allowed">
-                                <span class="sr-only">Next</span>
-                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                                </svg>
-                            </span>
-                        @endif
-                    </nav>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ $coupons->where('is_active', true)->where('expires_at', '>', now())->count() }}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Active</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ $coupons->sum('usages_count') }}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Total Uses</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ $coupons->where('expires_at', '<', now())->count() }}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Expired</p>
                 </div>
             </div>
         </div>
     </div>
+
+    {{-- Table Card --}}
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+        {{-- Table Container --}}
+        <div id="coupons-container">
+            @include('admin.coupons._table', ['coupons' => $coupons])
+        </div>
+    </div>
+</div>
+
+{{-- Delete Confirmation Modal --}}
+<div id="delete-modal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+        <div class="fixed inset-0 bg-gray-900/75 transition-opacity" id="modal-backdrop"></div>
+        
+        <div class="relative bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full mx-auto shadow-xl transform transition-all">
+            <div class="p-6">
+                <div class="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 mx-auto flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                </div>
+                
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Delete Coupon</h3>
+                <p class="text-gray-500 dark:text-gray-400 mb-1">Are you sure you want to delete <span id="delete-coupon-code" class="font-mono font-semibold text-gray-900 dark:text-gray-100"></span>?</p>
+                <p id="delete-warning" class="text-red-500 dark:text-red-400 text-sm mb-6"></p>
+                
+                <div class="flex gap-3">
+                    <button type="button" id="cancel-delete-btn" class="flex-1 px-4 py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                        Cancel
+                    </button>
+                    <form id="delete-form" method="POST" class="flex-1">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" id="confirm-delete-btn" class="w-full px-4 py-2.5 bg-red-600 text-white font-medium rounded-xl hover:bg-red-700 transition-colors">
+                            Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteModal = document.getElementById('delete-modal');
+    const modalBackdrop = document.getElementById('modal-backdrop');
+    const deleteCouponCode = document.getElementById('delete-coupon-code');
+    const deleteWarning = document.getElementById('delete-warning');
+    const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+    const deleteForm = document.getElementById('delete-form');
+    const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+    
+    function showModal() {
+        deleteModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function hideModal() {
+        deleteModal.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+    
+    function bindDeleteButtons() {
+        document.querySelectorAll('.delete-coupon-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const couponId = this.dataset.couponId;
+                const couponCode = this.dataset.couponCode;
+                const usagesCount = parseInt(this.dataset.usagesCount);
+                
+                deleteCouponCode.textContent = couponCode;
+                deleteForm.action = `{{ url('admin/coupons') }}/${couponId}`;
+                
+                if (usagesCount > 0) {
+                    deleteWarning.textContent = `This coupon has been used ${usagesCount} time(s) and cannot be deleted.`;
+                    confirmDeleteBtn.disabled = true;
+                    confirmDeleteBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                } else {
+                    deleteWarning.textContent = 'This action cannot be undone.';
+                    confirmDeleteBtn.disabled = false;
+                    confirmDeleteBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+                
+                showModal();
+            });
+        });
+    }
+    
+    cancelDeleteBtn.addEventListener('click', hideModal);
+    modalBackdrop.addEventListener('click', hideModal);
+    
+    bindDeleteButtons();
+});
+</script>
+@endpush

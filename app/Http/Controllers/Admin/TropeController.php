@@ -12,9 +12,61 @@ class TropeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $tropes = Trope::withCount('books')->latest()->paginate(6);
+        $query = Trope::withCount('books');
+
+        // Search
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('slug', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        // Sort
+        $sort = $request->sort ?? 'latest';
+        switch ($sort) {
+            case 'oldest':
+                $query->oldest();
+                break;
+            case 'name_asc':
+                $query->orderBy('name', 'asc');
+                break;
+            case 'name_desc':
+                $query->orderBy('name', 'desc');
+                break;
+            case 'books_asc':
+                $query->orderBy('books_count', 'asc');
+                break;
+            case 'books_desc':
+                $query->orderBy('books_count', 'desc');
+                break;
+            default:
+                $query->latest();
+                break;
+        }
+
+        $perPage = $request->per_page ?? 10;
+        $tropes = $query->paginate($perPage);
+
+        // Return JSON for AJAX requests
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'html' => view('admin.tropes._table', compact('tropes'))->render(),
+                'pagination' => [
+                    'current_page' => $tropes->currentPage(),
+                    'last_page' => $tropes->lastPage(),
+                    'total' => $tropes->total(),
+                    'from' => $tropes->firstItem(),
+                    'to' => $tropes->lastItem(),
+                ]
+            ]);
+        }
+
         return view('admin.tropes.index', compact('tropes'));
     }
 
@@ -40,7 +92,7 @@ class TropeController extends Controller
         Trope::create($request->all());
 
         return redirect()->route('admin.tropes.index')
-            ->with('success', "🏷️ Trope '{$request->name}' has been created successfully!");
+            ->with('success', "Trope '{$request->name}' has been created successfully!");
     }
 
     /**
@@ -56,6 +108,7 @@ class TropeController extends Controller
      */
     public function edit(Trope $trope)
     {
+        $trope->loadCount('books');
         return view('admin.tropes.edit', compact('trope'));
     }
 
@@ -73,18 +126,25 @@ class TropeController extends Controller
         $trope->update($request->all());
 
         return redirect()->route('admin.tropes.index')
-            ->with('success', "✅ Trope '{$trope->name}' has been updated successfully!");
+            ->with('success', "Trope '{$trope->name}' has been updated successfully!");
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Trope $trope)
+    public function destroy(Request $request, Trope $trope)
     {
-        // Delete the trope (the pivot table entries will be automatically deleted due to the cascade)
+        $tropeName = $trope->name;
         $trope->delete();
 
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Trope '{$tropeName}' has been deleted successfully!"
+            ]);
+        }
+
         return redirect()->route('admin.tropes.index')
-            ->with('success', "🗑️ Trope '{$trope->name}' has been deleted successfully!");
+            ->with('success', "Trope '{$tropeName}' has been deleted successfully!");
     }
 }

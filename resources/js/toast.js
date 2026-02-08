@@ -338,37 +338,29 @@ class ToastManager {
         }
         
         // Auto-detection for admin side or when no theme is forced
+        // Primary check: Look at the actual applied CSS class on the document
+        // This is the most reliable way since it reflects what the user actually sees
         
         // 1. Check if document has dark class (common Tailwind approach)
+        // This should be the primary source of truth
         if (document.documentElement.classList.contains('dark')) {
             return true;
         }
         
-        // 2. Check localStorage for theme preference
-        const storedTheme = localStorage.getItem('theme');
-        if (storedTheme === 'dark') {
-            return true;
-        }
-        
-        // 3. Check if data-theme attribute is set to dark
+        // 2. Check if data-theme attribute is set to dark
         const dataTheme = document.documentElement.getAttribute('data-theme');
         if (dataTheme === 'dark') {
             return true;
         }
         
-        // 4. Check system preference if no explicit theme is set
-        if ((!storedTheme || storedTheme === 'system') && 
-            window.matchMedia && 
-            window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            return true;
-        }
-        
-        // 5. Check for other common dark mode indicators
-        if (document.body.classList.contains('dark-mode') || 
+        // 3. Check for other common dark mode indicators on body
+        if (document.body.classList.contains('dark') ||
+            document.body.classList.contains('dark-mode') || 
             document.body.classList.contains('dark-theme')) {
             return true;
         }
         
+        // If none of the above, the page is in light mode
         return false;
     }
 

@@ -3,1118 +3,912 @@
 @section('header', 'SuperAdmin Dashboard')
 
 @section('content')
-    <!-- SuperAdmin Dashboard Skeleton Loader -->
-    <div id="superadmin-dashboard-skeleton" class="animate-pulse space-y-8">
-        <!-- Skeleton: Welcome Section -->
-        <div class="mb-8">
-            <div class="bg-gradient-to-r from-bookty-purple-600 to-bookty-pink-600 rounded-2xl p-8 text-white shadow-xl">
-                <div class="flex items-center justify-between">
-                    <div class="space-y-3">
-                        <div class="h-7 w-64 bg-white/30 rounded-full"></div>
-                        <div class="h-4 w-80 bg-white/20 rounded-full"></div>
-                    </div>
-                    <div class="hidden md:block">
-                        <div class="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-sm">
-                            <div class="w-20 h-20 bg-white/30 rounded-full"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Skeleton: Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+    <!-- Dashboard Skeleton Loader -->
+    <div id="dashboard-skeleton" class="animate-pulse space-y-6">
+        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-6 h-32"></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             @for ($i = 0; $i < 4; $i++)
-                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <div class="p-4 bg-gradient-to-br from-gray-200 to-gray-300">
-                        <div class="flex items-center justify-between">
-                            <div class="p-3 bg-white/40 rounded-xl">
-                                <div class="w-8 h-8 bg-gray-200 rounded-lg"></div>
-                            </div>
-                            <div class="text-right space-y-2">
-                                <div class="h-3 w-20 bg-white/70 rounded-full"></div>
-                                <div class="h-6 w-16 bg-white/90 rounded-md"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="p-4 bg-gray-50">
-                        <div class="h-3 w-32 bg-gray-200 rounded-full"></div>
-                    </div>
-                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 h-32"></div>
             @endfor
         </div>
-
-        <!-- Skeleton: Order & Registrations -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            <!-- Order Statistics Skeleton -->
-            <div class="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
-                <div class="flex items-center justify-between mb-6">
-                    <div class="space-y-2">
-                        <div class="h-4 w-40 bg-gray-200 rounded-full"></div>
-                        <div class="h-3 w-48 bg-gray-200 rounded-full"></div>
-                    </div>
-                    <div class="p-3 bg-blue-50 rounded-xl">
-                        <div class="w-6 h-6 bg-blue-100 rounded-lg"></div>
-                    </div>
-                </div>
-                <div class="space-y-4">
-                    @for ($i = 0; $i < 5; $i++)
-                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-3 h-3 bg-gray-300 rounded-full"></div>
-                                <div class="h-3 w-28 bg-gray-200 rounded-full"></div>
-                            </div>
-                            <div class="h-5 w-10 bg-gray-200 rounded-md"></div>
-                        </div>
-                    @endfor
-                </div>
-            </div>
-
-            <!-- User Registration Chart Skeleton -->
-            <div class="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 relative overflow-hidden">
-                <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full opacity-60"></div>
-                <div class="relative space-y-4">
-                    <div class="flex items-center justify-between mb-2">
-                        <div class="space-y-2">
-                            <div class="h-4 w-40 bg-gray-200 rounded-full"></div>
-                            <div class="h-3 w-48 bg-gray-200 rounded-full"></div>
-                        </div>
-                        <div class="p-3 bg-gray-100 rounded-xl">
-                            <div class="w-6 h-6 bg-gray-200 rounded-lg"></div>
-                        </div>
-                    </div>
-                    <div class="h-80 w-full bg-gray-50 rounded-xl"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Skeleton: Recent Users -->
-        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-            <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-8 py-6 border-b border-gray-200">
-                <div class="flex justify-between items-center">
-                    <div class="space-y-2">
-                        <div class="h-4 w-40 bg-gray-200 rounded-full"></div>
-                        <div class="h-3 w-48 bg-gray-200 rounded-full"></div>
-                    </div>
-                    <div class="flex items-center space-x-3">
-                        <div class="p-2 bg-white rounded-lg shadow-sm">
-                            <div class="w-5 h-5 bg-gray-200 rounded-md"></div>
-                        </div>
-                        <div class="h-8 w-24 bg-bookty-purple-200 rounded-lg"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="divide-y divide-gray-100">
-                @for ($i = 0; $i < 4; $i++)
-                    <div class="px-8 py-6">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center space-x-4">
-                                <div class="w-12 h-12 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full"></div>
-                                <div class="space-y-2">
-                                    <div class="h-4 w-32 bg-gray-200 rounded-full"></div>
-                                    <div class="h-3 w-40 bg-gray-200 rounded-full"></div>
-                                </div>
-                            </div>
-                            <div class="h-3 w-24 bg-gray-200 rounded-full"></div>
-                        </div>
-                    </div>
-                @endfor
-            </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 h-96"></div>
+            <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 h-96"></div>
         </div>
     </div>
 
-    <!-- Real SuperAdmin Dashboard Content -->
-    <div id="superadmin-dashboard-content" class="hidden">
-    <!-- Welcome Section -->
-    <div class="mb-8">
-        <div class="bg-gradient-to-r from-bookty-purple-600 to-bookty-pink-600 rounded-2xl p-8 text-white shadow-xl">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h1 class="text-3xl font-bold mb-2">Welcome back, {{ auth()->user()->name }}! 👋</h1>
-                    <p class="text-purple-100 text-lg">Here's what's happening with your platform today.</p>
-                </div>
-                <div class="hidden md:block">
-                    <div class="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-sm">
-                        <svg class="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+    <!-- Real Dashboard Content -->
+    <div id="dashboard-content" class="hidden space-y-6">
+
+        <!-- Welcome Banner -->
+        <div class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-6 text-white relative overflow-hidden">
+            <div class="absolute right-0 top-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32"></div>
+            <div class="absolute left-1/2 bottom-0 w-48 h-48 bg-white/5 rounded-full -mb-24"></div>
+            <div class="absolute right-20 bottom-0 w-32 h-32 bg-white/5 rounded-full -mb-16"></div>
+            <div class="relative z-10">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                         </svg>
                     </div>
+                    <span class="text-sm font-medium text-white/80 uppercase tracking-wider">SuperAdmin Control Center</span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-bold mb-1">Welcome back, {{ Auth::user()->name }}!</h1>
+                <p class="text-purple-100">Complete platform overview and management dashboard.</p>
+                <div class="mt-4 flex flex-wrap gap-3">
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-2">
+                        <span class="text-purple-200 text-xs">Today's Orders</span>
+                        <p class="text-xl font-bold" id="today-orders-banner">{{ $todayOrders ?? 0 }}</p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-2">
+                        <span class="text-purple-200 text-xs">Today's Revenue</span>
+                        <p class="text-xl font-bold" id="today-revenue-banner">RM {{ number_format($todayRevenue ?? 0, 2) }}</p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-2">
+                        <span class="text-purple-200 text-xs">New Users Today</span>
+                        <p class="text-xl font-bold" id="today-users-banner">{{ $todayUsers ?? 0 }}</p>
+                    </div>
+                    @if(($orderStats['pending'] ?? 0) > 0)
+                        <a href="{{ route('admin.orders.index', ['status' => 'pending']) }}" 
+                           class="bg-yellow-500/90 hover:bg-yellow-500 backdrop-blur-sm rounded-xl px-4 py-2 transition-colors">
+                            <span class="text-yellow-100 text-xs">Needs Attention</span>
+                            <p class="text-xl font-bold">{{ $orderStats['pending'] }} Pending</p>
+                        </a>
+                    @endif
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
-        <!-- Admin Users Card -->
-        <div class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden">
-            <div class="bg-gradient-to-br from-bookty-purple-600 to-bookty-purple-700 p-4">
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+            <!-- Total Revenue -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 hover:shadow-lg transition-all duration-300 group">
                 <div class="flex items-center justify-between">
-                    <div class="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
-                        <svg class="w-8 h-8 text-white" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"></path>
-                    </svg>
-                </div>
-                    <div class="text-white text-right">
-                        <p class="text-purple-100 text-sm font-medium">Admin Users</p>
-                        <p class="text-3xl font-bold counter" data-target="{{ $totalAdmins }}">0</p>
-                    </div>
-                </div>
-            </div>
-            <div class="p-4 bg-gradient-to-r from-bookty-purple-50 to-purple-50">
-                <div class="flex items-center text-bookty-purple-600">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-                    </svg>
-                    <span class="text-sm font-medium">System Administrators</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Customers Card -->
-        <div class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden">
-            <div class="bg-gradient-to-br from-bookty-pink-600 to-pink-700 p-4">
-                <div class="flex items-center justify-between">
-                    <div class="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
-                        <svg class="w-8 h-8 text-white" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-1a3 3 0 013.75-2.906z"></path>
-                    </svg>
-                </div>
-                    <div class="text-white text-right">
-                        <p class="text-pink-100 text-sm font-medium">Customers</p>
-                        <p class="text-3xl font-bold counter" data-target="{{ $totalCustomers }}">0</p>
-                    </div>
-                </div>
-            </div>
-            <div class="p-4 bg-gradient-to-r from-bookty-pink-50 to-pink-50">
-                <div class="flex items-center text-bookty-pink-600">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                    </svg>
-                    <span class="text-sm font-medium">Active Users</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Books Card -->
-        <div class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden">
-            <div class="bg-gradient-to-br from-indigo-600 to-indigo-700 p-4">
-                <div class="flex items-center justify-between">
-                    <div class="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
-                        <svg class="w-8 h-8 text-white" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"></path>
-                    </svg>
-                </div>
-                    <div class="text-white text-right">
-                        <p class="text-indigo-100 text-sm font-medium">Books</p>
-                        <p class="text-3xl font-bold counter" data-target="{{ $totalBooks }}">0</p>
-                    </div>
-                </div>
-            </div>
-            <div class="p-4 bg-gradient-to-r from-indigo-50 to-blue-50">
-                <div class="flex items-center text-indigo-600">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                    </svg>
-                    <span class="text-sm font-medium">Total Catalog</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Revenue Card -->
-        <div class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden">
-            <div class="bg-gradient-to-br from-emerald-600 to-green-700 p-4">
-                <div class="flex items-center justify-between">
-                    <div class="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
-                        <svg class="w-8 h-8 text-white" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"></path>
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd"></path>
-                    </svg>
-                </div>
-                    <div class="text-white text-right">
-                        <p class="text-emerald-100 text-sm font-medium">Total Revenue</p>
-                        <p class="text-2xl font-bold">RM <span class="counter" data-target="{{ $totalRevenue }}">0</span></p>
-                    </div>
-                </div>
-            </div>
-            <div class="p-4 bg-gradient-to-r from-emerald-50 to-green-50">
-                <div class="flex items-center text-emerald-600">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                    </svg>
-                    <span class="text-sm font-medium">All Time Earnings</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        <!-- Order Statistics -->
-        <div class="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
-            <div class="flex items-center justify-between mb-6">
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-800 mb-1">Order Statistics</h2>
-                    <p class="text-gray-500">Real-time order status overview</p>
-                </div>
-                <div class="p-3 bg-blue-100 rounded-xl">
-                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                </div>
-            </div>
-            
-            <div class="space-y-4">
-                <!-- Pending Orders -->
-                <div class="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-200 hover:shadow-md transition-all duration-200">
-                    <div class="flex items-center">
-                        <div class="w-3 h-3 bg-blue-500 rounded-full mr-3 animate-pulse"></div>
-                        <span class="font-medium text-blue-800">Pending Orders</span>
-                    </div>
-                    <div class="flex items-center">
-                        <span class="text-2xl font-bold text-blue-600 counter" data-target="{{ $orderStats['pending'] }}">0</span>
-                        <svg class="w-5 h-5 text-blue-500 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                    </div>
-                </div>
-
-                <!-- Processing Orders -->
-                <div class="flex items-center justify-between p-4 bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-xl border border-yellow-200 hover:shadow-md transition-all duration-200">
-                    <div class="flex items-center">
-                        <div class="w-3 h-3 bg-yellow-500 rounded-full mr-3"></div>
-                        <span class="font-medium text-yellow-800">Processing</span>
-                    </div>
-                    <div class="flex items-center">
-                        <span class="text-2xl font-bold text-yellow-600 counter" data-target="{{ $orderStats['processing'] }}">0</span>
-                        <svg class="w-5 h-5 text-yellow-500 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                        </svg>
-                    </div>
-                </div>
-
-                <!-- Shipped Orders -->
-                <div class="flex items-center justify-between p-4 bg-gradient-to-r from-indigo-50 to-indigo-100 rounded-xl border border-indigo-200 hover:shadow-md transition-all duration-200">
-                    <div class="flex items-center">
-                        <div class="w-3 h-3 bg-indigo-500 rounded-full mr-3"></div>
-                        <span class="font-medium text-indigo-800">Shipped</span>
-                    </div>
-                    <div class="flex items-center">
-                        <span class="text-2xl font-bold text-indigo-600 counter" data-target="{{ $orderStats['shipped'] }}">0</span>
-                        <svg class="w-5 h-5 text-indigo-500 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
-                        </svg>
-                    </div>
-                </div>
-
-                <!-- Completed Orders -->
-                <div class="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-xl border border-green-200 hover:shadow-md transition-all duration-200">
-                    <div class="flex items-center">
-                        <div class="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
-                        <span class="font-medium text-green-800">Completed</span>
-                    </div>
-                    <div class="flex items-center">
-                        <span class="text-2xl font-bold text-green-600 counter" data-target="{{ $orderStats['completed'] }}">0</span>
-                        <svg class="w-5 h-5 text-green-500 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                </div>
-                </div>
-
-                <!-- Cancelled Orders -->
-                <div class="flex items-center justify-between p-4 bg-gradient-to-r from-red-50 to-red-100 rounded-xl border border-red-200 hover:shadow-md transition-all duration-200">
-                    <div class="flex items-center">
-                        <div class="w-3 h-3 bg-red-500 rounded-full mr-3"></div>
-                        <span class="font-medium text-red-800">Cancelled</span>
-                </div>
-                    <div class="flex items-center">
-                        <span class="text-2xl font-bold text-red-600 counter" data-target="{{ $orderStats['cancelled'] }}">0</span>
-                        <svg class="w-5 h-5 text-red-500 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- User Registration Chart -->
-        <div class="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 relative overflow-hidden">
-            <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-gradient-to-br from-bookty-purple-100 to-bookty-pink-100 rounded-full opacity-60"></div>
-            <div class="relative">
-                <div class="flex items-center justify-between mb-6">
                     <div>
-                        <h2 class="text-2xl font-bold text-gray-800 mb-1">User Registrations</h2>
-                        <p class="text-gray-500">Monthly growth in {{ date('Y') }}</p>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Revenue</p>
+                        <h4 class="text-2xl font-bold text-gray-900 dark:text-white mt-1">RM {{ number_format($totalRevenue ?? 0, 2) }}</h4>
+                        <div class="flex items-center mt-2">
+                            @if(($revenueTrend ?? 0) >= 0)
+                                <span class="inline-flex items-center text-xs font-medium text-green-600 dark:text-green-400">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+                                    </svg>
+                                    {{ abs($revenueTrend) }}%
+                                </span>
+                            @else
+                                <span class="inline-flex items-center text-xs font-medium text-red-600 dark:text-red-400">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                                    </svg>
+                                    {{ abs($revenueTrend) }}%
+                                </span>
+                            @endif
+                            <span class="text-xs text-gray-400 ml-2">vs last month</span>
+                        </div>
                     </div>
-                    <div class="flex items-center space-x-2">
-                        <div class="p-3 bg-gradient-to-br from-bookty-purple-100 to-bookty-pink-100 rounded-xl">
-                            <svg class="w-6 h-6 text-bookty-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                            </svg>
+                    <div class="p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 text-white shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Orders -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 hover:shadow-lg transition-all duration-300 group">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Orders</p>
+                        <h4 class="text-2xl font-bold text-gray-900 dark:text-white mt-1">{{ number_format($totalOrders ?? 0) }}</h4>
+                        <div class="flex items-center mt-2">
+                            @if(($ordersTrend ?? 0) >= 0)
+                                <span class="inline-flex items-center text-xs font-medium text-green-600 dark:text-green-400">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+                                    </svg>
+                                    {{ abs($ordersTrend) }}%
+                                </span>
+                            @else
+                                <span class="inline-flex items-center text-xs font-medium text-red-600 dark:text-red-400">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                                    </svg>
+                                    {{ abs($ordersTrend) }}%
+                                </span>
+                            @endif
+                            <span class="text-xs text-gray-400 ml-2">vs last month</span>
+                        </div>
+                    </div>
+                    <div class="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Customers -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 hover:shadow-lg transition-all duration-300 group">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Customers</p>
+                        <h4 class="text-2xl font-bold text-gray-900 dark:text-white mt-1">{{ number_format($totalCustomers ?? 0) }}</h4>
+                        <div class="flex items-center mt-2">
+                            @if(($customersTrend ?? 0) >= 0)
+                                <span class="inline-flex items-center text-xs font-medium text-green-600 dark:text-green-400">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+                                    </svg>
+                                    {{ abs($customersTrend) }}%
+                                </span>
+                            @else
+                                <span class="inline-flex items-center text-xs font-medium text-red-600 dark:text-red-400">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                                    </svg>
+                                    {{ abs($customersTrend) }}%
+                                </span>
+                            @endif
+                            <span class="text-xs text-gray-400 ml-2">vs last month</span>
+                        </div>
+                    </div>
+                    <div class="p-3 rounded-xl bg-gradient-to-br from-pink-500 to-rose-600 text-white shadow-lg shadow-pink-500/30 group-hover:scale-110 transition-transform">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Users -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 hover:shadow-lg transition-all duration-300 group">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">System Users</p>
+                        <h4 class="text-2xl font-bold text-gray-900 dark:text-white mt-1">{{ ($totalAdmins ?? 0) + ($totalSuperAdmins ?? 0) }}</h4>
+                        <div class="flex items-center mt-2 gap-2">
+                            <span class="inline-flex items-center text-xs font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-2 py-0.5 rounded-full">
+                                {{ $totalSuperAdmins ?? 0 }} Super
+                            </span>
+                            <span class="inline-flex items-center text-xs font-medium text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/30 px-2 py-0.5 rounded-full">
+                                {{ $totalAdmins ?? 0 }} Admin
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-3 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/30 group-hover:scale-110 transition-transform">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Sales Chart -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Revenue Overview</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Platform revenue performance</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="text-right">
+                            <p id="salesChartTotal" class="text-2xl font-bold text-gray-900 dark:text-white">RM 0.00</p>
+                            <div id="salesChartChangeWrap" class="flex items-center justify-end gap-1 text-sm">
+                                <span id="salesChartChange" class="font-medium text-green-600 dark:text-green-400">0%</span>
+                                <svg id="salesChartIcon" class="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div x-data="{ open: false }" class="relative">
+                            <button @click="open = !open" type="button"
+                                class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-xl transition-colors">
+                                <span id="salesPeriodLabel">This week</span>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </button>
+                            <div x-show="open" @click.away="open = false" x-transition
+                                class="absolute right-0 mt-2 w-44 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 py-1 z-50">
+                                <a href="#" data-period="today" class="sales-period-option block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Today</a>
+                                <a href="#" data-period="yesterday" class="sales-period-option block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Yesterday</a>
+                                <a href="#" data-period="this_week" class="sales-period-option block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">This week</a>
+                                <a href="#" data-period="last_7_days" class="sales-period-option block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Last 7 days</a>
+                                <a href="#" data-period="last_30_days" class="sales-period-option block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Last 30 days</a>
+                                <a href="#" data-period="this_month" class="sales-period-option block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">This month</a>
+                                <a href="#" data-period="last_90_days" class="sales-period-option block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Last 90 days</a>
+                            </div>
                         </div>
                     </div>
                 </div>
-                
-                <div class="h-80 relative">
-                    <canvas id="userRegistrationChart" class="w-full h-full"></canvas>
-                </div>
-                
-                <div class="flex items-center justify-center mt-4 space-x-6">
-                    <div class="flex items-center">
-                        <div class="w-3 h-3 bg-bookty-purple-600 rounded-full mr-2"></div>
-                        <span class="text-sm text-gray-600">New Users</span>
+                <div id="sales-chart" class="w-full" style="min-height: 300px;"></div>
+                <div class="flex items-center justify-between pt-4 mt-2 border-t border-gray-100 dark:border-gray-700">
+                    <div class="flex items-center gap-4 text-sm">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-indigo-500"></span>
+                            <span class="text-gray-600 dark:text-gray-400">Revenue</span>
+                        </div>
+                        <div id="salesAvgOrder" class="text-gray-500 dark:text-gray-400">
+                            Avg: <span class="font-medium text-gray-900 dark:text-white">RM 0.00</span>
+                        </div>
                     </div>
-                    <div class="flex items-center">
-                        <div class="w-3 h-3 bg-gray-300 rounded-full mr-2"></div>
-                        <span class="text-sm text-gray-600">Previous Year</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Debug Info (temporary) -->
-    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-        <h3 class="text-sm font-medium text-yellow-800 mb-2">🐛 Debug Info (Server Values)</h3>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
-            <div>
-                <span class="text-yellow-600">Admins:</span> 
-                <span class="font-mono">{{ $totalAdmins }}</span>
-            </div>
-            <div>
-                <span class="text-yellow-600">Customers:</span> 
-                <span class="font-mono">{{ $totalCustomers }}</span>
-            </div>
-            <div>
-                <span class="text-yellow-600">Books:</span> 
-                <span class="font-mono">{{ $totalBooks }}</span>
-            </div>
-            <div>
-                <span class="text-yellow-600">Revenue:</span> 
-                <span class="font-mono">{{ $totalRevenue }}</span>
-            </div>
-        </div>
-        <div class="mt-2">
-            <span class="text-yellow-600">Orders:</span>
-            <span class="font-mono">{{ json_encode($orderStats) }}</span>
-        </div>
-        <div class="mt-3 flex flex-wrap gap-2">
-            <button onclick="testAPI()" class="px-3 py-1 bg-yellow-600 text-white text-xs rounded hover:bg-yellow-700 transition-colors">
-                🔍 Test API
-            </button>
-            <button onclick="updateCountersManually()" class="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors">
-                🔧 Fix Counters
-            </button>
-            <button onclick="forceDisplayValues()" class="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition-colors">
-                ⚡ Force Values
-            </button>
-            <button onclick="animateCounters()" class="px-3 py-1 bg-purple-600 text-white text-xs rounded hover:bg-purple-700 transition-colors">
-                🎬 Animate
-            </button>
-        </div>
-    </div>
-
-    <!-- Recent Users -->
-    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-        <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-8 py-6 border-b border-gray-200">
-            <div class="flex justify-between items-center">
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-800 mb-1">Recent Users</h2>
-                    <p class="text-gray-500">Latest platform registrations</p>
-                </div>
-                <div class="flex items-center space-x-3">
-                    <div class="p-2 bg-white rounded-lg shadow-sm">
-                        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    <a href="{{ route('admin.reports.sales') }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 inline-flex items-center gap-1 transition-colors">
+                        View Report
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                         </svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Top Selling Books Chart -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Top Selling Books</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Best performers by quantity sold</p>
                     </div>
-                    <a href="#" class="inline-flex items-center px-4 py-2 bg-bookty-purple-600 hover:bg-bookty-purple-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
-                        <span>View All</span>
-                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    <div class="flex items-center gap-3">
+                        <div class="text-right">
+                            <p id="topBooksTotal" class="text-2xl font-bold text-gray-900 dark:text-white">0</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">units sold</p>
+                        </div>
+                        <div x-data="{ open: false }" class="relative">
+                            <button @click="open = !open" type="button"
+                                class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-xl transition-colors">
+                                <span id="topBooksPeriodLabel">Last 6 months</span>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </button>
+                            <div x-show="open" @click.away="open = false" x-transition
+                                class="absolute right-0 mt-2 w-44 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 py-1 z-50">
+                                <a href="#" data-period="today" class="topbooks-period-option block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Today</a>
+                                <a href="#" data-period="yesterday" class="topbooks-period-option block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Yesterday</a>
+                                <a href="#" data-period="last_7_days" class="topbooks-period-option block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Last 7 days</a>
+                                <a href="#" data-period="last_30_days" class="topbooks-period-option block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Last 30 days</a>
+                                <a href="#" data-period="last_90_days" class="topbooks-period-option block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Last 90 days</a>
+                                <a href="#" data-period="last_6_months" class="topbooks-period-option block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Last 6 months</a>
+                                <a href="#" data-period="last_year" class="topbooks-period-option block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Last year</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="topbooks-chart" class="w-full" style="min-height: 300px;"></div>
+                <div class="flex items-center justify-between pt-4 mt-2 border-t border-gray-100 dark:border-gray-700">
+                    <div id="topBooksLeader" class="text-sm text-gray-600 dark:text-gray-400">
+                        Top: <span class="font-medium text-indigo-600 dark:text-indigo-400">—</span>
+                    </div>
+                    <a href="{{ route('admin.reports.sales') }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 inline-flex items-center gap-1 transition-colors">
+                        View Report
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                         </svg>
                     </a>
                 </div>
             </div>
         </div>
-        
-        <div class="overflow-hidden">
-            @if($recentUsers->count() > 0)
-                <div class="divide-y divide-gray-100">
-                    @foreach($recentUsers as $user)
-                    <div class="px-8 py-6 hover:bg-gray-50 transition-colors duration-150 group">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center space-x-4">
-                                <!-- Avatar -->
-                                <div class="flex-shrink-0">
-                                    <div class="w-12 h-12 bg-gradient-to-br from-bookty-purple-400 to-bookty-pink-400 rounded-full flex items-center justify-center text-white font-semibold text-lg shadow-md">
-                                        {{ strtoupper(substr($user->name, 0, 1)) }}
-                                    </div>
-                                </div>
-                                
-                                <!-- User Info -->
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex items-center space-x-3 mb-1">
-                                        <p class="text-lg font-semibold text-gray-900 group-hover:text-bookty-purple-600 transition-colors duration-150">
-                                            {{ $user->name }}
-                                        </p>
-                            @foreach($user->roles as $role)
-                                            <span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full
-                                                @if($role->name == 'superadmin') bg-gradient-to-r from-bookty-purple-100 to-purple-200 text-bookty-purple-800 border border-bookty-purple-200
-                                                @elseif($role->name == 'admin') bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 border border-blue-200
-                                                @else bg-gradient-to-r from-bookty-pink-100 to-pink-200 text-bookty-pink-800 border border-bookty-pink-200 @endif">
-                                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                    @if($role->name == 'superadmin')
-                                                        <path fill-rule="evenodd" d="M9.664 1.319a.75.75 0 01.672 0 41.059 41.059 0 018.198 5.424.75.75 0 01-.254 1.285 31.372 31.372 0 00-7.86 3.83.75.75 0 01-.84 0 31.508 31.508 0 00-2.08-1.287V9.394c0-.244.116-.463.302-.592a35.504 35.504 0 013.305-2.033.75.75 0 00-.714-1.319 37 37 0 00-3.446 2.12A2.216 2.216 0 006 9.393v.38a31.293 31.293 0 00-4.28-1.746.75.75 0 01-.254-1.285 41.059 41.059 0 018.198-5.424zM6 11.459a29.848 29.848 0 00-2.455-1.158 41.029 41.029 0 00-.39 3.114.75.75 0 00.419.74c.528.256 1.046.53 1.554.82-.21-.899-.385-1.804-.528-2.716zM16 11.459c-.143.912-.318 1.817-.528 2.716.508-.29 1.026-.564 1.554-.82a.75.75 0 00.419-.74 41.029 41.029 0 00-.39-3.114 29.848 29.848 0 00-2.455 1.158z" clip-rule="evenodd"></path>
-                                                    @elseif($role->name == 'admin')
-                                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"></path>
-                                                    @else
-                                                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
-                                                    @endif
-                                                </svg>
-                                    {{ ucfirst($role->name) }}
-                                </span>
-                            @endforeach
-                                    </div>
-                                    <p class="text-sm text-gray-500 truncate">{{ $user->email }}</p>
-                                </div>
-                            </div>
-                            
-                            <!-- Join Date -->
-                            <div class="flex items-center space-x-2 text-sm text-gray-500">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                </svg>
-                                <span class="font-medium">{{ $user->created_at->format('M d, Y') }}</span>
-                            </div>
-                        </div>
+
+        <!-- User Registrations & Order Status -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- User Registration Chart -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">User Registrations</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Monthly growth in {{ date('Y') }}</p>
                     </div>
-                    @endforeach
-                </div>
-            @else
-                <div class="px-8 py-12 text-center">
-                    <div class="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    <div class="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-xl">
+                        <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
                     </div>
-                    <p class="text-gray-500">No recent users found</p>
                 </div>
-            @endif
-        </div>
-    </div>
-    </div> <!-- /#superadmin-dashboard-content -->
+                <div id="user-registration-chart" style="min-height: 280px;"></div>
+            </div>
 
-    <!-- Skeleton Toggle Script -->
+            <!-- Order Status Distribution -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Order Status</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Current order distribution</p>
+                    </div>
+                    <a href="{{ route('admin.orders.index') }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 inline-flex items-center gap-1 transition-colors">
+                        View Orders
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+                <div class="space-y-3">
+                    @php
+                        $statuses = [
+                            'pending' => ['label' => 'Pending', 'color' => 'yellow', 'icon' => 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'],
+                            'processing' => ['label' => 'Processing', 'color' => 'blue', 'icon' => 'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15'],
+                            'shipped' => ['label' => 'Shipped', 'color' => 'indigo', 'icon' => 'M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4'],
+                            'completed' => ['label' => 'Completed', 'color' => 'green', 'icon' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'],
+                            'cancelled' => ['label' => 'Cancelled', 'color' => 'red', 'icon' => 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z'],
+                        ];
+                        $totalOrders = array_sum($orderStats);
+                    @endphp
+                    @foreach($statuses as $key => $status)
+                        @php
+                            $count = $orderStats[$key] ?? 0;
+                            $percentage = $totalOrders > 0 ? round(($count / $totalOrders) * 100, 1) : 0;
+                        @endphp
+                        <div class="flex items-center gap-4 p-3 rounded-xl bg-gray-50 dark:bg-gray-700/50">
+                            <div class="p-2 rounded-lg bg-{{ $status['color'] }}-100 dark:bg-{{ $status['color'] }}-900/40">
+                                <svg class="w-4 h-4 text-{{ $status['color'] }}-600 dark:text-{{ $status['color'] }}-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $status['icon'] }}"/>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $status['label'] }}</span>
+                                    <span class="text-sm font-bold text-gray-900 dark:text-white">{{ $count }}</span>
+                                </div>
+                                <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-1.5">
+                                    <div class="bg-{{ $status['color'] }}-500 h-1.5 rounded-full transition-all duration-500" style="width: {{ $percentage }}%"></div>
+                                </div>
+                            </div>
+                            <span class="text-xs font-medium text-gray-500 dark:text-gray-400 w-12 text-right">{{ $percentage }}%</span>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Orders & Users -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Recent Orders -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                <div class="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Recent Orders</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Latest platform orders</p>
+                    </div>
+                    <a href="{{ route('admin.orders.index') }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 inline-flex items-center gap-1 transition-colors">
+                        View all
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+                <div class="divide-y divide-gray-100 dark:divide-gray-700">
+                    @forelse($recentOrders as $order)
+                        <div class="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
+                                        <span class="text-sm font-medium text-indigo-600 dark:text-indigo-400">{{ substr($order->user->name ?? 'G', 0, 1) }}</span>
+                                    </div>
+                                    <div>
+                                        <a href="{{ route('admin.orders.show', $order) }}" class="text-sm font-medium text-gray-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400">
+                                            #{{ $order->public_id }}
+                                        </a>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ $order->user->name ?? 'Guest' }}</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm font-medium text-gray-900 dark:text-white">RM {{ number_format($order->total_amount, 2) }}</p>
+                                    @php
+                                        $statusColors = [
+                                            'pending' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
+                                            'processing' => 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+                                            'shipped' => 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300',
+                                            'completed' => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+                                            'cancelled' => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
+                                        ];
+                                    @endphp
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ $statusColors[$order->status] ?? 'bg-gray-100 text-gray-800' }}">
+                                        {{ ucfirst($order->status) }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="p-8 text-center">
+                            <svg class="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                            </svg>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">No orders yet</p>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+
+            <!-- Recent Users -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                <div class="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Recent Users</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Latest registrations</p>
+                    </div>
+                    <a href="{{ route('admin.customers.index') }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 inline-flex items-center gap-1 transition-colors">
+                        View all
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+                <div class="divide-y divide-gray-100 dark:divide-gray-700">
+                    @forelse($recentUsers as $user)
+                        <div class="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-medium">
+                                        {{ strtoupper(substr($user->name, 0, 1)) }}
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $user->name }}</p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ $user->email }}</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    @foreach($user->roles as $role)
+                                        @php
+                                            $roleColors = [
+                                                'superadmin' => 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300',
+                                                'admin' => 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
+                                                'customer' => 'bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300',
+                                            ];
+                                        @endphp
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ $roleColors[$role->name] ?? 'bg-gray-100 text-gray-800' }}">
+                                            {{ ucfirst($role->name) }}
+                                        </span>
+                                    @endforeach
+                                    <p class="text-xs text-gray-400 mt-1">{{ $user->created_at->format('M d, Y') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="p-8 text-center">
+                            <svg class="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                            </svg>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">No users yet</p>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats Cards -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div class="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl p-4 text-white">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-purple-100 text-xs">Total Books</p>
+                        <p class="text-xl font-bold">{{ number_format($totalBooks ?? 0) }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-4 text-white">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-amber-100 text-xs">Low Stock</p>
+                        <p class="text-xl font-bold">{{ $lowStockCount ?? 0 }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl p-4 text-white">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-cyan-100 text-xs">This Month</p>
+                        <p class="text-xl font-bold">RM {{ number_format($thisMonthRevenue ?? 0, 0) }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gradient-to-br from-rose-500 to-pink-600 rounded-2xl p-4 text-white">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-rose-100 text-xs">This Month Orders</p>
+                        <p class="text-xl font-bold">{{ $thisMonthOrders ?? 0 }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div> <!-- /#dashboard-content -->
+
+    <!-- Scripts -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            var skeleton = document.getElementById('superadmin-dashboard-skeleton');
-            var content = document.getElementById('superadmin-dashboard-content');
-
-            if (!skeleton || !content) return;
+            // Show content after short delay
+            var skeleton = document.getElementById('dashboard-skeleton');
+            var content = document.getElementById('dashboard-content');
 
             setTimeout(function () {
-                skeleton.classList.add('hidden');
-                content.classList.remove('hidden');
-            }, 500);
-        });
-    </script>
-
-    @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            let chart; // Store chart instance
-            let realtimeUpdateInterval;
-            let chartUpdateInterval;
-            let usersUpdateInterval;
-
-            // Counter Animation
-            function animateCounters() {
-                const counters = document.querySelectorAll('.counter');
-                const speed = 100; // Animation speed (lower = faster)
-
-                console.log('Animating', counters.length, 'counter elements');
+                if (skeleton) skeleton.classList.add('hidden');
+                if (content) content.classList.remove('hidden');
                 
-                counters.forEach((counter, index) => {
-                    const target = +counter.getAttribute('data-target') || 0;
-                    
-                    console.log(`Animating Counter ${index}:`, {
-                        target: target,
-                        currentText: counter.innerText,
-                        element: counter
-                    });
-                    
-                    // Reset counter to 0 before animation
-                    counter.innerText = '0';
-                    
-                    const updateCount = () => {
-                        const count = +counter.innerText || 0;
-                        const inc = Math.max(1, Math.ceil(target / speed));
+                // Initialize charts after content is visible
+                initSalesChart();
+                initTopBooksChart();
+                initUserRegistrationChart();
+            }, 400);
 
-                        if (count < target) {
-                            const newCount = Math.min(target, count + inc);
-                            counter.innerText = newCount.toLocaleString();
-                            requestAnimationFrame(updateCount);
-                        } else {
-                            counter.innerText = target.toLocaleString();
+            // Format currency
+            function formatRM(n) {
+                return 'RM ' + parseFloat(n || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            }
+
+            // Sales Chart
+            var salesChart = null;
+            function initSalesChart() {
+                loadSalesData('this_week', 'This week');
+            }
+
+            function renderSalesChart(labels, revenue, orders) {
+                var el = document.getElementById('sales-chart');
+                if (!el || typeof ApexCharts === 'undefined') return;
+
+                var isDark = document.documentElement.classList.contains('dark');
+
+                if (salesChart) salesChart.destroy();
+
+                var options = {
+                    series: [{ name: 'Revenue', data: revenue }],
+                    chart: {
+                        height: 300,
+                        type: 'area',
+                        fontFamily: 'Inter, sans-serif',
+                        toolbar: { show: false },
+                        zoom: { enabled: false },
+                        animations: { enabled: true, easing: 'easeinout', speed: 800 }
+                    },
+                    colors: ['#6366f1'],
+                    fill: {
+                        type: 'gradient',
+                        gradient: {
+                            shadeIntensity: 1,
+                            opacityFrom: 0.4,
+                            opacityTo: 0.05,
+                            stops: [0, 90, 100]
                         }
-                    };
-                    
-                    // Start animation
-                    requestAnimationFrame(updateCount);
+                    },
+                    dataLabels: { enabled: false },
+                    stroke: { curve: 'smooth', width: 3 },
+                    grid: {
+                        show: true,
+                        borderColor: isDark ? '#374151' : '#f3f4f6',
+                        strokeDashArray: 4,
+                        xaxis: { lines: { show: false } },
+                        yaxis: { lines: { show: true } }
+                    },
+                    xaxis: {
+                        categories: labels,
+                        labels: {
+                            style: {
+                                colors: isDark ? '#9ca3af' : '#6b7280',
+                                fontSize: '11px'
+                            }
+                        },
+                        axisBorder: { show: false },
+                        axisTicks: { show: false }
+                    },
+                    yaxis: {
+                        labels: {
+                            formatter: function (value) {
+                                return value >= 1000 ? (value / 1000).toFixed(1) + 'k' : value.toFixed(0);
+                            },
+                            style: {
+                                colors: isDark ? '#9ca3af' : '#6b7280',
+                                fontSize: '11px'
+                            }
+                        }
+                    },
+                    tooltip: {
+                        theme: isDark ? 'dark' : 'light',
+                        custom: function({ series, seriesIndex, dataPointIndex, w }) {
+                            var date = labels[dataPointIndex] || '';
+                            var rev = series[seriesIndex][dataPointIndex] || 0;
+                            var ord = orders[dataPointIndex] || 0;
+                            var aov = ord > 0 ? (rev / ord) : 0;
+                            return '<div class="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">' +
+                                '<div class="font-semibold text-gray-900 dark:text-white mb-1">' + date + '</div>' +
+                                '<div class="text-xs text-gray-600 dark:text-gray-300 flex justify-between gap-4"><span>Revenue:</span> <span class="font-medium text-indigo-600">' + formatRM(rev) + '</span></div>' +
+                                '<div class="text-xs text-gray-600 dark:text-gray-300 flex justify-between gap-4"><span>Orders:</span> <span class="font-medium">' + ord + '</span></div>' +
+                                '<div class="text-xs text-gray-600 dark:text-gray-300 flex justify-between gap-4"><span>Avg Order:</span> <span class="font-medium">' + formatRM(aov) + '</span></div>' +
+                                '</div>';
+                        }
+                    }
+                };
+
+                salesChart = new ApexCharts(el, options);
+                salesChart.render();
+            }
+
+            function loadSalesData(period, label) {
+                var el = document.getElementById('sales-chart');
+                if (el) el.style.opacity = '0.5';
+
+                fetch("{{ route('superadmin.api.sales') }}?period=" + encodeURIComponent(period), {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(function(res) { return res.json(); })
+                .then(function(json) {
+                    var totalEl = document.getElementById('salesChartTotal');
+                    var changeEl = document.getElementById('salesChartChange');
+                    var iconEl = document.getElementById('salesChartIcon');
+                    var labelEl = document.getElementById('salesPeriodLabel');
+                    var avgEl = document.getElementById('salesAvgOrder');
+
+                    if (totalEl) totalEl.textContent = formatRM(json.summary.total_revenue);
+                    if (changeEl) changeEl.textContent = Math.abs(json.summary.change_percent) + '%';
+                    if (labelEl) labelEl.textContent = label;
+                    if (avgEl) avgEl.innerHTML = 'Avg: <span class="font-medium text-gray-900 dark:text-white">' + formatRM(json.summary.avg_order_value || 0) + '</span>';
+
+                    if (changeEl && iconEl) {
+                        var isPositive = json.summary.change_percent >= 0;
+                        changeEl.className = 'font-medium ' + (isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400');
+                        iconEl.className = 'w-4 h-4 ' + (isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400');
+                        iconEl.style.transform = isPositive ? 'rotate(0deg)' : 'rotate(180deg)';
+                    }
+
+                    renderSalesChart(json.labels || [], json.revenue || [], json.orders || []);
+                    if (el) el.style.opacity = '1';
+                })
+                .catch(function(err) {
+                    console.error('Error loading sales data:', err);
+                    if (el) el.style.opacity = '1';
                 });
             }
 
-            // Update counter values without animation
-            function updateCounterValue(element, newValue) {
-                if (element) {
-                    element.setAttribute('data-target', newValue);
-                    element.innerText = newValue.toLocaleString();
-                }
+            document.querySelectorAll('.sales-period-option').forEach(function(link) {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    loadSalesData(this.getAttribute('data-period'), this.textContent.trim());
+                });
+            });
+
+            // Top Books Chart
+            var topBooksChart = null;
+            function initTopBooksChart() {
+                loadTopBooksData('last_6_months', 'Last 6 months');
             }
 
-            // Real-time stats update
-            function updateRealtimeStats() {
-                fetch('{{ route("superadmin.api.stats") }}')
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('Received stats data:', data);
+            function renderTopBooksChart(titles, quantities, prices) {
+                var el = document.getElementById('topbooks-chart');
+                if (!el || typeof ApexCharts === 'undefined') return;
 
-                        // Get all counter elements by their current data-target values
-                        const counters = document.querySelectorAll('.counter');
-                        
-                        if (counters.length === 0) {
-                            console.warn('No counter elements found');
-                            return;
-                        }
-                        
-                        // Define target mapping for easier debugging and maintenance
-                        const targetMapping = {
-                            '{{ $totalAdmins }}': data.totalAdmins,
-                            '{{ $totalCustomers }}': data.totalCustomers,
-                            '{{ $totalBooks }}': data.totalBooks,
-                            '{{ $totalRevenue }}': data.totalRevenue,
-                            '{{ $orderStats['pending'] }}': data.orderStats.pending,
-                            '{{ $orderStats['processing'] }}': data.orderStats.processing,
-                            '{{ $orderStats['shipped'] }}': data.orderStats.shipped,
-                            '{{ $orderStats['completed'] }}': data.orderStats.completed,
-                            '{{ $orderStats['cancelled'] }}': data.orderStats.cancelled
-                        };
+                var isDark = document.documentElement.classList.contains('dark');
 
-                        console.log('Target mapping:', targetMapping);
-
-                        counters.forEach(counter => {
-                            const currentTarget = counter.getAttribute('data-target');
-                            console.log('Processing counter with target:', currentTarget);
-                            
-                            if (targetMapping.hasOwnProperty(currentTarget)) {
-                                const newValue = targetMapping[currentTarget];
-                                console.log(`Updating counter from ${currentTarget} to ${newValue}`);
-                                updateCounterValue(counter, newValue);
-                            } else {
-                                console.warn('No mapping found for target:', currentTarget);
-                            }
-                        });
-
-                        // Update last updated time indicator
-                        updateLastUpdatedTime();
-
-                        console.log('Stats updated successfully at:', data.lastUpdated);
-                    })
-                    .catch(error => {
-                        console.error('Error updating stats:', error);
-                        showErrorNotification('Failed to update dashboard statistics');
-                    });
-            }
-
-            // Update chart data
-            function updateChartData() {
-                fetch('{{ route("superadmin.api.user-registrations") }}')
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('Received chart data:', data);
-                        if (chart && data.data) {
-                            chart.updateSeries([{
-                                name: 'New Users',
-                                data: data.data
-                            }]);
-                            console.log('Chart updated successfully:', data.lastUpdated);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error updating chart:', error);
-                        showErrorNotification('Failed to update user registration chart');
-                    });
-            }
-
-            // Update recent users list
-            function updateRecentUsers() {
-                fetch('{{ route("superadmin.api.recent-users") }}')
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('Received users data:', data);
-                        if (data.users) {
-                            updateRecentUsersList(data.users);
-                            console.log('Recent users updated successfully:', data.lastUpdated);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error updating recent users:', error);
-                        showErrorNotification('Failed to update recent users list');
-                    });
-            }
-
-            // Update recent users UI
-            function updateRecentUsersList(users) {
-                const container = document.querySelector('.divide-y.divide-gray-100');
-                if (!container) return;
-
-                container.innerHTML = '';
-                
-                if (users.length === 0) {
-                    container.innerHTML = `
-                        <div class="px-8 py-12 text-center">
-                            <div class="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                                </svg>
-                            </div>
-                            <p class="text-gray-500">No recent users found</p>
-                        </div>
-                    `;
+                if (!titles || titles.length === 0) {
+                    el.innerHTML = '<div class="flex flex-col items-center justify-center py-16 text-gray-400 dark:text-gray-500">' +
+                        '<svg class="w-16 h-16 mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
+                        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>' +
+                        '<p class="text-sm font-medium">No sales data for this period</p></div>';
                     return;
                 }
 
-                users.forEach(user => {
-                    const rolesBadges = user.roles.map(role => {
-                        let badgeClasses = '';
-                        let iconPath = '';
-                        
-                        if (role === 'superadmin') {
-                            badgeClasses = 'bg-gradient-to-r from-bookty-purple-100 to-purple-200 text-bookty-purple-800 border border-bookty-purple-200';
-                            iconPath = 'M9.664 1.319a.75.75 0 01.672 0 41.059 41.059 0 018.198 5.424.75.75 0 01-.254 1.285 31.372 31.372 0 00-7.86 3.83.75.75 0 01-.84 0 31.508 31.508 0 00-2.08-1.287V9.394c0-.244.116-.463.302-.592a35.504 35.504 0 013.305-2.033.75.75 0 00-.714-1.319 37 37 0 00-3.446 2.12A2.216 2.216 0 006 9.393v.38a31.293 31.293 0 00-4.28-1.746.75.75 0 01-.254-1.285 41.059 41.059 0 018.198-5.424zM6 11.459a29.848 29.848 0 00-2.455-1.158 41.029 41.029 0 00-.39 3.114.75.75 0 00.419.74c.528.256 1.046.53 1.554.82-.21-.899-.385-1.804-.528-2.716zM16 11.459c-.143.912-.318 1.817-.528 2.716.508-.29 1.026-.564 1.554-.82a.75.75 0 00.419-.74 41.029 41.029 0 00-.39-3.114 29.848 29.848 0 00-2.455 1.158z';
-                        } else if (role === 'admin') {
-                            badgeClasses = 'bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 border border-blue-200';
-                            iconPath = 'M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z';
-                        } else {
-                            badgeClasses = 'bg-gradient-to-r from-bookty-pink-100 to-pink-200 text-bookty-pink-800 border border-bookty-pink-200';
-                            iconPath = 'M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z';
-                        }
+                if (topBooksChart) topBooksChart.destroy();
 
-                        return `
-                            <span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ${badgeClasses}">
-                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="${iconPath}" clip-rule="evenodd"></path>
-                                </svg>
-                                ${role.charAt(0).toUpperCase() + role.slice(1)}
-                            </span>
-                        `;
-                    }).join(' ');
-
-                    const userHtml = `
-                        <div class="px-8 py-6 hover:bg-gray-50 transition-colors duration-150 group">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-4">
-                                    <div class="flex-shrink-0">
-                                        <div class="w-12 h-12 bg-gradient-to-br from-bookty-purple-400 to-bookty-pink-400 rounded-full flex items-center justify-center text-white font-semibold text-lg shadow-md">
-                                            ${user.avatar}
-                                        </div>
-                                    </div>
-                                    <div class="flex-1 min-w-0">
-                                        <div class="flex items-center space-x-3 mb-1">
-                                            <p class="text-lg font-semibold text-gray-900 group-hover:text-bookty-purple-600 transition-colors duration-150">
-                                                ${user.name}
-                                            </p>
-                                            ${rolesBadges}
-                                        </div>
-                                        <p class="text-sm text-gray-500 truncate">${user.email}</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center space-x-2 text-sm text-gray-500">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                    </svg>
-                                    <span class="font-medium">${user.created_at_formatted}</span>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    container.insertAdjacentHTML('beforeend', userHtml);
-                });
-            }
-
-            // Add visual indicator for last update
-            function updateLastUpdatedTime() {
-                const now = new Date();
-                const timeString = now.toLocaleTimeString();
-                
-                // Create or update last updated indicator
-                let indicator = document.getElementById('last-updated-indicator');
-                if (!indicator) {
-                    indicator = document.createElement('div');
-                    indicator.id = 'last-updated-indicator';
-                    indicator.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 opacity-0 transition-opacity duration-300';
-                    document.body.appendChild(indicator);
-                }
-                
-                indicator.textContent = `✅ Updated: ${timeString}`;
-                indicator.style.opacity = '1';
-                
-                setTimeout(() => {
-                    indicator.style.opacity = '0';
-                }, 3000);
-            }
-
-            // Show error notification
-            function showErrorNotification(message) {
-                let indicator = document.getElementById('error-indicator');
-                if (!indicator) {
-                    indicator = document.createElement('div');
-                    indicator.id = 'error-indicator';
-                    indicator.className = 'fixed bottom-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 opacity-0 transition-opacity duration-300';
-                    document.body.appendChild(indicator);
-                }
-                
-                indicator.textContent = `❌ ${message}`;
-                indicator.style.opacity = '1';
-                
-                setTimeout(() => {
-                    indicator.style.opacity = '0';
-                }, 5000);
-            }
-
-            // Real-time toggle functionality
-            function createRealtimeToggle() {
-                const toggleHtml = `
-                    <div class="fixed bottom-4 left-4 bg-white rounded-lg shadow-lg border border-gray-200 p-4 z-40">
-                        <div class="flex items-center space-x-3">
-                            <div class="flex items-center">
-                                <input type="checkbox" id="realtime-toggle" class="form-checkbox h-4 w-4 text-bookty-purple-600 rounded focus:ring-bookty-purple-500 border-gray-300">
-                                <label for="realtime-toggle" class="ml-2 text-sm font-medium text-gray-700">Real-time Updates</label>
-                            </div>
-                            <div id="realtime-status" class="flex items-center space-x-1">
-                                <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
-                                <span class="text-xs text-gray-500">Stopped</span>
-                            </div>
-                        </div>
-                        <div class="mt-2 flex space-x-2">
-                            <button id="test-update-btn" class="px-3 py-1 bg-bookty-purple-600 text-white text-xs rounded hover:bg-bookty-purple-700 transition-colors">
-                                Test Update
-                            </button>
-                            <button id="test-chart-btn" class="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors">
-                                Test Chart
-                            </button>
-                            <button id="test-users-btn" class="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition-colors">
-                                Test Users
-                            </button>
-                        </div>
-                    </div>
-                `;
-                
-                document.body.insertAdjacentHTML('beforeend', toggleHtml);
-                
-                const toggle = document.getElementById('realtime-toggle');
-                const status = document.getElementById('realtime-status');
-                
-                toggle.addEventListener('change', function() {
-                    if (this.checked) {
-                        startRealtimeUpdates();
-                        status.innerHTML = '<div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div><span class="text-xs text-green-600">Active</span>';
-                    } else {
-                        stopRealtimeUpdates();
-                        status.innerHTML = '<div class="w-2 h-2 bg-gray-400 rounded-full"></div><span class="text-xs text-gray-500">Stopped</span>';
-                    }
-                });
-
-                // Add event listeners for test buttons
-                document.getElementById('test-update-btn').addEventListener('click', function() {
-                    console.log('Testing stats update...');
-                    updateRealtimeStats();
-                });
-
-                document.getElementById('test-chart-btn').addEventListener('click', function() {
-                    console.log('Testing chart update...');
-                    updateChartData();
-                });
-
-                document.getElementById('test-users-btn').addEventListener('click', function() {
-                    console.log('Testing users update...');
-                    updateRecentUsers();
-                });
-
-                // Add a simple API test function
-                window.testAPI = function() {
-                    console.log('Testing API endpoints...');
-                    
-                    fetch('{{ route("superadmin.api.stats") }}')
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log('API Stats Response:', data);
-                        })
-                        .catch(error => {
-                            console.error('API Stats Error:', error);
-                        });
-                };
-
-                // Add window function for manual counter update
-                window.updateCountersManually = function() {
-                    console.log('🔧 Manual counter update triggered');
-                    const counters = document.querySelectorAll('.counter');
-                    console.log('Found counters for manual update:', counters.length);
-                    
-                    counters.forEach((counter, index) => {
-                        const target = counter.getAttribute('data-target');
-                        const formattedValue = target ? (+target).toLocaleString() : '0';
-                        console.log(`Manually updating counter ${index}: target=${target} -> display=${formattedValue}`);
-                        counter.innerText = formattedValue;
-                    });
-                    
-                    console.log('✅ Manual counter update completed');
-                };
-
-                // Force display with server values (direct from debug panel)
-                window.forceDisplayValues = function() {
-                    console.log('⚡ Force display values triggered');
-                    
-                    // Direct server values from the debug panel
-                    const serverValues = {
-                        totalAdmins: {{ $totalAdmins }},
-                        totalCustomers: {{ $totalCustomers }},
-                        totalBooks: {{ $totalBooks }},
-                        totalRevenue: {{ $totalRevenue }},
-                        orderStats: @json($orderStats)
-                    };
-                    
-                    console.log('Server values:', serverValues);
-                    
-                    // Find all counters and map them to server values
-                    const counterMappings = [
-                        { selector: '.counter[data-target="{{ $totalAdmins }}"]', value: serverValues.totalAdmins },
-                        { selector: '.counter[data-target="{{ $totalCustomers }}"]', value: serverValues.totalCustomers },
-                        { selector: '.counter[data-target="{{ $totalBooks }}"]', value: serverValues.totalBooks },
-                        { selector: '.counter[data-target="{{ $totalRevenue }}"]', value: serverValues.totalRevenue },
-                        { selector: '.counter[data-target="{{ $orderStats['pending'] }}"]', value: serverValues.orderStats.pending },
-                        { selector: '.counter[data-target="{{ $orderStats['processing'] }}"]', value: serverValues.orderStats.processing },
-                        { selector: '.counter[data-target="{{ $orderStats['shipped'] }}"]', value: serverValues.orderStats.shipped },
-                        { selector: '.counter[data-target="{{ $orderStats['completed'] }}"]', value: serverValues.orderStats.completed },
-                        { selector: '.counter[data-target="{{ $orderStats['cancelled'] }}"]', value: serverValues.orderStats.cancelled }
-                    ];
-                    
-                    counterMappings.forEach((mapping, index) => {
-                        const element = document.querySelector(mapping.selector);
-                        if (element && mapping.value !== undefined) {
-                            element.innerText = (+mapping.value).toLocaleString();
-                            console.log(`Set counter ${index}: ${mapping.selector} = ${mapping.value}`);
-                        } else {
-                            console.warn(`Counter not found or value undefined: ${mapping.selector}`, mapping.value);
-                        }
-                    });
-                    
-                    console.log('✅ Force display completed');
-                };
-            }
-
-            // Start real-time updates
-            function startRealtimeUpdates() {
-                // Update stats every 30 seconds
-                realtimeUpdateInterval = setInterval(updateRealtimeStats, 30000);
-                
-                // Update chart every 2 minutes
-                chartUpdateInterval = setInterval(updateChartData, 120000);
-                
-                // Update users every 1 minute
-                usersUpdateInterval = setInterval(updateRecentUsers, 60000);
-            }
-
-            // Stop real-time updates
-            function stopRealtimeUpdates() {
-                if (realtimeUpdateInterval) clearInterval(realtimeUpdateInterval);
-                if (chartUpdateInterval) clearInterval(chartUpdateInterval);
-                if (usersUpdateInterval) clearInterval(usersUpdateInterval);
-            }
-
-            // Debug: Log initial values
-            console.log('Initial values from server:');
-            console.log('Total Admins:', {{ $totalAdmins }});
-            console.log('Total Customers:', {{ $totalCustomers }});
-            console.log('Total Books:', {{ $totalBooks }});
-            console.log('Total Revenue:', {{ $totalRevenue }});
-            console.log('Order Stats:', @json($orderStats));
-
-            // Function to ensure counters display values (fallback)
-            function ensureCountersDisplay() {
-                const counters = document.querySelectorAll('.counter');
-                console.log('Ensuring counters display values:', counters.length);
-                
-                counters.forEach((counter, index) => {
-                    const target = counter.getAttribute('data-target');
-                    console.log(`Counter ${index}: target=${target}, current text="${counter.innerText}"`);
-                    
-                    // If counter is still showing 0 or empty, set the target value immediately
-                    if (target && (counter.innerText === '0' || counter.innerText === '' || !counter.innerText)) {
-                        counter.innerText = (+target).toLocaleString();
-                        console.log(`Fixed counter ${index} to show: ${counter.innerText}`);
-                    }
-                });
-            }
-
-            // Set initial values and animate
-            ensureCountersDisplay();
-            
-            // Start counter animation
-            setTimeout(() => {
-                animateCounters();
-                
-                // Fallback: ensure values are shown after animation
-                setTimeout(ensureCountersDisplay, 3000);
-            }, 100);
-
-            // ApexCharts Configuration
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            const registrationData = Array(12).fill(0);
-            
-            @foreach($userRegistrations as $data)
-                registrationData[{{ $data->month - 1 }}] = {{ $data->count }};
-            @endforeach
-            
-            const chartOptions = {
-                series: [{
-                    name: 'New Users',
-                    data: registrationData
-                }],
-                chart: {
-                type: 'bar',
-                    height: 320,
-                    toolbar: {
-                        show: false
+                var options = {
+                    series: [{ name: 'Sold', data: quantities }],
+                    chart: {
+                        type: 'bar',
+                        height: 300,
+                        fontFamily: 'Inter, sans-serif',
+                        toolbar: { show: false },
+                        animations: { enabled: true, easing: 'easeinout', speed: 800 }
                     },
-                    animations: {
-                        enabled: true,
-                        easing: 'easeinout',
-                        speed: 800
-                    }
-                },
-                colors: ['#9061F9'],
-                plotOptions: {
-                    bar: {
-                        borderRadius: 8,
-                        columnWidth: '60%',
-                        distributed: false
-                    }
-                },
-                dataLabels: {
-                    enabled: false
-                },
-                stroke: {
-                    show: true,
-                    width: 2,
-                    colors: ['transparent']
-                },
-                xaxis: {
-                    categories: months,
-                    axisBorder: {
-                        show: false
-                    },
-                    axisTicks: {
-                        show: false
-                    }
-                },
-                yaxis: {
-                    title: {
-                        text: 'Users'
-                    }
-                },
-                fill: {
-                    type: 'gradient',
-                    gradient: {
-                        shade: 'light',
-                        type: 'vertical',
-                        shadeIntensity: 0.25,
-                        gradientToColors: ['#7C3AED'],
-                        inverseColors: false,
-                        opacityFrom: 0.8,
-                        opacityTo: 0.1,
-                        stops: [0, 100]
-                    }
-                },
-                tooltip: {
-                    y: {
-                        formatter: function (val) {
-                            return val + " new users"
+                    plotOptions: {
+                        bar: {
+                            horizontal: true,
+                            borderRadius: 6,
+                            borderRadiusApplication: 'end',
+                            barHeight: '70%',
+                            distributed: true
                         }
                     },
-                    theme: 'dark'
-                },
-                grid: {
-                    borderColor: 'rgba(107, 114, 128, 0.1)',
-                    strokeDashArray: 5
-                }
-            };
+                    colors: ['#6366f1', '#ec4899', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#14b8a6', '#f97316', '#3b82f6'],
+                    dataLabels: { enabled: false },
+                    legend: { show: false },
+                    grid: {
+                        show: true,
+                        borderColor: isDark ? '#374151' : '#f3f4f6',
+                        strokeDashArray: 4,
+                        xaxis: { lines: { show: true } },
+                        yaxis: { lines: { show: false } }
+                    },
+                    xaxis: {
+                        categories: titles,
+                        labels: {
+                            style: {
+                                colors: isDark ? '#9ca3af' : '#6b7280',
+                                fontSize: '11px'
+                            }
+                        },
+                        axisBorder: { show: false },
+                        axisTicks: { show: false }
+                    },
+                    yaxis: {
+                        labels: {
+                            style: {
+                                colors: isDark ? '#9ca3af' : '#6b7280',
+                                fontSize: '11px',
+                                fontWeight: 500
+                            },
+                            maxWidth: 200,
+                            formatter: function(val) {
+                                return val.length > 25 ? val.substring(0, 25) + '...' : val;
+                            }
+                        }
+                    },
+                    tooltip: {
+                        theme: isDark ? 'dark' : 'light',
+                        custom: function({ series, seriesIndex, dataPointIndex, w }) {
+                            var qty = series[seriesIndex][dataPointIndex] || 0;
+                            var price = parseFloat(prices[dataPointIndex]) || 0;
+                            var total = (qty * price).toFixed(2);
+                            var title = w.globals.labels[dataPointIndex] || '';
+                            var color = w.globals.colors[dataPointIndex];
+                            return '<div class="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">' +
+                                '<div class="font-semibold text-gray-900 dark:text-white mb-1 flex items-center gap-2">' +
+                                '<span class="w-2 h-2 rounded-full" style="background-color:' + color + '"></span>' +
+                                title + '</div>' +
+                                '<div class="text-xs text-gray-600 dark:text-gray-300">Quantity: <span class="font-medium">' + qty + '</span></div>' +
+                                '<div class="text-xs text-gray-600 dark:text-gray-300">Revenue: <span class="font-medium">' + formatRM(total) + '</span></div>' +
+                                '</div>';
+                        }
+                    }
+                };
 
-            chart = new ApexCharts(document.querySelector("#userRegistrationChart"), chartOptions);
-            chart.render();
+                topBooksChart = new ApexCharts(el, options);
+                topBooksChart.render();
+            }
 
-            // Add hover effects to cards
-            const cards = document.querySelectorAll('.group');
-            cards.forEach(card => {
-                card.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-4px) scale(1.02)';
+            function loadTopBooksData(period, label) {
+                var el = document.getElementById('topbooks-chart');
+                if (el) el.style.opacity = '0.5';
+
+                fetch("{{ route('superadmin.api.top-selling') }}?period=" + encodeURIComponent(period), {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(function(res) { return res.json(); })
+                .then(function(json) {
+                    var totalEl = document.getElementById('topBooksTotal');
+                    var labelEl = document.getElementById('topBooksPeriodLabel');
+                    var leaderEl = document.getElementById('topBooksLeader');
+
+                    if (totalEl) totalEl.textContent = json.summary.total_sold || 0;
+                    if (labelEl) labelEl.textContent = label;
+                    if (leaderEl) {
+                        leaderEl.innerHTML = 'Top: <span class="font-medium text-indigo-600 dark:text-indigo-400">' + (json.summary.top_title || '—') + '</span>';
+                    }
+
+                    renderTopBooksChart(json.titles || [], json.quantities || [], json.prices || []);
+                    if (el) el.style.opacity = '1';
+                })
+                .catch(function(err) {
+                    console.error('Error loading top books data:', err);
+                    if (el) el.style.opacity = '1';
                 });
-                card.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0) scale(1)';
-                });
-            });
+            }
 
-            // Initialize real-time controls
-            createRealtimeToggle();
-
-            // Add loading state
-            const chartContainer = document.getElementById('userRegistrationChart').parentElement;
-            chartContainer.classList.add('relative');
-            
-            // Remove loading state after chart is ready
-            setTimeout(() => {
-                const loadingEl = chartContainer.querySelector('.loading');
-                if (loadingEl) {
-                    loadingEl.remove();
-                }
-            }, 2500);
-
-            // Clean up intervals when leaving the page
-            window.addEventListener('beforeunload', function() {
-                stopRealtimeUpdates();
-            });
-
-            // Add keyboard shortcut to toggle real-time updates (Ctrl+R)
-            document.addEventListener('keydown', function(e) {
-                if (e.ctrlKey && e.key === 'r') {
+            document.querySelectorAll('.topbooks-period-option').forEach(function(link) {
+                link.addEventListener('click', function(e) {
                     e.preventDefault();
-                    const toggle = document.getElementById('realtime-toggle');
-                    if (toggle) {
-                        toggle.checked = !toggle.checked;
-                        toggle.dispatchEvent(new Event('change'));
-                    }
-                }
+                    loadTopBooksData(this.getAttribute('data-period'), this.textContent.trim());
+                });
             });
 
-            console.log('🚀 SuperAdmin Dashboard initialized with real-time capabilities!');
-            console.log('💡 Press Ctrl+R to toggle real-time updates');
+            // User Registration Chart
+            var userRegChart = null;
+            function initUserRegistrationChart() {
+                var el = document.getElementById('user-registration-chart');
+                if (!el || typeof ApexCharts === 'undefined') return;
+
+                var isDark = document.documentElement.classList.contains('dark');
+                var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                var registrationData = Array(12).fill(0);
+                
+                @foreach($userRegistrations as $data)
+                    registrationData[{{ $data->month - 1 }}] = {{ $data->count }};
+                @endforeach
+
+                var options = {
+                    series: [{ name: 'New Users', data: registrationData }],
+                    chart: {
+                        type: 'bar',
+                        height: 280,
+                        fontFamily: 'Inter, sans-serif',
+                        toolbar: { show: false },
+                        animations: { enabled: true, easing: 'easeinout', speed: 800 }
+                    },
+                    colors: ['#a855f7'],
+                    plotOptions: {
+                        bar: {
+                            borderRadius: 6,
+                            columnWidth: '60%'
+                        }
+                    },
+                    dataLabels: { enabled: false },
+                    grid: {
+                        show: true,
+                        borderColor: isDark ? '#374151' : '#f3f4f6',
+                        strokeDashArray: 4,
+                        xaxis: { lines: { show: false } },
+                        yaxis: { lines: { show: true } }
+                    },
+                    xaxis: {
+                        categories: months,
+                        labels: {
+                            style: {
+                                colors: isDark ? '#9ca3af' : '#6b7280',
+                                fontSize: '11px'
+                            }
+                        },
+                        axisBorder: { show: false },
+                        axisTicks: { show: false }
+                    },
+                    yaxis: {
+                        labels: {
+                            style: {
+                                colors: isDark ? '#9ca3af' : '#6b7280',
+                                fontSize: '11px'
+                            }
+                        }
+                    },
+                    tooltip: {
+                        theme: isDark ? 'dark' : 'light',
+                        y: {
+                            formatter: function(val) {
+                                return val + ' new users';
+                            }
+                        }
+                    }
+                };
+
+                userRegChart = new ApexCharts(el, options);
+                userRegChart.render();
+            }
+
+            // Real-time stats refresh (every 60 seconds)
+            setInterval(function() {
+                fetch("{{ route('superadmin.api.stats') }}", {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(function(res) { return res.json(); })
+                .then(function(json) {
+                    var todayOrdersEl = document.getElementById('today-orders-banner');
+                    var todayRevenueEl = document.getElementById('today-revenue-banner');
+                    var todayUsersEl = document.getElementById('today-users-banner');
+                    
+                    if (todayOrdersEl) todayOrdersEl.textContent = json.todayOrders || 0;
+                    if (todayRevenueEl) todayRevenueEl.textContent = formatRM(json.todayRevenue || 0);
+                    if (todayUsersEl) todayUsersEl.textContent = json.todayUsers || 0;
+                })
+                .catch(function(err) {
+                    console.error('Error fetching real-time stats:', err);
+                });
+            }, 60000);
         });
     </script>
-    @endpush
 @endsection
