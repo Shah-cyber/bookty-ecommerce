@@ -3,219 +3,186 @@
 @section('header', 'Customers')
 
 @section('content')
-    <div class="mb-6">
-        <div class="flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0">
-            <h2 class="text-2xl font-semibold text-gray-800 dark:text-white">All Customers</h2>
-            
-            <div class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2">
-                <form action="{{ route('admin.customers.index') }}" method="GET" class="flex flex-wrap gap-2">
-                    <!-- Search -->
-                    <div class="flex">
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Search customers..." 
-                            class="rounded-l-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50">
-                        <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-r-md hover:bg-purple-700">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
-                        </button>
-                    </div>
-
-                    <!-- Has Orders Filter -->
-                    <select name="has_orders" onchange="this.form.submit()" class="rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50">
-                        <option value="">All Customers</option>
-                        <option value="yes" {{ request('has_orders') === 'yes' ? 'selected' : '' }}>With Orders</option>
-                        <option value="no" {{ request('has_orders') === 'no' ? 'selected' : '' }}>Without Orders</option>
-                    </select>
-
-                    <!-- Sort Options -->
-                    <select name="sort" onchange="this.form.submit()" class="rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50">
-                        <option value="latest" {{ request('sort') == 'latest' || !request('sort') ? 'selected' : '' }}>Newest First</option>
-                        <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Oldest First</option>
-                        <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>Name (A-Z)</option>
-                    </select>
-
-                    <!-- Date From -->
-                    <input type="date" name="date_from" value="{{ request('date_from') }}" 
-                        placeholder="From Date" class="rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50">
-
-                    <!-- Date To -->
-                    <input type="date" name="date_to" value="{{ request('date_to') }}" 
-                        placeholder="To Date" class="rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50">
-
-                    @if(request('search') || request('has_orders') || request('sort') || request('date_from') || request('date_to'))
-                        <a href="{{ route('admin.customers.index') }}" class="px-4 py-2 bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-100 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600">
-                            Clear Filters
-                        </a>
-                    @endif
-                </form>
+<div class="space-y-6">
+    {{-- Page Header --}}
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div>
+            <h1 class="text-xl font-semibold text-gray-900 dark:text-white">Customers</h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Manage and view all registered customers</p>
+        </div>
+        
+        {{-- Stats Summary --}}
+        <div class="flex items-center gap-4">
+            <div class="bg-purple-50 dark:bg-purple-900/20 px-4 py-2 rounded-lg">
+                <p class="text-xs text-purple-600 dark:text-purple-400">Total Customers</p>
+                <p class="text-lg font-bold text-purple-700 dark:text-purple-300">{{ $customers->total() }}</p>
             </div>
         </div>
     </div>
 
+    {{-- Filters --}}
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+        <form action="{{ route('admin.customers.index') }}" method="GET" class="flex flex-col lg:flex-row gap-4">
+            {{-- Search --}}
+            <div class="flex-1">
+                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">Search</label>
+                <div class="relative">
+                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Name, email, phone..." class="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500">
+                </div>
+            </div>
 
-    <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
+            {{-- Has Orders Filter --}}
+            <div class="w-full lg:w-40">
+                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">Orders</label>
+                <select name="has_orders" class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500">
+                    <option value="">All</option>
+                    <option value="yes" {{ request('has_orders') === 'yes' ? 'selected' : '' }}>With Orders</option>
+                    <option value="no" {{ request('has_orders') === 'no' ? 'selected' : '' }}>No Orders</option>
+                </select>
+            </div>
+
+            {{-- Sort --}}
+            <div class="w-full lg:w-40">
+                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">Sort By</label>
+                <select name="sort" class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500">
+                    <option value="latest" {{ request('sort') == 'latest' || !request('sort') ? 'selected' : '' }}>Newest First</option>
+                    <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Oldest First</option>
+                    <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>Name (A-Z)</option>
+                </select>
+            </div>
+
+            {{-- Date Range --}}
+            <div class="w-full lg:w-auto">
+                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">Date From</label>
+                <input type="date" name="date_from" value="{{ request('date_from') }}" class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500">
+            </div>
+
+            <div class="w-full lg:w-auto">
+                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">Date To</label>
+                <input type="date" name="date_to" value="{{ request('date_to') }}" class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500">
+            </div>
+
+            {{-- Actions --}}
+            <div class="flex items-end gap-2">
+                <button type="submit" class="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-medium rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors">
+                    Filter
+                </button>
+                @if(request('search') || request('has_orders') || request('sort') || request('date_from') || request('date_to'))
+                    <a href="{{ route('admin.customers.index') }}" class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                        Reset
+                    </a>
+                @endif
+            </div>
+        </form>
+    </div>
+
+    {{-- Customers Table --}}
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-700">
-                    <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Customer</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Contact Info</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Location</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Orders</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Registered</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+            <table class="w-full">
+                <thead>
+                    <tr class="bg-gray-50 dark:bg-gray-700/50">
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Customer</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Contact</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Location</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Orders</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Registered</th>
+                        <th class="px-6 py-3 text-right text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                     @forelse($customers as $customer)
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-purple-200 dark:bg-purple-800 flex items-center justify-center">
-                                        <span class="text-sm font-medium text-purple-800 dark:text-purple-200">{{ substr($customer->name, 0, 1) }}</span>
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white text-sm font-semibold">
+                                        {{ strtoupper(substr($customer->name, 0, 1)) }}
                                     </div>
-                                    <div class="ml-4">
-                                        <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                            {{ $customer->name }}
-                                        </div>
-                                        <div class="text-sm text-gray-500 dark:text-gray-400">
-                                            ID: {{ $customer->id }}
-                                        </div>
+                                    <div>
+                                        <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $customer->name }}</p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">ID: #{{ $customer->id }}</p>
                                     </div>
                                 </div>
                             </td>
                             <td class="px-6 py-4">
-                                <div class="text-sm text-gray-900 dark:text-gray-100">{{ $customer->email }}</div>
+                                <p class="text-sm text-gray-900 dark:text-white">{{ $customer->email }}</p>
                                 @if($customer->phone_number)
-                                    <div class="text-sm text-gray-500 dark:text-gray-400">{{ $customer->phone_number }}</div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ $customer->phone_number }}</p>
                                 @else
-                                    <div class="text-sm text-gray-400 dark:text-gray-500 italic">No phone</div>
+                                    <p class="text-xs text-gray-400 dark:text-gray-500 italic">No phone</p>
                                 @endif
                             </td>
                             <td class="px-6 py-4">
                                 @if($customer->city && $customer->state)
-                                    <div class="text-sm text-gray-900 dark:text-gray-100">{{ $customer->city }}, {{ $customer->state }}</div>
+                                    <p class="text-sm text-gray-900 dark:text-white">{{ $customer->city }}, {{ $customer->state }}</p>
                                     @if($customer->country)
-                                        <div class="text-sm text-gray-500 dark:text-gray-400">{{ $customer->country }}</div>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ $customer->country }}</p>
                                     @endif
                                 @else
-                                    <div class="text-sm text-gray-400 dark:text-gray-500 italic">No address</div>
+                                    <p class="text-sm text-gray-400 dark:text-gray-500 italic">No address</p>
                                 @endif
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900 dark:text-gray-100">{{ $customer->orders_count }} orders</div>
+                            <td class="px-6 py-4">
+                                @if($customer->orders_count > 0)
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                                        {{ $customer->orders_count }} {{ Str::plural('order', $customer->orders_count) }}
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400">
+                                        No orders
+                                    </span>
+                                @endif
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900 dark:text-gray-100">{{ $customer->created_at->format('M d, Y') }}</div>
-                                <div class="text-xs text-gray-500 dark:text-gray-400">{{ $customer->created_at->diffForHumans() }}</div>
+                            <td class="px-6 py-4">
+                                <p class="text-sm text-gray-900 dark:text-white">{{ $customer->created_at->format('M d, Y') }}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ $customer->created_at->diffForHumans() }}</p>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="{{ route('admin.customers.show', $customer->id) }}" class="text-purple-600 dark:text-purple-400 hover:text-purple-900 dark:hover:text-purple-300">View Details</a>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center justify-end">
+                                    <a href="{{ route('admin.customers.show', $customer->id) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30 rounded-lg transition-colors">
+                                        View Details
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                        </svg>
+                                    </a>
+                                </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">No customers found.</td>
+                            <td colspan="6" class="px-6 py-12 text-center">
+                                <div class="flex flex-col items-center">
+                                    <div class="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
+                                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                        </svg>
+                                    </div>
+                                    <p class="text-gray-500 dark:text-gray-400 mb-1">No customers found</p>
+                                    <p class="text-sm text-gray-400 dark:text-gray-500">Try adjusting your search or filter criteria</p>
+                                </div>
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
         
-        <!-- Pagination Info and Controls -->
-        <div class="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6">
-            <div class="flex-1 flex justify-between sm:hidden">
-                {{-- Mobile pagination --}}
-                @if ($customers->hasPages())
-                    <div class="flex space-x-2">
-                        @if ($customers->onFirstPage())
-                            <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 cursor-not-allowed">
-                                Previous
-                            </span>
-                        @else
-                            <a href="{{ $customers->previousPageUrl() }}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                Previous
-                            </a>
-                        @endif
-
-                        @if ($customers->hasMorePages())
-                            <a href="{{ $customers->nextPageUrl() }}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                Next
-                            </a>
-                        @else
-                            <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 cursor-not-allowed">
-                                Next
-                            </span>
-                        @endif
-                    </div>
-                @endif
-            </div>
-            
-            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                <div>
-                    <p class="text-sm text-gray-700 dark:text-gray-300">
-                        Showing
-                        <span class="font-medium">{{ $customers->firstItem() ?? 0 }}</span>
-                        to
-                        <span class="font-medium">{{ $customers->lastItem() ?? 0 }}</span>
-                        of
-                        <span class="font-medium">{{ $customers->total() }}</span>
-                        entries
+        {{-- Pagination --}}
+        @if($customers->hasPages())
+            <div class="px-6 py-4 border-t border-gray-100 dark:border-gray-700">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        Showing <span class="font-medium">{{ $customers->firstItem() ?? 0 }}</span> to <span class="font-medium">{{ $customers->lastItem() ?? 0 }}</span> of <span class="font-medium">{{ $customers->total() }}</span> customers
                     </p>
-                </div>
-                
-                <div>
-                    {{-- Desktop pagination --}}
-                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                        {{-- Previous Page Link --}}
-                        @if ($customers->onFirstPage())
-                            <span class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 cursor-not-allowed">
-                                <span class="sr-only">Previous</span>
-                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                </svg>
-                            </span>
-                        @else
-                            <a href="{{ $customers->previousPageUrl() }}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                <span class="sr-only">Previous</span>
-                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                </svg>
-                            </a>
-                        @endif
-
-                        {{-- Pagination Elements --}}
-                        @foreach ($customers->getUrlRange(1, $customers->lastPage()) as $page => $url)
-                            @if ($page == $customers->currentPage())
-                                <span class="relative inline-flex items-center px-4 py-2 border border-purple-500 text-sm font-medium text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900">
-                                    {{ $page }}
-                                </span>
-                            @else
-                                <a href="{{ $url }}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                    {{ $page }}
-                                </a>
-                            @endif
-                        @endforeach
-
-                        {{-- Next Page Link --}}
-                        @if ($customers->hasMorePages())
-                            <a href="{{ $customers->nextPageUrl() }}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                <span class="sr-only">Next</span>
-                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                                </svg>
-                            </a>
-                        @else
-                            <span class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 cursor-not-allowed">
-                                <span class="sr-only">Next</span>
-                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                                </svg>
-                            </span>
-                        @endif
-                    </nav>
+                    <div>
+                        {{ $customers->links() }}
+                    </div>
                 </div>
             </div>
-        </div>
+        @endif
     </div>
+</div>
 @endsection
