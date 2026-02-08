@@ -385,7 +385,8 @@ class RecommendationAnalyticsController extends Controller
      */
     public function settings()
     {
-        $settings = [
+        // Default settings
+        $defaults = [
             'content_based_weight' => 0.6,
             'collaborative_weight' => 0.4,
             'min_recommendation_score' => 0.3,
@@ -394,6 +395,10 @@ class RecommendationAnalyticsController extends Controller
             'enable_content_based' => true,
             'enable_collaborative' => true,
         ];
+        
+        // Get saved settings from cache, merge with defaults
+        $savedSettings = Cache::get('recommendation_settings', []);
+        $settings = array_merge($defaults, $savedSettings);
         
         return view('admin.recommendations.settings', compact('settings'));
     }
@@ -414,18 +419,69 @@ class RecommendationAnalyticsController extends Controller
         ]);
 
         // Validate that weights sum to 1
-        $totalWeight = $request->content_based_weight + $request->collaborative_weight;
+        $totalWeight = floatval($request->content_based_weight) + floatval($request->collaborative_weight);
         if (abs($totalWeight - 1.0) > 0.01) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Content-based and collaborative weights must sum to 1.0'
+                ], 422);
+            }
             return back()->withErrors(['weights' => 'Content-based and collaborative weights must sum to 1.0']);
         }
 
-        // Store settings (in a real implementation, you'd save these to a settings table)
-        Cache::put('recommendation_settings', $request->all(), now()->addDays(30));
+        // Prepare settings to save
+        $settings = [
+            'content_based_weight' => floatval($request->content_based_weight),
+            'collaborative_weight' => floatval($request->collaborative_weight),
+            'min_recommendation_score' => floatval($request->min_recommendation_score),
+            'max_recommendations_per_user' => intval($request->max_recommendations_per_user),
+            'cache_duration_hours' => intval($request->cache_duration_hours),
+            'enable_content_based' => $request->boolean('enable_content_based'),
+            'enable_collaborative' => $request->boolean('enable_collaborative'),
+        ];
+
+        // Store settings
+        Cache::put('recommendation_settings', $settings, now()->addDays(30));
         
         // Clear recommendation cache to apply new settings
-        Cache::tags(['recommendations'])->flush();
+        try {
+            Cache::tags(['recommendations'])->flush();
+        } catch (\Exception $e) {
+            // Tags may not be supported, try alternative approach
+            Cache::flush(); // Or use a more selective approach
+        }
+        
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Recommendation settings updated successfully!'
+            ]);
+        }
         
         return redirect()->route('admin.recommendations.settings')
             ->with('success', 'Recommendation settings updated successfully!');
+    }
+
+    /**
+     * Clear recommendation cache
+     */
+    public function clearCache(Request $request)
+    {
+        try {
+            Cache::tags(['recommendations'])->flush();
+        } catch (\Exception $e) {
+            // Tags may not be supported
+        }
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Recommendation cache cleared successfully!'
+            ]);
+        }
+
+        return redirect()->route('admin.recommendations.settings')
+            ->with('success', 'Recommendation cache cleared successfully!');
     }
 }

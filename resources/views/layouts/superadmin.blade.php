@@ -188,7 +188,7 @@
             </div>
 
             <div class="flex flex-col flex-1 overflow-hidden">
-                <header class="header-gradient border-b border-gray-200/60 shadow-lg backdrop-blur-sm">
+                <header class="relative header-gradient border-b border-gray-200/60 shadow-lg backdrop-blur-sm z-30">
                     <div class="flex items-center justify-between px-8 py-5">
                         <!-- Left Section -->
                         <div class="flex items-center space-x-4">
@@ -208,25 +208,17 @@
 
                         <!-- Right Section -->
                         <div class="flex items-center space-x-4">
-                            <!-- Notifications Bell -->
-                            <button class="relative p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors duration-200">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
-                                </svg>
-                                <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                            </button>
-
                             <!-- User Profile Dropdown -->
                             <div x-data="{ dropdownOpen: false }" class="relative">
-                                <button @click="dropdownOpen = ! dropdownOpen" class="flex items-center space-x-3 p-2 rounded-xl hover:bg-gray-100 transition-colors duration-200 focus:outline-none group">
+                                <button @click="dropdownOpen = !dropdownOpen" type="button" class="flex items-center space-x-3 p-2 rounded-xl hover:bg-gray-100 transition-colors duration-200 focus:outline-none group">
                                     <div class="relative">
-                                        <div class="h-10 w-10 rounded-full bg-gradient-to-br from-bookty-purple-500 to-bookty-pink-500 flex items-center justify-center shadow-lg">
+                                        <div class="h-10 w-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
                                             <span class="text-sm font-semibold text-white">{{ substr(Auth::user()->name, 0, 1) }}</span>
                                         </div>
                                         <div class="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white"></div>
                                     </div>
                                     <div class="hidden md:block text-left">
-                                        <p class="text-sm font-semibold text-gray-800 group-hover:text-bookty-purple-600 transition-colors duration-200">{{ Auth::user()->name }}</p>
+                                        <p class="text-sm font-semibold text-gray-800 group-hover:text-indigo-600 transition-colors duration-200">{{ Auth::user()->name }}</p>
                                         <p class="text-xs text-gray-500">SuperAdmin</p>
                                     </div>
                                     <svg class="w-4 h-4 text-gray-500 group-hover:text-gray-700 transition-colors duration-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -242,12 +234,12 @@
                                      x-transition:leave-start="transform opacity-100 scale-100"
                                      x-transition:leave-end="transform opacity-0 scale-95"
                                      @click.away="dropdownOpen = false" 
-                                     class="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl z-20 border border-gray-100 overflow-hidden">
+                                     class="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl z-[100] border border-gray-100 overflow-hidden">
                                     
                                     <!-- Profile Header -->
-                                    <div class="px-6 py-4 bg-gradient-to-r from-bookty-purple-50 to-bookty-pink-50 border-b border-gray-100">
+                                    <div class="px-6 py-4 bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-gray-100">
                                         <div class="flex items-center space-x-3">
-                                            <div class="h-12 w-12 rounded-full bg-gradient-to-br from-bookty-purple-500 to-bookty-pink-500 flex items-center justify-center">
+                                            <div class="h-12 w-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
                                                 <span class="text-white font-semibold">{{ substr(Auth::user()->name, 0, 1) }}</span>
                                             </div>
                                             <div>
@@ -259,7 +251,7 @@
 
                                     <!-- Menu Items -->
                                     <div class="py-2">
-                                        <a href="{{ route('profile.edit') }}" class="flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-bookty-purple-600 transition-colors duration-200">
+                                        <a href="{{ route('profile.edit') }}" class="flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition-colors duration-200">
                                             <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                                             </svg>
@@ -307,19 +299,19 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Handle session flash messages
             @if(session('success'))
-                window.showToast('{{ session('success') }}', 'success');
+                window.showToast({!! json_encode(session('success')) !!}, 'success');
             @endif
             
             @if(session('error'))
-                window.showToast('{{ session('error') }}', 'error');
+                window.showToast({!! json_encode(session('error')) !!}, 'error');
             @endif
             
             @if(session('warning'))
-                window.showToast('{{ session('warning') }}', 'warning');
+                window.showToast({!! json_encode(session('warning')) !!}, 'warning');
             @endif
             
             @if(session('info'))
-                window.showToast('{{ session('info') }}', 'info');
+                window.showToast({!! json_encode(session('info')) !!}, 'info');
             @endif
         });
     </script>

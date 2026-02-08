@@ -16,10 +16,137 @@ class BookController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $books = Book::with(['genre', 'tropes'])->latest()->paginate(6);
-        return view('admin.books.index', compact('books'));
+        $query = Book::with(['genre', 'tropes']);
+
+        // Search by title, author, or slug
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('author', 'like', "%{$search}%")
+                  ->orWhere('slug', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter by genre
+        if ($request->filled('genre')) {
+            $query->where('genre_id', $request->genre);
+        }
+
+        // Filter by condition
+        if ($request->filled('condition')) {
+            $query->where('condition', $request->condition);
+        }
+
+        // Filter by stock status
+        if ($request->filled('stock_status')) {
+            switch ($request->stock_status) {
+                case 'in_stock':
+                    $query->where('stock', '>', 10);
+                    break;
+                case 'low_stock':
+                    $query->whereBetween('stock', [1, 10]);
+                    break;
+                case 'out_of_stock':
+                    $query->where('stock', 0);
+                    break;
+            }
+        }
+
+        // Sort
+        $sort = $request->sort ?? 'latest';
+        switch ($sort) {
+            case 'oldest':
+                $query->oldest();
+                break;
+            case 'title_asc':
+                $query->orderBy('title', 'asc');
+                break;
+            case 'title_desc':
+                $query->orderBy('title', 'desc');
+                break;
+            case 'price_asc':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price_desc':
+                $query->orderBy('price', 'desc');
+                break;
+            case 'stock_asc':
+                $query->orderBy('stock', 'asc');
+                break;
+            case 'stock_desc':
+                $query->orderBy('stock', 'desc');
+                break;
+            default:
+                $query->latest();
+                break;
+        }
+
+        $perPage = $request->per_page ?? 10;
+        $books = $query->paginate($perPage);
+        
+        // Get all genres for filter
+        $genres = Genre::orderBy('name')->get();
+
+        // Return JSON for AJAX requests
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'html' => view('admin.books._table', compact('books'))->render(),
+                'pagination' => [
+                    'current_page' => $books->currentPage(),
+                    'last_page' => $books->lastPage(),
+                    'total' => $books->total(),
+                    'from' => $books->firstItem(),
+                    'to' => $books->lastItem(),
+                ]
+            ]);
+        }
+
+        return view('admin.books.index', compact('books', 'genres'));
+    }
+
+    /**
+     * Quick update book stock via AJAX.
+     */
+    public function quickUpdate(Request $request, Book $book)
+    {
+        $request->validate([
+            'stock' => 'sometimes|integer|min:0',
+            'price' => 'sometimes|numeric|min:0',
+            'condition' => 'sometimes|in:new,preloved',
+        ]);
+
+        $updateData = [];
+        
+        if ($request->has('stock')) {
+            $updateData['stock'] = $request->stock;
+        }
+        
+        if ($request->has('price')) {
+            $updateData['price'] = $request->price;
+        }
+        
+        if ($request->has('condition')) {
+            $updateData['condition'] = $request->condition;
+        }
+
+        $book->update($updateData);
+        $book->refresh();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Book updated successfully',
+            'book' => [
+                'id' => $book->id,
+                'title' => $book->title,
+                'stock' => $book->stock,
+                'price' => $book->price,
+                'condition' => $book->condition,
+            ]
+        ]);
     }
 
     /**
@@ -71,7 +198,7 @@ class BookController extends Controller
         // Cache clearing is handled by BookObserver automatically
 
         return redirect()->route('admin.books.index')
-            ->with('success', " '{$book->title}' by {$book->author} has been added to the catalog!");
+            ->with('success', "'{$book->title}' by {$book->author} has been added to the catalog!");
     }
 
     /**
@@ -138,14 +265,16 @@ class BookController extends Controller
         // Cache clearing is handled by BookObserver automatically
 
         return redirect()->route('admin.books.show', $book)
-            ->with('success', " '{$book->title}' has been updated successfully!");
+            ->with('success', "'{$book->title}' has been updated successfully!");
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Book $book)
+    public function destroy(Request $request, Book $book)
     {
+        $bookTitle = $book->title;
+        
         // Delete cover image if exists
         if ($book->cover_image) {
             Storage::disk('public')->delete($book->cover_image);
@@ -156,7 +285,14 @@ class BookController extends Controller
         
         // Cache clearing is handled by BookObserver automatically
 
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Book '{$bookTitle}' has been removed from the catalog."
+            ]);
+        }
+
         return redirect()->route('admin.books.index')
-            ->with('success', " Book '{$book->title}' has been removed from the catalog.");
+            ->with('success', "Book '{$bookTitle}' has been removed from the catalog.");
     }
 }
