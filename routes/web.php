@@ -94,6 +94,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/wishlist/add/{book}', [WishlistController::class, 'add'])->name('wishlist.add');
     Route::delete('/wishlist/remove/{book}', [WishlistController::class, 'remove'])->name('wishlist.remove');
     Route::post('/wishlist/toggle/{book}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
+    Route::delete('/wishlist/clear', [WishlistController::class, 'clear'])->name('wishlist.clear');
     
     // Track user interactions for recommendations
     Route::post('/api/track-interaction', function (\Illuminate\Http\Request $request) {

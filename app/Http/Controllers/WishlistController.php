@@ -112,4 +112,34 @@ class WishlistController extends Controller
             return $this->add($book);
         }
     }
+
+    /**
+     * Clear all items from the user's wishlist.
+     */
+    public function clear()
+    {
+        $user = Auth::user();
+        $deleted = $user->wishlist()->delete();
+        
+        if ($deleted) {
+            if (request()->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Your wishlist has been cleared!',
+                    'wishlist_count' => 0
+                ]);
+            }
+            
+            return redirect()->route('wishlist.index')->with('success', 'Your wishlist has been cleared!');
+        }
+        
+        if (request()->wantsJson()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Your wishlist is already empty.'
+            ], 400);
+        }
+        
+        return redirect()->route('wishlist.index')->with('info', 'Your wishlist is already empty.');
+    }
 }
