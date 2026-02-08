@@ -31,17 +31,26 @@ class DashboardController extends Controller
         $lowStockBooks = Book::where('stock', '<', 10)->orderBy('stock', 'asc')->take(5)->get();
         
         // Get best selling books this month (sum of quantities, not count of order items)
-        $bestSellingBooks = Book::select('books.*')
-            ->join('order_items', 'books.id', '=', 'order_items.book_id')
+        // Using subquery approach to avoid MySQL ONLY_FULL_GROUP_BY issues
+        $bestSellingBookIds = OrderItem::query()
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
             ->where('orders.status', 'completed')
             ->whereMonth('orders.created_at', now()->month)
             ->whereYear('orders.created_at', now()->year)
-            ->groupBy('books.id')
-            ->selectRaw('SUM(order_items.quantity) as total_sold')
+            ->selectRaw('order_items.book_id, SUM(order_items.quantity) as total_sold')
+            ->groupBy('order_items.book_id')
             ->orderByDesc('total_sold')
             ->take(10)
-            ->get();
+            ->pluck('total_sold', 'book_id');
+        
+        $bestSellingBooks = Book::whereIn('id', $bestSellingBookIds->keys())
+            ->get()
+            ->map(function ($book) use ($bestSellingBookIds) {
+                $book->total_sold = $bestSellingBookIds[$book->id] ?? 0;
+                return $book;
+            })
+            ->sortByDesc('total_sold')
+            ->values();
         
         // Get recent customers
         $recentCustomers = User::role('customer')
