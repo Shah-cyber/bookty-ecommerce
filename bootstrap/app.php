@@ -30,6 +30,10 @@ return Application::configure(basePath: dirname(__DIR__))
                     'session_expired' => true
                 ], 401);
             }
+            
+            // For regular requests, redirect to home with open_login flag
+            return redirect()->route('home', ['open_login' => 'true'])
+                ->with('info', 'Your session has expired. Please log in again.');
         });
 
         // Handle CSRF token expiration (419 Page Expired)

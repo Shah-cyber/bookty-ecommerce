@@ -75,6 +75,19 @@
                 @if(session('info'))
                     window.showToast('{{ session('info') }}', 'info');
                 @endif
+                
+                // Check if we need to open the login modal (e.g. after session expiration)
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.has('open_login')) {
+                    // Slight delay to ensure Alpine is ready
+                    setTimeout(() => {
+                        window.dispatchEvent(new CustomEvent('open-auth-modal', { detail: 'login' }));
+                    }, 500);
+                    
+                    // Clean up URL without refreshing
+                    const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                    window.history.replaceState({path: newUrl}, '', newUrl);
+                }
             });
         </script>
 
