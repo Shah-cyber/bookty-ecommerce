@@ -866,7 +866,7 @@
                 </div>
 
                 <!-- Gallery Grid -->
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="genreGallery">
+                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4" id="genreGallery">
                     @if($newArrivals->count() > 0)
                         @foreach($newArrivals as $book)
                             <div class="gallery-item" data-genre-id="{{ $book->genre?->id ?? '' }}" data-aos="fade-up">
