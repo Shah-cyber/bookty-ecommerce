@@ -1,147 +1,138 @@
 @extends('layouts.admin')
 
-@section('header', __('Postage Rate History: ') . strtoupper($region))
+@section('header', __('Postage Rate History'))
 
 @section('content')
-    <div class="mb-6 flex items-center justify-between">
-        <a href="{{ route('admin.postage-rates.index') }}" class="text-bookty-purple-600 hover:text-bookty-purple-800 text-sm">&larr; {{ __('Back to Postage Rates') }}</a>
-        <a href="{{ route('admin.postage-rates.all-history') }}" class="text-blue-600 hover:text-blue-800 text-sm">
-            📊 View All Regions History
+<div class="space-y-6">
+    {{-- Page Header --}}
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <div class="flex items-center gap-3 mb-1">
+                <a href="{{ route('admin.postage-rates.index') }}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                </a>
+                <h1 class="text-xl font-semibold text-gray-900 dark:text-white">{{ strtoupper($region) }} Region History</h1>
+            </div>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Price change timeline for {{ __('regions.'.$region) }}</p>
+        </div>
+        <a href="{{ route('admin.postage-rates.all-history') }}" class="inline-flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 hover:underline">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+            View All Regions
         </a>
     </div>
 
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+    {{-- Current Rate Card --}}
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
         <div class="flex items-center justify-between">
-            <div>
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Current Rate</h3>
-                <p class="text-sm text-gray-500 dark:text-gray-400">Region: {{ strtoupper($rate->region) }}</p>
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center">
+                    <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Current Active Rate</p>
+                    <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ strtoupper($rate->region) }}</p>
+                </div>
             </div>
             <div class="text-right">
-                <div class="text-sm text-gray-500 dark:text-gray-400">Customer Price</div>
-                <div class="text-2xl font-bold text-bookty-purple-600">RM {{ number_format($rate->customer_price, 2) }}</div>
-                <div class="text-xs text-gray-500 dark:text-gray-400">Cost: RM {{ number_format($rate->actual_cost, 2) }}</div>
+                <p class="text-2xl font-bold text-gray-900 dark:text-white">RM {{ number_format($rate->customer_price, 2) }}</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Cost: RM {{ number_format($rate->actual_cost, 2) }}</p>
             </div>
         </div>
     </div>
 
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
-        <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                Price Change Timeline
-            </h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400">
-                Complete audit trail of all price changes
-            </p>
+    {{-- Timeline --}}
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-base font-semibold text-gray-900 dark:text-white">Price Change Timeline</h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Complete audit trail of all price changes</p>
         </div>
 
         <div class="p-6">
             @forelse($timeline as $log)
-            <div class="flex mb-6 pb-6 border-b last:border-0 border-gray-200 dark:border-gray-700">
-                <!-- Timeline Icon -->
-                <div class="flex-shrink-0 mr-4">
-                    <div class="w-10 h-10 rounded-full {{ $log->isCurrent() ? 'bg-green-100 dark:bg-green-900' : 'bg-blue-100 dark:bg-blue-900' }} flex items-center justify-center">
-                        <svg class="w-5 h-5 {{ $log->isCurrent() ? 'text-green-600 dark:text-green-400' : 'text-blue-600 dark:text-blue-400' }}" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
-                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
-                        </svg>
-                    </div>
-                </div>
-                
-                <!-- Timeline Content -->
-                <div class="flex-grow">
-                    <!-- Header -->
-                    <div class="flex justify-between items-start mb-2">
-                        <div>
-                            <span class="font-semibold text-gray-900 dark:text-gray-100">
-                                {{ $log->updater_name }}
-                            </span>
-                            <span class="text-gray-500 dark:text-gray-400">updated pricing</span>
-                            
-                            @if($log->isCurrent())
-                            <span class="ml-2 px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 dark:bg-green-900/50 dark:text-green-300 rounded">
-                                Current
-                            </span>
-                            @endif
-                        </div>
-                        
-                        <div class="text-right">
-                            <div class="text-sm text-gray-900 dark:text-gray-100">
-                                {{ $log->created_at->format('d M Y, H:i') }}
-                            </div>
-                            <div class="text-xs text-gray-500 dark:text-gray-400">
-                                {{ $log->created_at->diffForHumans() }}
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Price Information -->
-                    <div class="grid grid-cols-2 gap-4 mt-3 p-3 bg-gray-50 dark:bg-gray-700 rounded">
-                        <div>
-                            <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                                Customer Price
-                            </div>
-                            <div class="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                                RM {{ number_format($log->customer_price, 2) }}
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                                Actual Cost
-                            </div>
-                            <div class="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                                RM {{ number_format($log->actual_cost, 2) }}
-                            </div>
-                        </div>
-                        
-                        <div class="col-span-2">
-                            <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                                Profit Margin
-                            </div>
-                            <div class="text-sm font-semibold text-green-600 dark:text-green-400">
-                                {{ number_format($log->getProfitMargin(), 2) }}%
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Comment -->
-                    @if($log->comment)
-                    <div class="mt-3 p-3 bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-400 rounded">
-                        <div class="text-xs text-blue-800 dark:text-blue-300 font-semibold mb-1">
-                            💬 Note:
-                        </div>
-                        <div class="text-sm text-blue-900 dark:text-blue-200">
-                            {{ $log->comment }}
-                        </div>
-                    </div>
-                    @endif
-                    
-                    <!-- Metadata -->
-                    <div class="mt-2 text-xs text-gray-400 dark:text-gray-500">
-                        Valid from: {{ $log->valid_from->format('d M Y H:i:s') }}
-                        @if($log->valid_until)
-                            to {{ $log->valid_until->format('d M Y H:i:s') }}
-                            <span class="text-gray-500">({{ $log->getValidDuration() }})</span>
+                <div class="relative pl-8 pb-8 last:pb-0 border-l-2 {{ $log->isCurrent() ? 'border-green-400' : 'border-gray-200 dark:border-gray-700' }} last:border-transparent">
+                    {{-- Timeline Dot --}}
+                    <div class="absolute -left-2.5 top-0 w-5 h-5 rounded-full {{ $log->isCurrent() ? 'bg-green-500 ring-4 ring-green-100 dark:ring-green-900/50' : 'bg-gray-300 dark:bg-gray-600' }}">
+                        @if($log->isCurrent())
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
                         @endif
                     </div>
-                    
-                    <!-- Orders Count -->
-                    <div class="mt-2">
-                        <a href="{{ route('admin.orders.index', ['postage_history' => $log->id]) }}" 
-                           class="text-xs text-blue-600 hover:underline dark:text-blue-400">
-                            📦 View orders using this rate ({{ $log->orders->count() }})
-                        </a>
+
+                    {{-- Timeline Content --}}
+                    <div class="ml-6">
+                        {{-- Header --}}
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ $log->updater_name }}</span>
+                                <span class="text-sm text-gray-500 dark:text-gray-400">updated pricing</span>
+                                @if($log->isCurrent())
+                                    <span class="px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-full">Current</span>
+                                @endif
+                            </div>
+                            <div class="text-sm text-gray-500 dark:text-gray-400">
+                                {{ $log->created_at->format('d M Y, H:i') }}
+                                <span class="text-gray-400 dark:text-gray-500">({{ $log->created_at->diffForHumans() }})</span>
+                            </div>
+                        </div>
+
+                        {{-- Price Card --}}
+                        <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 mb-3">
+                            <div class="grid grid-cols-3 gap-4">
+                                <div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Customer Price</p>
+                                    <p class="text-lg font-bold text-gray-900 dark:text-white">RM {{ number_format($log->customer_price, 2) }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Actual Cost</p>
+                                    <p class="text-lg font-bold text-gray-900 dark:text-white">RM {{ number_format($log->actual_cost, 2) }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Profit Margin</p>
+                                    @php $margin = $log->getProfitMargin(); @endphp
+                                    <p class="text-lg font-bold {{ $margin >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">{{ number_format($margin, 2) }}%</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Comment --}}
+                        @if($log->comment)
+                            <div class="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-400 rounded-r-lg p-3 mb-3">
+                                <p class="text-xs font-medium text-blue-700 dark:text-blue-300 mb-1">Note</p>
+                                <p class="text-sm text-blue-800 dark:text-blue-200">{{ $log->comment }}</p>
+                            </div>
+                        @endif
+
+                        {{-- Metadata --}}
+                        <div class="flex flex-wrap items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+                            <span>Valid from: {{ $log->valid_from->format('d M Y H:i') }}</span>
+                            @if($log->valid_until)
+                                <span>to {{ $log->valid_until->format('d M Y H:i') }}</span>
+                                <span class="text-gray-400">({{ $log->getValidDuration() }})</span>
+                            @endif
+                            <a href="{{ route('admin.orders.index', ['postage_history' => $log->id]) }}" class="text-blue-600 dark:text-blue-400 hover:underline">
+                                {{ $log->orders->count() }} orders used this rate
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </div>
             @empty
-            <div class="text-center py-8 text-gray-500 dark:text-gray-400">
-                <svg class="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                <p>No history records found</p>
-            </div>
+                <div class="text-center py-12">
+                    <div class="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <p class="text-gray-500 dark:text-gray-400">No history records found</p>
+                </div>
             @endforelse
         </div>
     </div>
+</div>
 @endsection
