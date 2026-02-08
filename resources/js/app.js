@@ -665,10 +665,20 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (data.success) {
                         // Update cart count in header if it exists
                         if (data.cart_count !== undefined) {
+                            // Update count text
                             const cartCountElements = document.querySelectorAll('.cart-count');
                             cartCountElements.forEach(element => {
                                 element.textContent = data.cart_count;
-                                element.classList.remove('hidden');
+                            });
+                            
+                            // Show/hide badge containers
+                            const cartBadgeElements = document.querySelectorAll('.cart-count-badge');
+                            cartBadgeElements.forEach(element => {
+                                if (data.cart_count > 0) {
+                                    element.classList.remove('hidden');
+                                } else {
+                                    element.classList.add('hidden');
+                                }
                             });
                         }
 

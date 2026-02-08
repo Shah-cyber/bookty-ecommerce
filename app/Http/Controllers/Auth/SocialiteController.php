@@ -32,20 +32,30 @@ class SocialiteController extends Controller
         try {
             $googleUser = Socialite::driver('google')->user();
             
-            // Check if user already exists
-            $user = User::where('email', $googleUser->email)->first();
+            // Check if user already exists by google_id or email
+            $user = User::where('google_id', $googleUser->id)
+                        ->orWhere('email', $googleUser->email)
+                        ->first();
             
             // If user doesn't exist, create a new one
             if (!$user) {
                 $user = User::create([
                     'name' => $googleUser->name,
                     'email' => $googleUser->email,
+                    'google_id' => $googleUser->id,
+                    'avatar' => $googleUser->avatar,
                     'password' => Hash::make(Str::random(24)),
                     'email_verified_at' => now(), // Google accounts are already verified
                 ]);
                 
                 // Assign customer role to new user
                 $user->assignRole('customer');
+            } else {
+                // Update existing user's Google info and avatar
+                $user->update([
+                    'google_id' => $googleUser->id,
+                    'avatar' => $googleUser->avatar,
+                ]);
             }
             
             // Log the user in
