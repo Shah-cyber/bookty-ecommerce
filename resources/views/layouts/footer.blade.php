@@ -55,7 +55,7 @@
                     <li><a href="#" class="text-gray-500 hover:text-indigo-600 transition-colors duration-200">Help Center</a></li>
                     <li><a href="#" class="text-gray-500 hover:text-indigo-600 transition-colors duration-200">Shipping Info</a></li>
                     <li><a href="#" class="text-gray-500 hover:text-indigo-600 transition-colors duration-200">Returns</a></li>
-                    <li><a href="#" class="text-gray-500 hover:text-indigo-600 transition-colors duration-200">Contact Us</a></li>
+                    <li><a href="{{ route('contact') }}" class="text-gray-500 hover:text-indigo-600 transition-colors duration-200">Contact Us</a></li>
                 </ul>
             </div>
 

@@ -23,6 +23,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'google_id',
+        'avatar',
         'phone_number',
         'age',
         'address_line1',
@@ -32,6 +34,37 @@ class User extends Authenticatable
         'postal_code',
         'country',
     ];
+    
+    /**
+     * Get the user's avatar URL.
+     * Returns Google avatar if available, otherwise returns null.
+     *
+     * @return string|null
+     */
+    public function getAvatarUrl(): ?string
+    {
+        return $this->avatar;
+    }
+    
+    /**
+     * Check if user has an avatar.
+     *
+     * @return bool
+     */
+    public function hasAvatar(): bool
+    {
+        return !empty($this->avatar);
+    }
+    
+    /**
+     * Check if user signed up via Google.
+     *
+     * @return bool
+     */
+    public function isGoogleUser(): bool
+    {
+        return !empty($this->google_id);
+    }
 
     /**
      * The attributes that should be hidden for serialization.

@@ -142,6 +142,9 @@ class CartController extends Controller
     {
         // Check if the cart item belongs to the authenticated user
         if ($cartItem->cart->user_id !== Auth::id()) {
+            if ($request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
+            }
             return back()->with('error', 'Unauthorized action.');
         }
         
@@ -151,17 +154,61 @@ class CartController extends Controller
         
         $cartItem->update(['quantity' => $request->quantity]);
         
+        // Calculate updated totals
+        $cart = $cartItem->cart->fresh(['items.book']);
+        $cartCount = $cart->items->sum('quantity');
+        $subtotal = $cart->items->sum(function($item) {
+            return $item->book->price * $item->quantity;
+        });
+        $itemCount = $cart->items->count();
+        
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Cart updated successfully!',
+                'cart_count' => $cartCount,
+                'item_count' => $itemCount,
+                'subtotal' => $subtotal,
+                'subtotal_formatted' => 'RM ' . number_format($subtotal, 2),
+                'item_total' => $cartItem->book->price * $cartItem->quantity,
+                'item_total_formatted' => 'RM ' . number_format($cartItem->book->price * $cartItem->quantity, 2),
+            ]);
+        }
+        
         return back()->with('success', 'Cart updated successfully!');
     }
     
-    public function remove(CartItem $cartItem)
+    public function remove(Request $request, CartItem $cartItem)
     {
         // Check if the cart item belongs to the authenticated user
         if ($cartItem->cart->user_id !== Auth::id()) {
+            if ($request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
+            }
             return back()->with('error', 'Unauthorized action.');
         }
         
+        $cart = $cartItem->cart;
         $cartItem->delete();
+        
+        // Calculate updated totals
+        $cart = $cart->fresh(['items.book']);
+        $cartCount = $cart ? $cart->items->sum('quantity') : 0;
+        $subtotal = $cart ? $cart->items->sum(function($item) {
+            return $item->book->price * $item->quantity;
+        }) : 0;
+        $itemCount = $cart ? $cart->items->count() : 0;
+        
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Item removed from cart.',
+                'cart_count' => $cartCount,
+                'item_count' => $itemCount,
+                'subtotal' => $subtotal,
+                'subtotal_formatted' => 'RM ' . number_format($subtotal, 2),
+            ]);
+        }
         
         return back()->with('success', 'Item removed from cart.');
     }
