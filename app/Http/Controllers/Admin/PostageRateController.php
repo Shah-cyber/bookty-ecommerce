@@ -14,8 +14,15 @@ class PostageRateController extends Controller
     public function __construct(PostageRateService $service)
     {
         $this->service = $service;
+
+        $this->middleware('permission:view postage rates')->only([
+            'index', 'history', 'allHistory', 'verifyIntegrity',
+        ]);
+        $this->middleware('permission:manage postage rates')->only([
+            'create', 'store', 'edit', 'update', 'destroy',
+        ]);
     }
-    
+
     /**
      * Display a listing of the resource.
      */

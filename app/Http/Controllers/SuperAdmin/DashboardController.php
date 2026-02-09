@@ -278,56 +278,64 @@ class DashboardController extends Controller
     }
 
     /**
-     * Get sales data for a given period
+     * Get sales data for a given period (matches Admin dashboard logic)
      */
     public function getSalesData(Request $request)
     {
         $period = $request->get('period', 'this_week');
 
-        $end = now();
+        $end = Carbon::now();
         switch ($period) {
             case 'this_week':
-                $start = now()->startOfWeek();
+                $start = Carbon::now()->startOfWeek();
+                $end = Carbon::now()->endOfDay();
                 $intervalDays = 7;
                 break;
             case 'yesterday':
-                $start = now()->subDay()->startOfDay();
-                $end = now()->subDay()->endOfDay();
+                $start = Carbon::yesterday()->startOfDay();
+                $end = Carbon::yesterday()->endOfDay();
                 $intervalDays = 1;
                 break;
             case 'today':
-                $start = now()->startOfDay();
+                $start = Carbon::today()->startOfDay();
+                $end = Carbon::today()->endOfDay();
                 $intervalDays = 1;
                 break;
             case 'last_30_days':
-                $start = now()->subDays(30);
+                $start = Carbon::now()->subDays(30)->startOfDay();
+                $end = Carbon::now()->endOfDay();
                 $intervalDays = 30;
                 break;
             case 'last_90_days':
-                $start = now()->subDays(90);
+                $start = Carbon::now()->subDays(90)->startOfDay();
+                $end = Carbon::now()->endOfDay();
                 $intervalDays = 90;
                 break;
             case 'last_7_days':
-                $start = now()->subDays(7);
+                $start = Carbon::now()->subDays(7)->startOfDay();
+                $end = Carbon::now()->endOfDay();
                 $intervalDays = 7;
                 break;
             case 'this_month':
-                $start = now()->startOfMonth();
-                $intervalDays = now()->daysInMonth;
+                $start = Carbon::now()->startOfMonth();
+                $end = Carbon::now()->endOfDay();
+                $intervalDays = (int) Carbon::now()->daysInMonth;
                 break;
             case 'last_month':
-                $start = now()->subMonth()->startOfMonth();
-                $end = now()->subMonth()->endOfMonth();
-                $intervalDays = $end->daysInMonth;
+                $start = Carbon::now()->subMonth()->startOfMonth();
+                $end = Carbon::now()->subMonth()->endOfMonth();
+                $intervalDays = (int) $end->daysInMonth;
                 break;
             default:
-                $start = now()->subDays(7);
+                $start = Carbon::now()->subDays(7)->startOfDay();
+                $end = Carbon::now()->endOfDay();
                 $intervalDays = 7;
                 break;
         }
 
         $series = Order::where('status', 'completed')
-            ->whereBetween('created_at', [$start, $end])
+            ->whereDate('created_at', '>=', $start->toDateString())
+            ->whereDate('created_at', '<=', $end->toDateString())
             ->selectRaw('DATE(created_at) as day')
             ->selectRaw('SUM(total_amount) as revenue')
             ->selectRaw('COUNT(*) as orders_count')
@@ -340,10 +348,22 @@ class DashboardController extends Controller
         $orders = [];
         $cursor = (clone $start)->startOfDay();
         $last = (clone $end)->startOfDay();
-        $map = $series->keyBy('day');
+        $map = $series->keyBy(function ($item) {
+            return Carbon::parse($item->day)->toDateString();
+        });
+
+        $isToday = $period === 'today';
+        $isYesterday = $period === 'yesterday';
+
         while ($cursor <= $last) {
             $key = $cursor->toDateString();
-            $labels[] = $cursor->format('d M');
+            if ($isToday && $cursor->isToday()) {
+                $labels[] = 'Today';
+            } elseif ($isYesterday && $cursor->toDateString() === Carbon::yesterday()->toDateString()) {
+                $labels[] = 'Yesterday';
+            } else {
+                $labels[] = $cursor->format('d M');
+            }
             $revenue[] = isset($map[$key]) ? (float) $map[$key]->revenue : 0.0;
             $orders[] = isset($map[$key]) ? (int) $map[$key]->orders_count : 0;
             $cursor->addDay();
@@ -352,13 +372,21 @@ class DashboardController extends Controller
         $totalRevenue = array_sum($revenue);
         $totalOrders = array_sum($orders);
 
-        // Compare with previous equivalent period
-        $prevStart = (clone $start)->subDays($intervalDays);
-        $prevEnd = (clone $start);
+        $prevStart = (clone $start)->subDays($intervalDays)->startOfDay();
+        $prevEnd = (clone $start)->subDay()->endOfDay();
         $prevTotal = Order::where('status', 'completed')
-            ->whereBetween('created_at', [$prevStart, $prevEnd])
+            ->whereDate('created_at', '>=', $prevStart->toDateString())
+            ->whereDate('created_at', '<=', $prevEnd->toDateString())
             ->sum('total_amount');
-        $changePercent = $prevTotal > 0 ? round((($totalRevenue - $prevTotal) / $prevTotal) * 100, 1) : 0.0;
+
+        if ($prevTotal > 0) {
+            $changePercent = round((($totalRevenue - $prevTotal) / $prevTotal) * 100, 1);
+        } elseif ($prevTotal == 0 && $totalRevenue > 0) {
+            $changePercent = 100.0;
+        } else {
+            $changePercent = 0.0;
+        }
+        $changePercent = (float) $changePercent;
 
         return response()->json([
             'labels' => $labels,
@@ -374,37 +402,42 @@ class DashboardController extends Controller
     }
 
     /**
-     * Get top selling books data
+     * Get top selling books data (matches Admin dashboard logic)
      */
     public function getTopSellingBooks(Request $request)
     {
         $period = $request->get('period', 'last_6_months');
 
-        $end = now();
+        $end = Carbon::now();
         switch ($period) {
             case 'yesterday':
-                $start = now()->subDay()->startOfDay();
-                $end = now()->subDay()->endOfDay();
+                $start = Carbon::yesterday()->startOfDay();
+                $end = Carbon::yesterday()->endOfDay();
                 break;
             case 'today':
-                $start = now()->startOfDay();
-                $end = now()->endOfDay();
+                $start = Carbon::today()->startOfDay();
+                $end = Carbon::today()->endOfDay();
                 break;
             case 'last_7_days':
-                $start = now()->subDays(7);
+                $start = Carbon::now()->subDays(7)->startOfDay();
+                $end = Carbon::now()->endOfDay();
                 break;
             case 'last_30_days':
-                $start = now()->subDays(30);
+                $start = Carbon::now()->subDays(30)->startOfDay();
+                $end = Carbon::now()->endOfDay();
                 break;
             case 'last_90_days':
-                $start = now()->subDays(90);
+                $start = Carbon::now()->subDays(90)->startOfDay();
+                $end = Carbon::now()->endOfDay();
                 break;
             case 'last_year':
-                $start = now()->subYear();
+                $start = Carbon::now()->subYear()->startOfDay();
+                $end = Carbon::now()->endOfDay();
                 break;
             case 'last_6_months':
             default:
-                $start = now()->subMonths(6);
+                $start = Carbon::now()->subMonths(6)->startOfDay();
+                $end = Carbon::now()->endOfDay();
                 break;
         }
 
@@ -412,7 +445,8 @@ class DashboardController extends Controller
             ->join('order_items', 'books.id', '=', 'order_items.book_id')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
             ->where('orders.status', 'completed')
-            ->whereBetween('orders.created_at', [$start, $end])
+            ->whereDate('orders.created_at', '>=', $start->toDateString())
+            ->whereDate('orders.created_at', '<=', $end->toDateString())
             ->groupBy('books.id', 'books.title', 'books.price')
             ->selectRaw('SUM(order_items.quantity) as total_sold')
             ->selectRaw('SUM(order_items.quantity * order_items.price) as total_revenue')

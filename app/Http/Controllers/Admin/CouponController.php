@@ -11,6 +11,14 @@ use Illuminate\Support\Str;
 
 class CouponController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view coupons')->only(['index', 'show']);
+        $this->middleware('permission:create coupons')->only(['create', 'store', 'generateCode']);
+        $this->middleware('permission:edit coupons')->only(['edit', 'update', 'toggleActive']);
+        $this->middleware('permission:delete coupons')->only(['destroy']);
+    }
+
     /**
      * Display a listing of the resource.
      */

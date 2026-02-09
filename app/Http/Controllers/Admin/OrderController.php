@@ -9,6 +9,12 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view orders')->only(['index', 'show', 'invoice', 'invoicePdf']);
+        $this->middleware('permission:manage orders')->only(['create', 'store', 'edit', 'update', 'destroy', 'quickUpdate']);
+    }
+
     /**
      * Display a listing of the resource.
      */

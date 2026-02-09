@@ -518,15 +518,31 @@
 
                 if (salesChart) salesChart.destroy();
 
+                // Handle single data point scenario (like "today" or "yesterday")
+                var isSinglePoint = labels.length === 1;
+                
+                // For single point, ensure we have at least 2 points for better visualization
+                var displayLabels = labels;
+                var displayRevenue = revenue;
+                var displayOrders = orders;
+                
+                if (isSinglePoint) {
+                    // Add a starting point at 0 for better visual representation
+                    displayLabels = ['Start', labels[0]];
+                    displayRevenue = [0, revenue[0]];
+                    displayOrders = [0, orders[0]];
+                }
+
                 var options = {
-                    series: [{ name: 'Revenue', data: revenue }],
+                    series: [{ name: 'Revenue', data: displayRevenue }],
                     chart: {
                         height: 300,
                         type: 'area',
                         fontFamily: 'Inter, sans-serif',
                         toolbar: { show: false },
                         zoom: { enabled: false },
-                        animations: { enabled: true, easing: 'easeinout', speed: 800 }
+                        animations: { enabled: true, easing: 'easeinout', speed: 800 },
+                        sparkline: { enabled: false }
                     },
                     colors: ['#7c3aed'],
                     fill: {
@@ -538,44 +554,80 @@
                             stops: [0, 90, 100]
                         }
                     },
-                    dataLabels: { enabled: false },
-                    stroke: { curve: 'smooth', width: 3 },
+                    dataLabels: { 
+                        enabled: false, // Disable data labels to keep chart clean, use tooltips instead
+                        formatter: function(val) {
+                            return val > 0 ? formatRM(val) : '';
+                        }
+                    },
+                    stroke: { 
+                        curve: isSinglePoint ? 'straight' : 'smooth', // Straight line for single point
+                        width: 3 
+                    },
+                    markers: {
+                        size: isSinglePoint ? 6 : 5, // Larger markers for single point, visible markers for all
+                        colors: ['#7c3aed'],
+                        strokeColors: '#fff',
+                        strokeWidth: 2,
+                        hover: { size: 8 },
+                        showNullDataPoints: false
+                    },
                     grid: {
                         show: true,
                         borderColor: isDark ? '#374151' : '#f3f4f6',
                         strokeDashArray: 4,
                         xaxis: { lines: { show: false } },
                         yaxis: { lines: { show: true } },
-                        padding: { top: 0, right: 0, bottom: 0, left: 10 }
+                        padding: { top: isSinglePoint ? 20 : 0, right: 0, bottom: 0, left: 10 }
                     },
                     xaxis: {
-                        categories: labels,
+                        categories: displayLabels,
                         labels: {
                             style: {
                                 colors: isDark ? '#9ca3af' : '#6b7280',
-                                fontSize: '11px'
+                                fontSize: '12px',
+                                fontWeight: isSinglePoint ? 600 : 400
+                            },
+                            formatter: function(value) {
+                                // Hide "Start" label for single point scenarios
+                                return value === 'Start' ? '' : value;
                             }
                         },
                         axisBorder: { show: false },
                         axisTicks: { show: false }
                     },
                     yaxis: {
+                        min: 0,
                         labels: {
                             formatter: function (value) {
-                                return value >= 1000 ? (value / 1000).toFixed(1) + 'k' : value.toFixed(0);
+                                // Format as RM currency
+                                if (value >= 1000000) {
+                                    return 'RM ' + (value / 1000000).toFixed(1) + 'M';
+                                } else if (value >= 1000) {
+                                    return 'RM ' + (value / 1000).toFixed(1) + 'k';
+                                } else {
+                                    return 'RM ' + value.toFixed(0);
+                                }
                             },
                             style: {
                                 colors: isDark ? '#9ca3af' : '#6b7280',
                                 fontSize: '11px'
                             }
-                        }
+                        },
+                        forceNiceScale: true // Ensure nice round numbers on Y-axis
                     },
                     tooltip: {
                         theme: isDark ? 'dark' : 'light',
                         custom: function({ series, seriesIndex, dataPointIndex, w }) {
-                            var date = labels[dataPointIndex] || '';
-                            var rev = series[seriesIndex][dataPointIndex] || 0;
-                            var ord = orders[dataPointIndex] || 0;
+                            // Skip tooltip for the "Start" point
+                            if (isSinglePoint && dataPointIndex === 0) {
+                                return '';
+                            }
+                            
+                            var actualIndex = isSinglePoint ? dataPointIndex - 1 : dataPointIndex;
+                            var date = labels[actualIndex] || '';
+                            var rev = revenue[actualIndex] || 0;
+                            var ord = orders[actualIndex] || 0;
                             var aov = ord > 0 ? (rev / ord) : 0;
                             return '<div class="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">' +
                                 '<div class="font-semibold text-gray-900 dark:text-white mb-1">' + date + '</div>' +

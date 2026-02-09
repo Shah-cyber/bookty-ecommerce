@@ -8,6 +8,11 @@ use Illuminate\Http\Request;
 
 class CustomerController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view customers')->only(['index', 'show']);
+    }
+
     /**
      * Display a listing of the resource.
      */

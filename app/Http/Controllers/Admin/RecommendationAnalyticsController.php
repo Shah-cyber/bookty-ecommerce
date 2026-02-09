@@ -16,6 +16,8 @@ class RecommendationAnalyticsController extends Controller
 {
     public function __construct(private RecommendationService $recommendationService)
     {
+        $this->middleware('permission:view recommendations')->only(['index', 'userDetails']);
+        $this->middleware('permission:manage recommendations')->only(['settings', 'updateSettings', 'clearCache']);
     }
 
     /**

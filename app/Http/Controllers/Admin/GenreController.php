@@ -9,6 +9,14 @@ use Illuminate\Support\Str;
 
 class GenreController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view genres')->only(['index', 'show']);
+        $this->middleware('permission:create genres')->only(['create', 'store']);
+        $this->middleware('permission:edit genres')->only(['edit', 'update']);
+        $this->middleware('permission:delete genres')->only(['destroy']);
+    }
+
     /**
      * Display a listing of the resource.
      */

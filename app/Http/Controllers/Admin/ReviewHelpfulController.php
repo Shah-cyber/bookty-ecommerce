@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\DB;
 
 class ReviewHelpfulController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view reviews')->only(['index']);
+    }
+
     /**
      * Display helpful analytics dashboard.
      */

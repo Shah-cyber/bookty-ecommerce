@@ -21,6 +21,16 @@ use App\Exports\SalesReportExport;
 
 class ReportsController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view reports')->only([
+            'index', 'sales', 'customers', 'inventory', 'promotions', 'shipping', 'profitability',
+        ]);
+        $this->middleware('permission:export reports')->only([
+            'exportSales', 'exportCustomers', 'exportProfitability',
+        ]);
+    }
+
     /**
      * Display the reports dashboard.
      */
