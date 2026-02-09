@@ -12,6 +12,14 @@ use Illuminate\Support\Facades\DB;
 
 class FlashSaleController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view flash sales')->only(['index', 'show']);
+        $this->middleware('permission:create flash sales')->only(['create', 'store']);
+        $this->middleware('permission:edit flash sales')->only(['edit', 'update', 'toggleActive', 'getBooksByGenre']);
+        $this->middleware('permission:delete flash sales')->only(['destroy']);
+    }
+
     /**
      * Display a listing of the resource.
      */

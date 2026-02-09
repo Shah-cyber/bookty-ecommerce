@@ -9,6 +9,12 @@ use Illuminate\Support\Facades\Auth;
 
 class ReviewReportController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view reviews')->only(['index', 'show']);
+        $this->middleware('permission:manage reviews')->only(['updateStatus']);
+    }
+
     /**
      * Display a listing of review reports.
      */

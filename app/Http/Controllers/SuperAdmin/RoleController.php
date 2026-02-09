@@ -40,8 +40,9 @@ class RoleController extends Controller
         
         $role = Role::create(['name' => $request->name, 'guard_name' => 'web']);
         
-        if ($request->has('permissions')) {
-            $role->syncPermissions($request->permissions);
+        if ($request->has('permissions') && !empty($request->permissions)) {
+            $permissions = Permission::whereIn('id', $request->permissions)->get();
+            $role->syncPermissions($permissions);
         }
         
         return redirect()->route('superadmin.roles.index')
@@ -91,8 +92,9 @@ class RoleController extends Controller
         $role->name = $request->name;
         $role->save();
         
-        if ($request->has('permissions')) {
-            $role->syncPermissions($request->permissions);
+        if ($request->has('permissions') && !empty($request->permissions)) {
+            $permissions = Permission::whereIn('id', $request->permissions)->get();
+            $role->syncPermissions($permissions);
         } else {
             $role->syncPermissions([]);
         }

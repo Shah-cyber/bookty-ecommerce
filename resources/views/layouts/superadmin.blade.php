@@ -294,6 +294,9 @@
         </div>
     </div>
     
+    <!-- ApexCharts (required for dashboard charts) -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.46.0/dist/apexcharts.min.js"></script>
+
     <!-- Session Flash Message Handler -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {

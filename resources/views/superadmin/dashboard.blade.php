@@ -572,8 +572,18 @@
 
                 if (salesChart) salesChart.destroy();
 
+                var isSinglePoint = labels.length === 1;
+                var displayLabels = labels;
+                var displayRevenue = revenue;
+                var displayOrders = orders;
+                if (isSinglePoint) {
+                    displayLabels = ['Start', labels[0]];
+                    displayRevenue = [0, revenue[0]];
+                    displayOrders = [0, orders[0]];
+                }
+
                 var options = {
-                    series: [{ name: 'Revenue', data: revenue }],
+                    series: [{ name: 'Revenue', data: displayRevenue }],
                     chart: {
                         height: 300,
                         type: 'area',
@@ -593,42 +603,60 @@
                         }
                     },
                     dataLabels: { enabled: false },
-                    stroke: { curve: 'smooth', width: 3 },
+                    stroke: { curve: isSinglePoint ? 'straight' : 'smooth', width: 3 },
+                    markers: {
+                        size: isSinglePoint ? 6 : 5,
+                        colors: ['#6366f1'],
+                        strokeColors: '#fff',
+                        strokeWidth: 2,
+                        hover: { size: 8 },
+                        showNullDataPoints: false
+                    },
                     grid: {
                         show: true,
                         borderColor: isDark ? '#374151' : '#f3f4f6',
                         strokeDashArray: 4,
                         xaxis: { lines: { show: false } },
-                        yaxis: { lines: { show: true } }
+                        yaxis: { lines: { show: true } },
+                        padding: { top: isSinglePoint ? 20 : 0, right: 0, bottom: 0, left: 10 }
                     },
                     xaxis: {
-                        categories: labels,
+                        categories: displayLabels,
                         labels: {
                             style: {
                                 colors: isDark ? '#9ca3af' : '#6b7280',
                                 fontSize: '11px'
+                            },
+                            formatter: function(value) {
+                                return value === 'Start' ? '' : value;
                             }
                         },
                         axisBorder: { show: false },
                         axisTicks: { show: false }
                     },
                     yaxis: {
+                        min: 0,
                         labels: {
                             formatter: function (value) {
-                                return value >= 1000 ? (value / 1000).toFixed(1) + 'k' : value.toFixed(0);
+                                if (value >= 1000000) return 'RM ' + (value / 1000000).toFixed(1) + 'M';
+                                if (value >= 1000) return 'RM ' + (value / 1000).toFixed(1) + 'k';
+                                return 'RM ' + value.toFixed(0);
                             },
                             style: {
                                 colors: isDark ? '#9ca3af' : '#6b7280',
                                 fontSize: '11px'
                             }
-                        }
+                        },
+                        forceNiceScale: true
                     },
                     tooltip: {
                         theme: isDark ? 'dark' : 'light',
                         custom: function({ series, seriesIndex, dataPointIndex, w }) {
-                            var date = labels[dataPointIndex] || '';
-                            var rev = series[seriesIndex][dataPointIndex] || 0;
-                            var ord = orders[dataPointIndex] || 0;
+                            if (isSinglePoint && dataPointIndex === 0) return '';
+                            var actualIndex = isSinglePoint ? dataPointIndex - 1 : dataPointIndex;
+                            var date = labels[actualIndex] || '';
+                            var rev = revenue[actualIndex] || 0;
+                            var ord = orders[actualIndex] || 0;
                             var aov = ord > 0 ? (rev / ord) : 0;
                             return '<div class="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">' +
                                 '<div class="font-semibold text-gray-900 dark:text-white mb-1">' + date + '</div>' +
@@ -819,22 +847,40 @@
                 });
             });
 
-            // User Registration Chart
+            // User Registration Chart (load real data via API after content is visible)
             var userRegChart = null;
             function initUserRegistrationChart() {
                 var el = document.getElementById('user-registration-chart');
                 if (!el || typeof ApexCharts === 'undefined') return;
 
+                var year = new Date().getFullYear();
+                fetch("{{ route('superadmin.api.user-registrations') }}?year=" + year, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(function(res) { return res.json(); })
+                .then(function(json) {
+                    renderUserRegistrationChart(json.data || Array(12).fill(0));
+                })
+                .catch(function(err) {
+                    console.error('Error loading user registrations:', err);
+                    renderUserRegistrationChart(Array(12).fill(0));
+                });
+            }
+
+            function renderUserRegistrationChart(registrationData) {
+                var el = document.getElementById('user-registration-chart');
+                if (!el || typeof ApexCharts === 'undefined') return;
+
                 var isDark = document.documentElement.classList.contains('dark');
                 var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                var registrationData = Array(12).fill(0);
-                
-                @foreach($userRegistrations as $data)
-                    registrationData[{{ $data->month - 1 }}] = {{ $data->count }};
-                @endforeach
+                var data = Array.isArray(registrationData) && registrationData.length >= 12
+                    ? registrationData.slice(0, 12)
+                    : Array(12).fill(0);
+
+                if (userRegChart) userRegChart.destroy();
 
                 var options = {
-                    series: [{ name: 'New Users', data: registrationData }],
+                    series: [{ name: 'New Users', data: data }],
                     chart: {
                         type: 'bar',
                         height: 280,
@@ -869,19 +915,24 @@
                         axisTicks: { show: false }
                     },
                     yaxis: {
+                        min: 0,
                         labels: {
                             style: {
                                 colors: isDark ? '#9ca3af' : '#6b7280',
                                 fontSize: '11px'
                             }
-                        }
+                        },
+                        forceNiceScale: true
                     },
                     tooltip: {
                         theme: isDark ? 'dark' : 'light',
-                        y: {
-                            formatter: function(val) {
-                                return val + ' new users';
-                            }
+                        custom: function({ series, seriesIndex, dataPointIndex, w }) {
+                            var month = months[dataPointIndex] || '';
+                            var val = series[seriesIndex][dataPointIndex] != null ? series[seriesIndex][dataPointIndex] : 0;
+                            return '<div class="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">' +
+                                '<div class="font-semibold text-gray-900 dark:text-white mb-1">' + month + '</div>' +
+                                '<div class="text-sm text-gray-600 dark:text-gray-300">' + val + ' new user' + (val !== 1 ? 's' : '') + '</div>' +
+                                '</div>';
                         }
                     }
                 };

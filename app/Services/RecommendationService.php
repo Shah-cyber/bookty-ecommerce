@@ -214,9 +214,9 @@ class RecommendationService
             $scores[$bookId] = ($scores[$bookId] ?? 0) + ($collabWeight * $score);
         }
 
-        // Step 5: QUALITY THRESHOLD FILTER
+        // Step 5: QUALITY THRESHOLD FILTER (strict: 0.3)
         // Only recommend books above minimum quality threshold
-        // 
+        //
         // Purpose:
         // - Prevents low-quality recommendations from appearing
         // - Ensures user sees only meaningful matches
@@ -228,12 +228,13 @@ class RecommendationService
         // Fetch books and attach total score
         $bookIds = array_keys($scores);
         if (empty($bookIds)) {
-            // If no books pass the threshold, return fallback recommendations
+            // No books pass the threshold; return fallback recommendations
             return $this->fallbackRecommendations($limit);
         }
 
         $books = Book::with(['genre', 'tropes'])
             ->whereIn('id', $bookIds)
+            ->where('stock', '>', 0)  // Ensure books are in stock
             ->get()
             ->map(function (Book $book) use ($scores) {
                 $book->score = round($scores[$book->id] ?? 0, 4);
@@ -255,6 +256,11 @@ class RecommendationService
             $books = $books->concat($supplementBooks)->values();
         }
 
+        // Final safety check: if still empty, return fallback
+        if ($books->isEmpty()) {
+            return $this->fallbackRecommendations($limit);
+        }
+
         return $books->take($limit);
     }
 
@@ -272,7 +278,22 @@ class RecommendationService
             ->get();
 
         if ($books->isEmpty()) {
-            return collect();
+            // If no books at all, try without stock filter (for testing/debugging)
+            $books = Book::with(['genre', 'tropes'])
+                ->orderByDesc('created_at')
+                ->take($limit)
+                ->get();
+            
+            if ($books->isEmpty()) {
+                return collect();
+            }
+            
+            // Return with default scores
+            return $books->map(function (Book $book) {
+                $book->score = 0.5; // Default fallback score
+                $book->is_fallback = true;
+                return $book;
+            })->take($limit)->values();
         }
 
         // Calculate popularity-based scores
@@ -280,7 +301,10 @@ class RecommendationService
         
         return $books->map(function (Book $book) use ($maxReviews) {
             // Score based on popularity (reviews) and recency
-            $popularityScore = $maxReviews > 0 ? ($book->reviews_count / $maxReviews) * 0.7 : 0;
+            // If no reviews, give base score of 0.3 + recency bonus
+            $popularityScore = $maxReviews > 0 
+                ? ($book->reviews_count / $maxReviews) * 0.7 
+                : 0.3; // Base score when no reviews exist
             $recencyBonus = $book->created_at && $book->created_at->gt(now()->subDays(30)) ? 0.3 : 0.1;
             $book->score = round(min($popularityScore + $recencyBonus, 1.0), 4);
             $book->is_fallback = true; // Mark as fallback recommendation

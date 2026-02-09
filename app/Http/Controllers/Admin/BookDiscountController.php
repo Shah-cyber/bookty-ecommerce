@@ -10,6 +10,14 @@ use Illuminate\Support\Facades\DB;
 
 class BookDiscountController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view discounts')->only(['index', 'show']);
+        $this->middleware('permission:create discounts')->only(['create', 'store']);
+        $this->middleware('permission:edit discounts')->only(['edit', 'update', 'toggleActive']);
+        $this->middleware('permission:delete discounts')->only(['destroy']);
+    }
+
     /**
      * Display a listing of the resource.
      */

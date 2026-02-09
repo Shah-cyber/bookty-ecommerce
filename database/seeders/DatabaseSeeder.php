@@ -18,6 +18,9 @@ class DatabaseSeeder extends Seeder
             SettingsSeeder::class,
             GenreSeeder::class,
             TropeSeeder::class,
+            RecommendationDummyDataSeeder::class,
+            RolesAndPermissionsSeeder::class,
+            
         ]);
     }
 }

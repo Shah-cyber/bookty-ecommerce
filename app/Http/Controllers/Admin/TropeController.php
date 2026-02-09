@@ -9,6 +9,14 @@ use Illuminate\Support\Str;
 
 class TropeController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view tropes')->only(['index', 'show']);
+        $this->middleware('permission:create tropes')->only(['create', 'store']);
+        $this->middleware('permission:edit tropes')->only(['edit', 'update']);
+        $this->middleware('permission:delete tropes')->only(['destroy']);
+    }
+
     /**
      * Display a listing of the resource.
      */

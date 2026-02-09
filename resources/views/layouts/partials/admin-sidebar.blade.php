@@ -42,6 +42,7 @@
         </div>
 
         {{-- Books --}}
+        @can('view books')
         <a href="{{ route('admin.books.index') }}"
             class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
                   {{ request()->routeIs('admin.books.*')
@@ -54,8 +55,10 @@
             </div>
             <span class="font-medium">Books</span>
         </a>
+        @endcan
 
         {{-- Genres --}}
+        @can('view genres')
         <a href="{{ route('admin.genres.index') }}"
             class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
                   {{ request()->routeIs('admin.genres.*')
@@ -68,8 +71,10 @@
             </div>
             <span class="font-medium">Genres</span>
         </a>
+        @endcan
 
         {{-- Tropes --}}
+        @can('view tropes')
         <a href="{{ route('admin.tropes.index') }}"
             class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
                   {{ request()->routeIs('admin.tropes.*')
@@ -82,6 +87,7 @@
             </div>
             <span class="font-medium">Tropes</span>
         </a>
+        @endcan
 
         {{-- Section: Sales & Users --}}
         <div class="pt-6 pb-2">
@@ -89,6 +95,7 @@
         </div>
 
         {{-- Orders --}}
+        @can('view orders')
         <a href="{{ route('admin.orders.index') }}"
             class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
                   {{ request()->routeIs('admin.orders.*')
@@ -101,8 +108,10 @@
             </div>
             <span class="font-medium">Orders</span>
         </a>
+        @endcan
 
         {{-- Customers --}}
+        @can('view customers')
         <a href="{{ route('admin.customers.index') }}"
             class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
                   {{ request()->routeIs('admin.customers.*')
@@ -115,8 +124,10 @@
             </div>
             <span class="font-medium">Customers</span>
         </a>
+        @endcan
 
         {{-- Promotions (Collapsible) --}}
+        @canany(['view discounts', 'view coupons', 'view flash sales'])
         @php
             $promotionsActive = request()->routeIs('admin.discounts.*') || request()->routeIs('admin.coupons.*') || request()->routeIs('admin.flash-sales.*');
         @endphp
@@ -139,25 +150,33 @@
                 </svg>
             </button>
             <div x-show="open" x-collapse class="mt-1 ml-4 pl-8 border-l-2 border-gray-100 dark:border-gray-800 space-y-1">
+                @can('view discounts')
                 <a href="{{ route('admin.discounts.index') }}"
                     class="block px-4 py-2.5 text-sm rounded-lg transition-colors duration-200
                           {{ request()->routeIs('admin.discounts.*') ? 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800' }}">
                     Book Discounts
                 </a>
+                @endcan
+                @can('view coupons')
                 <a href="{{ route('admin.coupons.index') }}"
                     class="block px-4 py-2.5 text-sm rounded-lg transition-colors duration-200
                           {{ request()->routeIs('admin.coupons.*') ? 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800' }}">
                     Coupon Codes
                 </a>
+                @endcan
+                @can('view flash sales')
                 <a href="{{ route('admin.flash-sales.index') }}"
                     class="block px-4 py-2.5 text-sm rounded-lg transition-colors duration-200
                           {{ request()->routeIs('admin.flash-sales.*') ? 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800' }}">
                     Flash Sales
                 </a>
+                @endcan
             </div>
         </div>
+        @endcanany
 
         {{-- Reports (Collapsible) --}}
+        @can('view reports')
         @php $reportsActive = request()->routeIs('admin.reports.*'); @endphp
         <div x-data="{ open: {{ $reportsActive ? 'true' : 'false' }} }">
             <button @click="open = !open"
@@ -210,8 +229,10 @@
                 </a>
             </div>
         </div>
+        @endcan
 
         {{-- Recommendations --}}
+        @can('view recommendations')
         <a href="{{ route('admin.recommendations.index') }}"
             class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
                   {{ request()->routeIs('admin.recommendations.*')
@@ -224,8 +245,10 @@
             </div>
             <span class="font-medium">Recommendations</span>
         </a>
+        @endcan
 
         {{-- Reviews (Collapsible) --}}
+        @can('view reviews')
         @php $reviewsActive = request()->routeIs('admin.reviews.*'); @endphp
         <div x-data="{ open: {{ $reviewsActive ? 'true' : 'false' }} }">
             <button @click="open = !open"
@@ -258,8 +281,10 @@
                 </a>
             </div>
         </div>
+        @endcan
 
         {{-- Settings (Collapsible) --}}
+        @canany(['view settings', 'view postage rates'])
         @php $settingsActive = request()->routeIs('admin.settings.*') || request()->routeIs('admin.postage-rates.*'); @endphp
         <div x-data="{ open: {{ $settingsActive ? 'true' : 'false' }} }">
             <button @click="open = !open"
@@ -281,11 +306,14 @@
                 </svg>
             </button>
             <div x-show="open" x-collapse class="mt-1 ml-4 pl-8 border-l-2 border-gray-100 dark:border-gray-800 space-y-1">
+                @can('view settings')
                 <a href="{{ route('admin.settings.system') }}"
                     class="block px-4 py-2.5 text-sm rounded-lg transition-colors duration-200
                           {{ request()->routeIs('admin.settings.system') ? 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800' }}">
                     System Preference
                 </a>
+                @endcan
+                @can('view postage rates')
                 <a href="{{ route('admin.postage-rates.index') }}"
                     class="block px-4 py-2.5 text-sm rounded-lg transition-colors duration-200
                           {{ request()->routeIs('admin.postage-rates.index') || request()->routeIs('admin.postage-rates.edit') || request()->routeIs('admin.postage-rates.create') ? 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800' }}">
@@ -296,8 +324,10 @@
                           {{ request()->routeIs('admin.postage-rates.all-history') || request()->routeIs('admin.postage-rates.history') ? 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800' }}">
                     Postage Rate History
                 </a>
+                @endcan
             </div>
         </div>
+        @endcanany
 
         {{-- Section: Quick Access --}}
         <div class="pt-6 pb-2">

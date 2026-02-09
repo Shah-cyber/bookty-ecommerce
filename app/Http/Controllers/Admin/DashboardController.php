@@ -137,41 +137,48 @@ class DashboardController extends Controller
     {
         $period = $request->get('period', 'last_6_months');
 
-        // Resolve date range
-        $end = now();
+        // Resolve date range - ensure we use Carbon instances and proper timezone
+        $end = Carbon::now();
         switch ($period) {
             case 'yesterday':
-                $start = now()->subDay()->startOfDay();
-                $end = now()->subDay()->endOfDay();
+                $start = Carbon::yesterday()->startOfDay();
+                $end = Carbon::yesterday()->endOfDay();
                 break;
             case 'today':
-                $start = now()->startOfDay();
-                $end = now()->endOfDay();
+                $start = Carbon::today()->startOfDay();
+                $end = Carbon::today()->endOfDay();
                 break;
             case 'last_7_days':
-                $start = now()->subDays(7);
+                $start = Carbon::now()->subDays(7)->startOfDay();
+                $end = Carbon::now()->endOfDay();
                 break;
             case 'last_30_days':
-                $start = now()->subDays(30);
+                $start = Carbon::now()->subDays(30)->startOfDay();
+                $end = Carbon::now()->endOfDay();
                 break;
             case 'last_90_days':
-                $start = now()->subDays(90);
+                $start = Carbon::now()->subDays(90)->startOfDay();
+                $end = Carbon::now()->endOfDay();
                 break;
             case 'last_year':
-                $start = now()->subYear();
+                $start = Carbon::now()->subYear()->startOfDay();
+                $end = Carbon::now()->endOfDay();
                 break;
             case 'last_6_months':
             default:
-                $start = now()->subMonths(6);
+                $start = Carbon::now()->subMonths(6)->startOfDay();
+                $end = Carbon::now()->endOfDay();
                 break;
         }
 
         // Get best selling books using SUM of quantity (not COUNT)
+        // Filter by completed orders created within the date range
         $books = Book::select('books.id', 'books.title', 'books.price')
             ->join('order_items', 'books.id', '=', 'order_items.book_id')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
             ->where('orders.status', 'completed')
-            ->whereBetween('orders.created_at', [$start, $end])
+            ->whereDate('orders.created_at', '>=', $start->toDateString())
+            ->whereDate('orders.created_at', '<=', $end->toDateString())
             ->groupBy('books.id', 'books.title', 'books.price')
             ->selectRaw('SUM(order_items.quantity) as total_sold')
             ->selectRaw('SUM(order_items.quantity * order_items.price) as total_revenue')
@@ -210,41 +217,51 @@ class DashboardController extends Controller
     {
         $period = $request->get('period', 'this_week');
 
-        $end = now();
+        // Resolve date range - ensure we use Carbon instances and proper timezone
+        $end = Carbon::now();
         switch ($period) {
             case 'this_week':
-                $start = now()->startOfWeek();
+                $start = Carbon::now()->startOfWeek();
+                $end = Carbon::now()->endOfDay();
                 $intervalDays = 7;
                 break;
             case 'yesterday':
-                $start = now()->subDay()->startOfDay();
-                $end = now()->subDay()->endOfDay();
+                $start = Carbon::yesterday()->startOfDay();
+                $end = Carbon::yesterday()->endOfDay();
                 $intervalDays = 1;
                 break;
             case 'today':
-                $start = now()->startOfDay();
+                $start = Carbon::today()->startOfDay();
+                $end = Carbon::today()->endOfDay();
                 $intervalDays = 1;
                 break;
             case 'last_30_days':
-                $start = now()->subDays(30);
+                $start = Carbon::now()->subDays(30)->startOfDay();
+                $end = Carbon::now()->endOfDay();
                 $intervalDays = 30;
                 break;
             case 'last_90_days':
-                $start = now()->subDays(90);
+                $start = Carbon::now()->subDays(90)->startOfDay();
+                $end = Carbon::now()->endOfDay();
                 $intervalDays = 90;
                 break;
             case 'last_7_days':
-                $start = now()->subDays(7);
+                $start = Carbon::now()->subDays(7)->startOfDay();
+                $end = Carbon::now()->endOfDay();
                 $intervalDays = 7;
                 break;
             default:
-                $start = now()->subDays(7);
+                $start = Carbon::now()->subDays(7)->startOfDay();
+                $end = Carbon::now()->endOfDay();
                 $intervalDays = 7;
                 break;
         }
 
+        // Filter by completed orders created within the date range
+        // Use DATE() function to group by day, ensuring timezone consistency
         $series = Order::where('status', 'completed')
-            ->whereBetween('created_at', [$start, $end])
+            ->whereDate('created_at', '>=', $start->toDateString())
+            ->whereDate('created_at', '<=', $end->toDateString())
             ->selectRaw('DATE(created_at) as day')
             ->selectRaw('SUM(total_amount) as revenue')
             ->selectRaw('COUNT(*) as orders_count')
@@ -257,10 +274,28 @@ class DashboardController extends Controller
         $orders = [];
         $cursor = (clone $start)->startOfDay();
         $last = (clone $end)->startOfDay();
-        $map = $series->keyBy('day');
+        $map = $series->keyBy(function($item) {
+            // Ensure consistent date format for key matching
+            return Carbon::parse($item->day)->toDateString();
+        });
+        
+        // Determine if this is a single-day period
+        $isSingleDay = $start->toDateString() === $end->toDateString();
+        $isToday = $period === 'today';
+        $isYesterday = $period === 'yesterday';
+        
         while ($cursor <= $last) {
             $key = $cursor->toDateString();
-            $labels[] = $cursor->format('d M');
+            
+            // Format label - use friendly names for single-day periods
+            if ($isToday && $cursor->isToday()) {
+                $labels[] = 'Today';
+            } elseif ($isYesterday && $cursor->toDateString() === Carbon::yesterday()->toDateString()) {
+                $labels[] = 'Yesterday';
+            } else {
+                $labels[] = $cursor->format('d M');
+            }
+            
             $revenue[] = isset($map[$key]) ? (float) $map[$key]->revenue : 0.0;
             $orders[] = isset($map[$key]) ? (int) $map[$key]->orders_count : 0;
             $cursor->addDay();
@@ -270,12 +305,40 @@ class DashboardController extends Controller
         $totalOrders = array_sum($orders);
 
         // Compare with previous equivalent period
-        $prevStart = (clone $start)->subDays($intervalDays);
-        $prevEnd = (clone $start);
+        // Calculate the previous period date range
+        $prevStart = (clone $start)->subDays($intervalDays)->startOfDay();
+        $prevEnd = (clone $start)->subDay()->endOfDay();
+        
+        // Ensure we don't overlap with current period
+        if ($prevEnd >= $start) {
+            $prevEnd = (clone $start)->subDay()->endOfDay();
+        }
+        
         $prevTotal = Order::where('status', 'completed')
-            ->whereBetween('created_at', [$prevStart, $prevEnd])
+            ->whereDate('created_at', '>=', $prevStart->toDateString())
+            ->whereDate('created_at', '<=', $prevEnd->toDateString())
             ->sum('total_amount');
-        $changePercent = $prevTotal > 0 ? round((($totalRevenue - $prevTotal) / $prevTotal) * 100, 1) : 0.0;
+        
+        // Calculate percentage change with proper handling of all scenarios
+        $changePercent = 0.0;
+        
+        if ($prevTotal > 0) {
+            // Normal calculation: ((current - previous) / previous) * 100
+            $changePercent = round((($totalRevenue - $prevTotal) / $prevTotal) * 100, 1);
+        } elseif ($prevTotal == 0 && $totalRevenue > 0) {
+            // Previous period had 0, current period has revenue = new sales/infinite increase
+            // Show as 100% increase to indicate growth from zero baseline
+            $changePercent = 100.0;
+        } elseif ($prevTotal == 0 && $totalRevenue == 0) {
+            // Both periods have 0 revenue - no change
+            $changePercent = 0.0;
+        } elseif ($prevTotal < 0) {
+            // Edge case: negative previous (shouldn't happen, but handle it)
+            $changePercent = 0.0;
+        }
+        
+        // Ensure we return a numeric value
+        $changePercent = (float) $changePercent;
 
         return response()->json([
             'labels' => $labels,

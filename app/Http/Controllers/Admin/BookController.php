@@ -13,6 +13,14 @@ use Illuminate\Support\Str;
 
 class BookController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view books')->only(['index', 'show']);
+        $this->middleware('permission:create books')->only(['create', 'store']);
+        $this->middleware('permission:edit books')->only(['edit', 'update', 'quickUpdate']);
+        $this->middleware('permission:delete books')->only(['destroy']);
+    }
+
     /**
      * Display a listing of the resource.
      */
