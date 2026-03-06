@@ -8,6 +8,7 @@ use App\Services\RecommendationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+
 class RecommendationController extends Controller
 {
     public function __construct(private RecommendationService $service)
