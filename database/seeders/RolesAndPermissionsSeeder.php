@@ -18,91 +18,190 @@ class RolesAndPermissionsSeeder extends Seeder
         // Reset cached roles and permissions
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // Create permissions
-        // Book permissions
-        Permission::create(['name' => 'view books']);
-        Permission::create(['name' => 'create books']);
-        Permission::create(['name' => 'edit books']);
-        Permission::create(['name' => 'delete books']);
-        
-        // Genre permissions
-        Permission::create(['name' => 'view genres']);
-        Permission::create(['name' => 'create genres']);
-        Permission::create(['name' => 'edit genres']);
-        Permission::create(['name' => 'delete genres']);
-        
-        // Trope permissions
-        Permission::create(['name' => 'view tropes']);
-        Permission::create(['name' => 'create tropes']);
-        Permission::create(['name' => 'edit tropes']);
-        Permission::create(['name' => 'delete tropes']);
-        
-        // Order permissions
-        Permission::create(['name' => 'view orders']);
-        Permission::create(['name' => 'manage orders']);
-        
-        // Customer permissions
-        Permission::create(['name' => 'view customers']);
-        
-        // Admin permissions
-        Permission::create(['name' => 'access admin']);
-        Permission::create(['name' => 'manage admins']);
-        
-        // Create roles and assign permissions
-        
-        // Customer role
-        $customerRole = Role::create(['name' => 'customer']);
-        $customerRole->givePermissionTo([
-            'view books',
-        ]);
-        
-        // Admin role
-        $adminRole = Role::create(['name' => 'admin']);
-        $adminRole->givePermissionTo([
-            'access admin',
+        /*
+         * Permissions
+         * Keep this list in sync with the permissions you manage from the SuperAdmin UI,
+         * so new deployments (and fresh databases) get the same capabilities as local.
+         */
+
+        $permissions = [
+            // Book permissions
             'view books',
             'create books',
             'edit books',
             'delete books',
+
+            // Genre permissions
             'view genres',
             'create genres',
             'edit genres',
             'delete genres',
+
+            // Trope permissions
             'view tropes',
             'create tropes',
             'edit tropes',
             'delete tropes',
+
+            // Order permissions
+            'view orders',
+            'manage orders',
+
+            // Customer permissions
+            'view customers',
+
+            // Discount permissions
+            'view discounts',
+            'create discounts',
+            'edit discounts',
+            'delete discounts',
+
+            // Coupon permissions
+            'view coupons',
+            'create coupons',
+            'edit coupons',
+            'delete coupons',
+
+            // Flash sale permissions
+            'view flash sales',
+            'create flash sales',
+            'edit flash sales',
+            'delete flash sales',
+
+            // Reports
+            'view reports',
+            'export reports',
+
+            // Reviews
+            'view reviews',
+            'manage reviews',
+
+            // Settings
+            'view settings',
+            'edit settings',
+
+            // Postage rates
+            'view postage rates',
+            'manage postage rates',
+
+            // Recommendations
+            'view recommendations',
+            'manage recommendations',
+
+            // Admin / system permissions
+            'access admin',
+            'manage admins',
+            'manage roles',
+            'manage permissions',
+            'manage system settings',
+            'access superadmin',
+        ];
+
+        foreach ($permissions as $name) {
+            Permission::firstOrCreate([
+                'name' => $name,
+                'guard_name' => 'web',
+            ]);
+        }
+
+        // Create roles and assign permissions to match your current local database
+
+        // Customer role
+        $customerRole = Role::firstOrCreate(
+            ['name' => 'customer', 'guard_name' => 'web']
+        );
+        $customerRole->syncPermissions([
+            'view books',
+        ]);
+
+        // Admin role
+        $adminRole = Role::firstOrCreate(
+            ['name' => 'admin', 'guard_name' => 'web']
+        );
+        $adminRole->syncPermissions([
+            'access admin',
+
+            // Books
+            'view books',
+            'create books',
+            'edit books',
+            'delete books',
+
+            // Genres
+            'view genres',
+            'create genres',
+            'edit genres',
+            'delete genres',
+
+            // Tropes
+            'view tropes',
+            'create tropes',
+            'edit tropes',
+            'delete tropes',
+
+            // Orders & customers
             'view orders',
             'manage orders',
             'view customers',
+
+            // Promotions
+            'view discounts',
+            'create discounts',
+            'edit discounts',
+            'delete discounts',
+
+            'view coupons',
+            'create coupons',
+            'edit coupons',
+            'delete coupons',
+
+            'view flash sales',
+            'create flash sales',
+            'edit flash sales',
+            'delete flash sales',
+
+            // Reports
+            'view reports',
+            'export reports',
+
+            // Reviews
+            'view reviews',
+            'manage reviews',
+
+            // Settings & postage
+            'view settings',
+            'view postage rates',
+            'manage postage rates',
+
+            // Recommendations
+            'view recommendations',
+            'manage recommendations',
         ]);
-        
-        // Superadmin role
-        $superadminRole = Role::create(['name' => 'superadmin']);
-        $superadminRole->givePermissionTo(Permission::all());
-        
-        // Create default superadmin user
-        $superadmin = User::create([
-            'name' => 'Super Admin',
-            'email' => 'superadmin@bookty.com',
-            'password' => bcrypt('password'),
-        ]);
+
+        // Superadmin role – full access to everything
+        $superadminRole = Role::firstOrCreate(
+            ['name' => 'superadmin', 'guard_name' => 'web']
+        );
+        $superadminRole->syncPermissions(Permission::all());
+
+        // Create / update default users and assign roles
+
+        $superadmin = User::firstOrCreate(
+            ['email' => 'superadmin@bookty.com'],
+            ['name' => 'Super Admin', 'password' => bcrypt('password')]
+        );
         $superadmin->assignRole($superadminRole);
-        
-        // Create default admin user
-        $admin = User::create([
-            'name' => 'Admin User',
-            'email' => 'admin@bookty.com',
-            'password' => bcrypt('password'),
-        ]);
+
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@bookty.com'],
+            ['name' => 'Admin User', 'password' => bcrypt('password')]
+        );
         $admin->assignRole($adminRole);
-        
-        // Create default customer user
-        $customer = User::create([
-            'name' => 'Customer User',
-            'email' => 'customer@bookty.com',
-            'password' => bcrypt('password'),
-        ]);
+
+        $customer = User::firstOrCreate(
+            ['email' => 'customer@bookty.com'],
+            ['name' => 'Customer User', 'password' => bcrypt('password')]
+        );
         $customer->assignRole($customerRole);
     }
 }

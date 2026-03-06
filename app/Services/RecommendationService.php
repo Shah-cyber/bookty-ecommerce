@@ -168,7 +168,7 @@ class RecommendationService
      * 
      * Weighted fusion chosen because:
      * - Simple and interpretable
-     * - Easy to tune weights via admin panel
+     * - Easy to tune weights 
      * - Both signals preserved in final score
      * - Proven effective in industry (Netflix, Amazon)
      */
